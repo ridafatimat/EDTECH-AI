@@ -1,0 +1,80 @@
+# =========================
+# Python virtual environments
+# =========================
+.venv/
+venv/
+env/
+
+# =========================
+# Secrets / environment variables
+# =========================
+.env
+.env.*
+!.env.example
+
+# =========================
+# Python cache
+# =========================
+__pycache__/
+*.py[cod]
+*.pyo
+
+# =========================
+# IDE / OS
+# =========================
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# =========================
+# Testing/cache
+# =========================
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# =========================
+# Jupyter
+# =========================
+.ipynb_checkpoints/
+
+# =========================
+# Build files
+# =========================
+build/
+dist/
+*.egg-info/
+
+# =========================
+# Logs
+# =========================
+*.log
+
+# =========================
+# Generated test outputs
+# =========================
+Agent_1/test_outputs/
+test_outputs/
+
+# =========================
+# Private/raw transcript data
+# =========================
+Agent_1/test_data/*.docx
+Agent_1/test_data/*.pdf
+
+# Generated preprocessing/chunking outputs
+Agent_1/test_data/*_cleaned.txt
+Agent_1/test_data/*_chunks.json
+
+# =========================
+# Local model/cache folders
+# =========================
+.cache/
+huggingface/
+models/
+
+# Local/private test datasets
+Agent_1/test_data/
