@@ -78,3 +78,6 @@ models/
 
 # Local/private test datasets
 Agent_1/test_data/
+
+# Local archive files
+*.zip
