@@ -214,7 +214,6 @@ class SemanticChunker:
         r"\blet'?s move on\b",
         r"\bmove on to\b",
         r"\bmoving on\b",
-        r"\bbefore (?:we )?move on\b",
         r"\blet'?s talk about\b",
         r"\blet'?s discuss\b",
         r"\blet'?s look at\b",
