@@ -4,11 +4,15 @@ from pathlib import Path
 
 from docx import Document
 
-# IMPORTANT:
-# Module 1 uses ONLY lightweight deterministic preprocessing.
-# hybrid_preprocessor.py is NOT used here.
+# Module 1
 from app.services.transcript_preprocessor import (
     preprocess_transcript,
+)
+
+# Module 2
+from app.services.semantic_chunker import (
+    SemanticChunker,
+    SemanticChunkingConfig,
 )
 
 
@@ -28,12 +32,18 @@ DOCX_PATH = (
     / "Transcript 1.docx"
 )
 
-# Cleaned transcript produced by Module 1.
-# Module 2 uses this file during independent testing.
+# Module 1 output
 CLEANED_OUTPUT_PATH = (
     PROJECT_ROOT
     / "test_data"
     / "transcript_1_cleaned.txt"
+)
+
+# Module 2 readable chunks output
+CHUNKS_OUTPUT_PATH = (
+    PROJECT_ROOT
+    / "test_data"
+    / "transcript_1_chunks.txt"
 )
 
 
@@ -60,9 +70,8 @@ def extract_text_from_docx(
     paragraphs: list[str] = []
 
     for paragraph in document.paragraphs:
-        text = (
-            paragraph.text.strip()
-        )
+
+        text = paragraph.text.strip()
 
         if text:
             paragraphs.append(
@@ -90,13 +99,10 @@ def save_cleaned_transcript(
     output_path: Path,
 ) -> None:
     """
-    Save the Module 1 cleaned transcript so Module 2 can be
-    tested independently.
+    Save Module 1 cleaned transcript.
     """
 
-    cleaned_text = (
-        cleaned_text.strip()
-    )
+    cleaned_text = cleaned_text.strip()
 
     if not cleaned_text:
         raise ValueError(
@@ -115,19 +121,217 @@ def save_cleaned_transcript(
 
 
 # =========================================================
+# SAVE READABLE CHUNKS
+# =========================================================
+
+def save_chunks_to_text(
+    chunking_result,
+    output_path: Path,
+) -> None:
+    """
+    Save Module 2 chunks in a readable Notepad text file.
+
+    The output includes:
+    - chunk number
+    - word count
+    - sentence count
+    - sentence ranges
+    - boundary reason
+    - similarity
+    - transition strength
+    - overlap
+    - complete chunk text
+    """
+
+    output_path.parent.mkdir(
+        parents=True,
+        exist_ok=True,
+    )
+
+    lines: list[str] = []
+
+    # Overall result summary
+    lines.append(
+        "=" * 100
+    )
+
+    lines.append(
+        "TRANSCRIPT 1 — MODULE 2 CHUNKS"
+    )
+
+    lines.append(
+        "=" * 100
+    )
+
+    lines.append(
+        f"Embedding model: "
+        f"{chunking_result.embedding_model}"
+    )
+
+    lines.append(
+        f"Semantic threshold: "
+        f"{chunking_result.semantic_threshold}"
+    )
+
+    lines.append(
+        f"Total transcript words: "
+        f"{chunking_result.total_words}"
+    )
+
+    lines.append(
+        f"Total transcript sentences: "
+        f"{chunking_result.total_sentences}"
+    )
+
+    lines.append(
+        f"Semantic units: "
+        f"{chunking_result.semantic_unit_count}"
+    )
+
+    lines.append(
+        f"Final chunks: "
+        f"{len(chunking_result.chunks)}"
+    )
+
+    lines.append("")
+
+    # Individual chunks
+    for chunk in chunking_result.chunks:
+
+        lines.append(
+            "=" * 100
+        )
+
+        lines.append(
+            f"CHUNK {chunk.chunk_id}"
+        )
+
+        lines.append(
+            "=" * 100
+        )
+
+        lines.append(
+            f"Words: "
+            f"{chunk.word_count}"
+        )
+
+        lines.append(
+            f"Sentences: "
+            f"{chunk.sentence_count}"
+        )
+
+        lines.append(
+            f"Text sentence range: "
+            f"{chunk.start_sentence}"
+            f" -> "
+            f"{chunk.end_sentence}"
+        )
+
+        lines.append(
+            f"Core sentence range: "
+            f"{chunk.core_start_sentence}"
+            f" -> "
+            f"{chunk.core_end_sentence}"
+        )
+
+        lines.append(
+            f"Boundary reason: "
+            f"{chunk.boundary_reason}"
+        )
+
+        lines.append(
+            f"Boundary similarity: "
+            f"{chunk.boundary_similarity}"
+        )
+
+        lines.append(
+            f"Transition strength: "
+            f"{chunk.boundary_transition_strength}"
+        )
+
+        lines.append(
+            f"Overlap words: "
+            f"{chunk.overlap_word_count}"
+        )
+
+        lines.append(
+            "-" * 100
+        )
+
+        lines.append(
+            chunk.text
+        )
+
+        lines.append("")
+
+    output_path.write_text(
+        "\n".join(lines),
+        encoding="utf-8",
+    )
+
+
+# =========================================================
+# BUILD MODULE 2 CHUNKER
+# =========================================================
+
+def build_chunker() -> SemanticChunker:
+    """
+    Create Module 2 using the finalised MiniLM configuration.
+    """
+
+    config = SemanticChunkingConfig(
+
+        # Final chunk sizes
+        min_chunk_words=150,
+        target_chunk_words=325,
+        max_chunk_words=550,
+
+        # Strong transition can create a smaller chunk
+        strong_transition_min_words=80,
+
+        # Temporary semantic unit size
+        semantic_unit_words=60,
+
+        # Adaptive threshold configuration
+        boundary_percentile=15.0,
+        threshold_floor=0.10,
+        threshold_ceiling=0.45,
+
+        # Soft transition rules
+        soft_transition_margin=0.10,
+        soft_transition_similarity_ceiling=0.35,
+
+        # Overlap only after max-size split
+        max_size_overlap_words=45,
+        max_size_overlap_sentences=2,
+    )
+
+    return SemanticChunker(
+        config=config
+    )
+
+
+# =========================================================
 # MAIN TEST
 # =========================================================
 
 def main() -> None:
-    print("=" * 100)
+
     print(
-        "AGENT 1 - TRANSCRIPT 1 "
-        "LIGHTWEIGHT PREPROCESSING TEST"
+        "=" * 100
     )
-    print("=" * 100)
+
+    print(
+        "AGENT 1 — TRANSCRIPT 1 "
+        "PREPROCESSING + CHUNKING TEST"
+    )
+
+    print(
+        "=" * 100
+    )
 
     # =====================================================
-    # STEP 1: EXTRACT TEXT
+    # STEP 1: EXTRACT DOCX TEXT
     # =====================================================
 
     raw_text = extract_text_from_docx(
@@ -135,122 +339,204 @@ def main() -> None:
     )
 
     print(
-        "\nRAW EXTRACTED TRANSCRIPT:"
+        "\nRAW TRANSCRIPT EXTRACTED"
     )
-    print("-" * 100)
-    print(
-        raw_text
-    )
-
-    # =====================================================
-    # STEP 2: RUN MODULE 1 PREPROCESSING
-    # =====================================================
-
-    result = preprocess_transcript(
-        raw_text=raw_text
-    )
-
-    # =====================================================
-    # STEP 3: SHOW CLEANED TRANSCRIPT
-    # =====================================================
 
     print(
-        "\n\nFINAL CLEANED TRANSCRIPT:"
-    )
-    print("-" * 100)
-
-    print(
-        result.cleaned_text
+        f"Characters: {len(raw_text)}"
     )
 
     # =====================================================
-    # STEP 4: SAVE CLEANED TRANSCRIPT
+    # STEP 2: MODULE 1 PREPROCESSING
+    # =====================================================
+
+    preprocessing_result = (
+        preprocess_transcript(
+            raw_text=raw_text
+        )
+    )
+
+    cleaned_text = (
+        preprocessing_result
+        .cleaned_text
+        .strip()
+    )
+
+    # =====================================================
+    # STEP 3: SAVE CLEANED TRANSCRIPT
     # =====================================================
 
     save_cleaned_transcript(
-        cleaned_text=(
-            result.cleaned_text
-        ),
-        output_path=(
-            CLEANED_OUTPUT_PATH
-        ),
+        cleaned_text=cleaned_text,
+        output_path=CLEANED_OUTPUT_PATH,
     )
 
     print(
-        "\nCleaned transcript saved to:"
+        "\nMODULE 1 COMPLETED"
     )
 
     print(
-        CLEANED_OUTPUT_PATH
+        f"Cleaned transcript saved to:\n"
+        f"{CLEANED_OUTPUT_PATH}"
     )
 
     # =====================================================
-    # STEP 5: PREPROCESSING STATS
+    # STEP 4: MODULE 1 STATS
     # =====================================================
 
+    stats = preprocessing_result.stats
+
     print(
-        "\n\nMODULE 1 RESULT:"
+        "\nMODULE 1 STATISTICS"
     )
-    print("-" * 100)
+
+    print(
+        "-" * 100
+    )
 
     print(
         f"Original characters: "
-        f"{result.stats.original_characters}"
+        f"{stats.original_characters}"
     )
 
     print(
-        f"Final characters: "
-        f"{result.stats.cleaned_characters}"
+        f"Cleaned characters: "
+        f"{stats.cleaned_characters}"
     )
 
     print(
         f"Timestamps removed: "
-        f"{result.stats.timestamps_removed}"
+        f"{stats.timestamps_removed}"
     )
 
     print(
         f"Speaker labels removed: "
-        f"{result.stats.speaker_labels_removed}"
+        f"{stats.speaker_labels_removed}"
     )
 
     print(
         f"Fillers removed: "
-        f"{result.stats.fillers_removed}"
+        f"{stats.fillers_removed}"
     )
 
     print(
         f"Artefacts removed: "
-        f"{result.stats.artefacts_removed}"
+        f"{stats.artefacts_removed}"
     )
 
     print(
         f"Uncertainty markers removed: "
-        f"{result.stats.uncertainty_markers_removed}"
+        f"{stats.uncertainty_markers_removed}"
     )
 
     print(
         f"Repeated words removed: "
-        f"{result.stats.repeated_words_removed}"
+        f"{stats.repeated_words_removed}"
     )
 
     print(
         f"Repeated sentences removed: "
-        f"{result.stats.repeated_sentences_removed}"
+        f"{stats.repeated_sentences_removed}"
     )
 
     # =====================================================
-    # STEP 6: WARNINGS
+    # STEP 5: MODULE 2 CHUNKING
+    # =====================================================
+
+    chunker = build_chunker()
+
+    chunking_result = chunker.chunk(
+        cleaned_transcript=cleaned_text
+    )
+
+    # =====================================================
+    # STEP 6: SAVE CHUNKS TO NOTEPAD FILE
+    # =====================================================
+
+    save_chunks_to_text(
+        chunking_result=chunking_result,
+        output_path=CHUNKS_OUTPUT_PATH,
+    )
+
+    print(
+        "\nMODULE 2 COMPLETED"
+    )
+
+    print(
+        f"Chunks saved to:\n"
+        f"{CHUNKS_OUTPUT_PATH}"
+    )
+
+    # =====================================================
+    # STEP 7: MODULE 2 SUMMARY
     # =====================================================
 
     print(
-        "\nWARNINGS:"
+        "\nMODULE 2 SUMMARY"
     )
 
-    if result.warnings:
-        for warning in result.warnings:
+    print(
+        "-" * 100
+    )
+
+    print(
+        f"Embedding model: "
+        f"{chunking_result.embedding_model}"
+    )
+
+    print(
+        f"Semantic threshold: "
+        f"{chunking_result.semantic_threshold}"
+    )
+
+    print(
+        f"Transcript words: "
+        f"{chunking_result.total_words}"
+    )
+
+    print(
+        f"Transcript sentences: "
+        f"{chunking_result.total_sentences}"
+    )
+
+    print(
+        f"Semantic units: "
+        f"{chunking_result.semantic_unit_count}"
+    )
+
+    print(
+        f"Final chunks: "
+        f"{len(chunking_result.chunks)}"
+    )
+
+    # Show compact chunk summary in terminal
+    for chunk in chunking_result.chunks:
+
+        print(
+            "\n"
+            f"Chunk {chunk.chunk_id}: "
+            f"{chunk.word_count} words | "
+            f"{chunk.sentence_count} sentences | "
+            f"{chunk.boundary_reason}"
+        )
+
+    # =====================================================
+    # WARNINGS
+    # =====================================================
+
+    print(
+        "\nMODULE 1 WARNINGS"
+    )
+
+    if preprocessing_result.warnings:
+
+        for warning in (
+            preprocessing_result.warnings
+        ):
             print(
                 f"- {warning}"
             )
+
     else:
         print(
             "- None"
@@ -265,7 +551,8 @@ def main() -> None:
     )
 
     print(
-        "TRANSCRIPT 1 PREPROCESSING TEST COMPLETED"
+        "TRANSCRIPT 1 PREPROCESSING "
+        "AND CHUNKING TEST COMPLETED"
     )
 
     print(
