@@ -121,7 +121,7 @@ ARTEFACT_PATTERN = re.compile(
             | keyboard\s+noise
             | typing
             | chair\s+noise
-            | notification\s+sound
+            | notification\s+(?:sound|noise)
             | notification
             | audio\s+glitch
             | microphone\s+noise
@@ -161,8 +161,13 @@ UNCERTAINTY_PATTERN = re.compile(
 
 # Conservative fillers only.
 FILLER_PATTERN = re.compile(
-    r"\b(?:um+|uh+|erm+|hmm+)\b[,\s]*",
-    re.IGNORECASE,
+    r"""
+    (?<![\w-])
+    (?:um+|uh+|erm+|hmm+)
+    (?![\w-])
+    (?:[ \t]*,[ \t]*)?
+    """,
+    re.IGNORECASE | re.VERBOSE,
 )
 
 
@@ -344,25 +349,31 @@ def compress_repeated_sentences(
     text: str,
 ) -> tuple[str, int]:
     """
-    Remove consecutive duplicate sentences.
+    Remove consecutive duplicate sentences across the whole transcript.
+
+    This works both:
+    - within the same line/paragraph
+    - across adjacent lines/paragraphs
 
     Example:
 
-        Okay. Okay. Okay.
+        Okay.
+        Okay.
 
     becomes:
 
         Okay.
 
-    Also handles long repeated ASR sentences such as:
-
-        I'm going to start with the first one.
-        I'm going to start with the first one.
-        ...
+    Paragraph structure is preserved as much as possible; only the
+    duplicate sentence itself is removed.
     """
 
     removed_count = 0
     cleaned_lines: list[str] = []
+
+    # Keep this outside the line loop so duplicate sentences split
+    # across separate DOCX paragraphs can still be detected.
+    previous_normalized: str | None = None
 
     for line in text.splitlines():
 
@@ -378,8 +389,6 @@ def compress_repeated_sentences(
         )
 
         kept_sentences: list[str] = []
-
-        previous_normalized: str | None = None
 
         for sentence in sentences:
 
