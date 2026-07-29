@@ -18,9 +18,28 @@ TransitionStrength = Literal[
     "soft",
 ]
 
+SegmentPosition = Literal[
+    "single",
+    "start",
+    "middle",
+    "end",
+]
+
+ContinuationReason = Literal[
+    "max_size_split",
+]
+
 
 class TranscriptChunk(BaseModel):
-    """One meaningful section of a lesson transcript."""
+    """
+    One meaningful section of a lesson transcript.
+
+    `chunk_id` identifies the physical chunk.
+
+    `segment_id` identifies the larger logical lesson segment. Multiple
+    chunks can belong to the same segment when the chunker is forced to
+    split a long, continuous discussion because of max_chunk_words.
+    """
 
     chunk_id: int = Field(ge=1)
 
@@ -44,8 +63,7 @@ class TranscriptChunk(BaseModel):
     # Why this chunk ended.
     boundary_reason: BoundaryReason
 
-    # Similarity between the semantic units around the ending boundary.
-    # Lower similarity normally indicates a stronger semantic change.
+    # Similarity between semantic units around the ending boundary.
     boundary_similarity: float | None = Field(
         default=None,
         ge=-1.0,
@@ -56,11 +74,53 @@ class TranscriptChunk(BaseModel):
     boundary_transition_strength: TransitionStrength | None = None
 
     # Context repeated from the previous chunk.
-    # This is non-zero only when the PREVIOUS chunk ended because of max_size.
+    # Non-zero only when the previous chunk ended because of max_size.
     overlap_word_count: int = Field(
         default=0,
         ge=0,
     )
+
+    # -------------------------------------------------------------
+    # Logical segment and continuation metadata
+    # -------------------------------------------------------------
+
+    # Human-readable logical segment identifier.
+    segment_id: str = Field(
+        default="segment_001",
+        min_length=1,
+    )
+
+    # First physical chunk belonging to this logical segment.
+    segment_root_chunk_id: int = Field(
+        default=1,
+        ge=1,
+    )
+
+    # Position of this chunk inside its logical segment.
+    segment_chunk_index: int = Field(
+        default=1,
+        ge=1,
+    )
+
+    # Total number of physical chunks in the logical segment.
+    segment_chunk_count: int = Field(
+        default=1,
+        ge=1,
+    )
+
+    segment_position: SegmentPosition = "single"
+
+    # True when this chunk continues the same logical segment because
+    # the previous physical chunk was forcibly split at max size.
+    is_continuation: bool = False
+
+    # Immediate previous physical chunk continued by this chunk.
+    continuation_of_chunk_id: int | None = Field(
+        default=None,
+        ge=1,
+    )
+
+    continuation_reason: ContinuationReason | None = None
 
 
 class ChunkingResult(BaseModel):
@@ -72,12 +132,19 @@ class ChunkingResult(BaseModel):
     total_words: int = Field(ge=0)
     semantic_unit_count: int = Field(ge=0)
 
+    # Number of logical lesson segments after grouping forced
+    # max-size continuations.
+    segment_count: int = Field(
+        default=0,
+        ge=0,
+    )
+
     embedding_model: str
 
     # Actual semantic threshold calculated for this transcript.
     semantic_threshold: float
 
-    # Effective configuration is included for reproducible testing.
+    # Effective configuration for reproducible testing.
     min_chunk_words: int = Field(ge=1)
     target_chunk_words: int = Field(ge=1)
     max_chunk_words: int = Field(ge=1)
