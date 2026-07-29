@@ -56,3 +56,10 @@ Agent_1/test_data/*_chunks.json
 
 # Logs
 *.log
+
+@"
+
+# Track SQLAlchemy source models
+!app/db/models/
+!app/db/models/*.py
+"@ | Add-Content .gitignore
