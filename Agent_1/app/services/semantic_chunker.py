@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+from collections import defaultdict
 from dataclasses import dataclass
 
 import numpy as np
@@ -30,43 +31,31 @@ class SemanticChunkingConfig:
     - respect explicit lesson transitions
     - prevent excessively large chunks
     - use overlap only when size forces a split
+    - add deterministic logical segment metadata
     - use MiniLM-specific adaptive similarity thresholds
     """
 
-    # Final chunk sizes.
     min_chunk_words: int = 150
     target_chunk_words: int = 325
     max_chunk_words: int = 550
 
-    # A strong transition may justify a smaller chunk.
     strong_transition_min_words: int = 80
-
-    # Temporary contextual units used only for semantic comparison.
     semantic_unit_words: int = 60
 
-    # Lowest similarity region considered for semantic boundaries.
     boundary_percentile: float = 15.0
-
-    # MiniLM produces a different cosine-similarity distribution from Qwen.
-    # Keep the threshold adaptive, but stop extreme values.
     threshold_floor: float = 0.10
     threshold_ceiling: float = 0.45
 
-    # Soft transition phrases should not automatically split a chunk.
-    # They need a semantic drop as well.
     soft_transition_margin: float = 0.10
     soft_transition_similarity_ceiling: float = 0.35
 
-    # Boundary ranking weights.
     size_penalty_weight: float = 0.12
     strong_transition_bonus: float = 0.10
     soft_transition_bonus: float = 0.04
 
-    # Context overlap is used ONLY after a forced max-size split.
     max_size_overlap_words: int = 45
     max_size_overlap_sentences: int = 2
 
-    # Module 2 uses MiniLM for fast semantic comparison.
     embedding_model: str = CHUNKING_EMBEDDING_MODEL
 
     def __post_init__(self) -> None:
@@ -159,7 +148,8 @@ class _ChunkPlan:
     """
     Non-overlapping/core chunk boundaries.
 
-    Overlap is added only while materializing final chunks.
+    Overlap and logical segment metadata are added while materializing
+    final TranscriptChunk objects.
     """
 
     start_unit: int
@@ -179,20 +169,21 @@ class SemanticChunker:
     Module 2.
 
     Input:
-        Lightly cleaned transcript from Module 1.
+        Final cleaned transcript from Module 1.
 
     Output:
-        Meaningful, guarded transcript chunks.
+        Meaningful physical chunks plus logical segment metadata.
+
+    A logical segment may contain multiple physical chunks when a long,
+    continuous discussion must be split only because of max_chunk_words.
 
     This module does NOT:
-    - identify AQA topics
-    - search the syllabus
+    - identify topics
+    - map to the AQA syllabus
     - call an LLM
-    - store transcript embeddings in Qdrant
+    - store transcript embeddings
     """
 
-    # Strong transitions are highly likely to represent a genuine
-    # lesson/chapter/topic/question change.
     STRONG_TRANSITION_PATTERNS = (
         r"\bnext (?:chapter|topic|concept|section|question)\b",
         r"\bthe next (?:chapter|topic|concept|section|question)\b",
@@ -201,15 +192,12 @@ class SemanticChunker:
         r"\bchapter (?:number )?\d+\b",
         r"\bnew (?:chapter|topic|concept|section)\b",
         r"\bmove on to (?:the )?(?:next )?(?:chapter|topic|concept|section)\b",
-
-        # Explicit new-question / new-part signals.
         r"\blet'?s move on to (?:the )?next (?:thing|one|question)\b",
         r"\bmove on to (?:the )?next (?:thing|one|question)\b",
         r"\blet'?s look at (?:the )?next question\b",
         r"\blet'?s go to (?:the )?next question\b",
     )
 
-    # Soft transitions are only supporting evidence.
     SOFT_TRANSITION_PATTERNS = (
         r"\blet'?s move on\b",
         r"\bmove on to\b",
@@ -240,7 +228,7 @@ class SemanticChunker:
         self,
         cleaned_transcript: str,
     ) -> ChunkingResult:
-        """Convert a cleaned transcript into meaningful semantic chunks."""
+        """Convert a cleaned transcript into guarded semantic chunks."""
 
         if not isinstance(
             cleaned_transcript,
@@ -250,9 +238,7 @@ class SemanticChunker:
                 "cleaned_transcript must be a string."
             )
 
-        cleaned_transcript = (
-            cleaned_transcript.strip()
-        )
+        cleaned_transcript = cleaned_transcript.strip()
 
         if not cleaned_transcript:
             raise ValueError(
@@ -297,6 +283,14 @@ class SemanticChunker:
                 boundary_similarity=None,
                 boundary_transition_strength=None,
                 overlap_word_count=0,
+                segment_id="segment_001",
+                segment_root_chunk_id=1,
+                segment_chunk_index=1,
+                segment_chunk_count=1,
+                segment_position="single",
+                is_continuation=False,
+                continuation_of_chunk_id=None,
+                continuation_reason=None,
             )
 
             return self._build_result(
@@ -307,27 +301,20 @@ class SemanticChunker:
                 semantic_threshold=self.config.threshold_ceiling,
             )
 
-        # MiniLM embeddings for fast neighbour comparison.
         unit_embeddings = embed_texts(
             [
                 unit.text
                 for unit in units
             ],
-            model_name=(
-                self.config.embedding_model
-            ),
+            model_name=self.config.embedding_model,
         )
 
-        similarities = (
-            self._neighbour_similarities(
-                unit_embeddings
-            )
+        similarities = self._neighbour_similarities(
+            unit_embeddings
         )
 
-        semantic_threshold = (
-            self._calculate_threshold(
-                similarities
-            )
+        semantic_threshold = self._calculate_threshold(
+            similarities
         )
 
         boundaries = self._detect_boundaries(
@@ -364,6 +351,13 @@ class SemanticChunker:
         cleaned_transcript: str,
         semantic_threshold: float,
     ) -> ChunkingResult:
+        segment_count = len(
+            {
+                chunk.segment_id
+                for chunk in chunks
+            }
+        )
+
         return ChunkingResult(
             chunks=chunks,
             total_sentences=len(sentences),
@@ -371,22 +365,15 @@ class SemanticChunker:
                 cleaned_transcript
             ),
             semantic_unit_count=len(units),
-            embedding_model=(
-                self.config.embedding_model
-            ),
+            segment_count=segment_count,
+            embedding_model=self.config.embedding_model,
             semantic_threshold=round(
                 semantic_threshold,
                 4,
             ),
-            min_chunk_words=(
-                self.config.min_chunk_words
-            ),
-            target_chunk_words=(
-                self.config.target_chunk_words
-            ),
-            max_chunk_words=(
-                self.config.max_chunk_words
-            ),
+            min_chunk_words=self.config.min_chunk_words,
+            target_chunk_words=self.config.target_chunk_words,
+            max_chunk_words=self.config.max_chunk_words,
             max_size_overlap_words=(
                 self.config.max_size_overlap_words
             ),
@@ -403,8 +390,8 @@ class SemanticChunker:
         """
         Lightweight sentence segmentation.
 
-        A period inside text such as array.length is not split because
-        there is no whitespace after that period.
+        A period inside `array.length` is not split because there is no
+        whitespace after that period.
         """
 
         text = text.replace(
@@ -443,29 +430,17 @@ class SemanticChunker:
         self,
         sentence: str,
     ) -> str | None:
-        """
-        Detect whether a sentence begins a likely transition.
-
-        Strong patterns are checked first.
-        """
-
         head = sentence[:220].lower()
 
         if any(
-            re.search(
-                pattern,
-                head,
-            )
+            re.search(pattern, head)
             for pattern
             in self.STRONG_TRANSITION_PATTERNS
         ):
             return "strong"
 
         if any(
-            re.search(
-                pattern,
-                head,
-            )
+            re.search(pattern, head)
             for pattern
             in self.SOFT_TRANSITION_PATTERNS
         ):
@@ -481,13 +456,6 @@ class SemanticChunker:
         self,
         sentences: list[str],
     ) -> list[_SemanticUnit]:
-        """
-        Create contextual units for embedding comparison.
-
-        A transition sentence starts a fresh semantic unit so the
-        transition cannot be buried in the middle of another unit.
-        """
-
         units: list[_SemanticUnit] = []
 
         buffer: list[str] = []
@@ -525,10 +493,8 @@ class SemanticChunker:
         for sentence_index, sentence in enumerate(
             sentences
         ):
-            transition_strength = (
-                self._transition_strength(
-                    sentence
-                )
+            transition_strength = self._transition_strength(
+                sentence
             )
 
             if transition_strength and buffer:
@@ -537,21 +503,14 @@ class SemanticChunker:
                 )
 
             if not buffer:
-                start_sentence = (
-                    sentence_index
-                )
+                start_sentence = sentence_index
                 buffer_transition_strength = (
                     transition_strength
                 )
 
-            buffer.append(
+            buffer.append(sentence)
+            buffer_words += self._word_count(
                 sentence
-            )
-
-            buffer_words += (
-                self._word_count(
-                    sentence
-                )
             )
 
             if (
@@ -567,7 +526,6 @@ class SemanticChunker:
                 len(sentences) - 1
             )
 
-        # Merge only a tiny non-transition tail.
         if len(units) >= 2:
             minimum_tail = max(
                 15,
@@ -578,10 +536,8 @@ class SemanticChunker:
             last = units[-1]
 
             if (
-                last.word_count
-                < minimum_tail
-                and last.transition_strength
-                is None
+                last.word_count < minimum_tail
+                and last.transition_strength is None
             ):
                 previous = units[-2]
 
@@ -618,8 +574,6 @@ class SemanticChunker:
     def _neighbour_similarities(
         embeddings: np.ndarray,
     ) -> np.ndarray:
-        """Cosine similarity between neighbouring normalized embeddings."""
-
         if len(embeddings) < 2:
             return np.array(
                 [],
@@ -640,17 +594,8 @@ class SemanticChunker:
         self,
         similarities: np.ndarray,
     ) -> float:
-        """
-        Calculate a MiniLM-specific adaptive threshold.
-
-        The transcript's own similarity distribution drives the threshold.
-        The floor/ceiling only prevent pathological values.
-        """
-
         if len(similarities) == 0:
-            return (
-                self.config.threshold_ceiling
-            )
+            return self.config.threshold_ceiling
 
         percentile_value = float(
             np.percentile(
@@ -676,13 +621,6 @@ class SemanticChunker:
         self,
         semantic_threshold: float,
     ) -> float:
-        """
-        Soft transitions need more evidence than text alone.
-
-        Their allowed similarity is only slightly above the semantic
-        threshold and never above the configured ceiling.
-        """
-
         return min(
             self.config.soft_transition_similarity_ceiling,
             semantic_threshold
@@ -699,21 +637,10 @@ class SemanticChunker:
         similarities: np.ndarray,
         semantic_threshold: float,
     ) -> dict[int, _Boundary]:
-        """
-        Find candidate boundaries.
+        boundaries: dict[int, _Boundary] = {}
 
-        A boundary key represents the unit index AFTER which a split may occur.
-        """
-
-        boundaries: dict[
-            int,
-            _Boundary,
-        ] = {}
-
-        soft_threshold = (
-            self._soft_transition_threshold(
-                semantic_threshold
-            )
+        soft_threshold = self._soft_transition_threshold(
+            semantic_threshold
         )
 
         for index, similarity_value in enumerate(
@@ -728,24 +655,19 @@ class SemanticChunker:
                 <= semantic_threshold
             )
 
-            next_unit = (
-                units[index + 1]
-            )
+            next_unit = units[index + 1]
 
             transition_strength = (
                 next_unit.transition_strength
             )
 
             strong_transition = (
-                transition_strength
-                == "strong"
+                transition_strength == "strong"
             )
 
             soft_transition = (
-                transition_strength
-                == "soft"
-                and similarity
-                <= soft_threshold
+                transition_strength == "soft"
+                and similarity <= soft_threshold
             )
 
             transition_boundary = (
@@ -766,16 +688,10 @@ class SemanticChunker:
                 reason = (
                     "semantic_shift+transition_phrase"
                 )
-
             elif transition_boundary:
-                reason = (
-                    "transition_phrase"
-                )
-
+                reason = "transition_phrase"
             else:
-                reason = (
-                    "semantic_shift"
-                )
+                reason = "semantic_shift"
 
             boundaries[index] = _Boundary(
                 unit_index=index,
@@ -800,15 +716,6 @@ class SemanticChunker:
         similarities: np.ndarray,
         boundaries: dict[int, _Boundary],
     ) -> list[_ChunkPlan]:
-        """
-        Build non-overlapping core chunk plans.
-
-        Important:
-        even when the remaining text already fits under max_chunk_words,
-        we still inspect meaningful boundaries before deciding to keep the
-        whole tail as one final chunk.
-        """
-
         prefix_words = [0]
 
         for unit in units:
@@ -827,28 +734,19 @@ class SemanticChunker:
             )
 
         plans: list[_ChunkPlan] = []
-
         start = 0
         number_of_units = len(units)
 
         while start < number_of_units:
-
-            remaining_words = (
-                words_between(
-                    start,
-                    number_of_units - 1,
-                )
+            remaining_words = words_between(
+                start,
+                number_of_units - 1,
             )
 
             candidates: list[
-                tuple[
-                    int,
-                    _Boundary,
-                ]
+                tuple[int, _Boundary]
             ] = []
 
-            # Search for meaningful boundaries whether or not the
-            # remaining tail already fits under the max size.
             for end_index in range(
                 start,
                 number_of_units - 1,
@@ -872,8 +770,7 @@ class SemanticChunker:
                     continue
 
                 required_min = (
-                    self.config
-                    .strong_transition_min_words
+                    self.config.strong_transition_min_words
                     if (
                         boundary.transition_strength
                         == "strong"
@@ -881,10 +778,7 @@ class SemanticChunker:
                     else self.config.min_chunk_words
                 )
 
-                if (
-                    current_words
-                    < required_min
-                ):
+                if current_words < required_min:
                     continue
 
                 words_after = words_between(
@@ -892,7 +786,6 @@ class SemanticChunker:
                     number_of_units - 1,
                 )
 
-                # Avoid deliberately creating a tiny final tail.
                 if (
                     0
                     < words_after
@@ -908,22 +801,17 @@ class SemanticChunker:
                 )
 
             if candidates:
-
                 def candidate_score(
                     candidate: tuple[
                         int,
                         _Boundary,
                     ],
                 ) -> float:
-                    end_index, boundary = (
-                        candidate
-                    )
+                    end_index, boundary = candidate
 
-                    current_words = (
-                        words_between(
-                            start,
-                            end_index,
-                        )
+                    current_words = words_between(
+                        start,
+                        end_index,
                     )
 
                     size_distance = abs(
@@ -939,8 +827,7 @@ class SemanticChunker:
                     score = (
                         boundary.similarity
                         + (
-                            self.config
-                            .size_penalty_weight
+                            self.config.size_penalty_weight
                             * size_penalty
                         )
                     )
@@ -950,17 +837,14 @@ class SemanticChunker:
                         == "strong"
                     ):
                         score -= (
-                            self.config
-                            .strong_transition_bonus
+                            self.config.strong_transition_bonus
                         )
-
                     elif (
                         boundary.transition_strength
                         == "soft"
                     ):
                         score -= (
-                            self.config
-                            .soft_transition_bonus
+                            self.config.soft_transition_bonus
                         )
 
                     return score
@@ -975,9 +859,7 @@ class SemanticChunker:
                         start_unit=start,
                         end_unit=end,
                         reason=selected.reason,
-                        similarity=(
-                            selected.similarity
-                        ),
+                        similarity=selected.similarity,
                         transition_strength=(
                             selected.transition_strength
                         ),
@@ -987,8 +869,6 @@ class SemanticChunker:
                 start = end + 1
                 continue
 
-            # If everything left fits and there is no good boundary,
-            # keep it together as the final chunk.
             if (
                 remaining_words
                 <= self.config.max_chunk_words
@@ -1006,19 +886,15 @@ class SemanticChunker:
                 )
                 break
 
-            # No reliable semantic/transition boundary before max size.
-            # Force a split only because max size requires it.
             possible_ends: list[int] = []
 
             for end_index in range(
                 start,
                 number_of_units - 1,
             ):
-                current_words = (
-                    words_between(
-                        start,
-                        end_index,
-                    )
+                current_words = words_between(
+                    start,
+                    end_index,
                 )
 
                 if (
@@ -1027,11 +903,9 @@ class SemanticChunker:
                 ):
                     break
 
-                words_after = (
-                    words_between(
-                        end_index + 1,
-                        number_of_units - 1,
-                    )
+                words_after = words_between(
+                    end_index + 1,
+                    number_of_units - 1,
                 )
 
                 if (
@@ -1047,10 +921,8 @@ class SemanticChunker:
             else:
                 end = start
 
-            similarity: float | None
-
             if end < len(similarities):
-                similarity = float(
+                similarity: float | None = float(
                     similarities[end]
                 )
             else:
@@ -1071,7 +943,7 @@ class SemanticChunker:
         return plans
 
     # -----------------------------------------------------------------
-    # Materialize chunks + selective overlap
+    # Materialize chunks + logical segment metadata
     # -----------------------------------------------------------------
 
     def _materialize_chunks(
@@ -1103,13 +975,11 @@ class SemanticChunker:
 
             overlap_word_count = 0
 
-            # Overlap only after a forced max-size split.
             if (
                 index > 0
                 and plans[
                     index - 1
-                ].reason
-                == "max_size"
+                ].reason == "max_size"
             ):
                 (
                     text_start_sentence,
@@ -1134,10 +1004,8 @@ class SemanticChunker:
                 TranscriptChunk(
                     chunk_id=index + 1,
                     text=text,
-                    word_count=(
-                        self._word_count(
-                            text
-                        )
+                    word_count=self._word_count(
+                        text
                     ),
                     sentence_count=(
                         core_end_sentence
@@ -1179,25 +1047,212 @@ class SemanticChunker:
                 )
             )
 
-        return chunks
+        return self._assign_segment_metadata(
+            chunks=chunks,
+            plans=plans,
+        )
+
+    def _assign_segment_metadata(
+        self,
+        *,
+        chunks: list[TranscriptChunk],
+        plans: list[_ChunkPlan],
+    ) -> list[TranscriptChunk]:
+        """
+        Group physical chunks into deterministic logical segments.
+
+        Safe rule:
+        - A chunk continues the same segment only when the previous
+          chunk ended because of `max_size`.
+        - Semantic and transition boundaries start a new segment.
+
+        This avoids guessing topic identity inside Module 2 while still
+        telling Module 3 which chunks are definitely continuations.
+        """
+
+        if not chunks:
+            return []
+
+        assignments: list[dict[str, object]] = []
+
+        segment_number = 1
+        segment_root_chunk_id = chunks[0].chunk_id
+        segment_chunk_index = 1
+
+        assignments.append(
+            {
+                "segment_number": segment_number,
+                "segment_root_chunk_id": (
+                    segment_root_chunk_id
+                ),
+                "segment_chunk_index": (
+                    segment_chunk_index
+                ),
+                "is_continuation": False,
+                "continuation_of_chunk_id": None,
+                "continuation_reason": None,
+            }
+        )
+
+        for index in range(
+            1,
+            len(chunks),
+        ):
+            previous_plan = plans[
+                index - 1
+            ]
+
+            is_continuation = (
+                previous_plan.reason
+                == "max_size"
+            )
+
+            if is_continuation:
+                segment_chunk_index += 1
+            else:
+                segment_number += 1
+                segment_root_chunk_id = (
+                    chunks[index].chunk_id
+                )
+                segment_chunk_index = 1
+
+            assignments.append(
+                {
+                    "segment_number": segment_number,
+                    "segment_root_chunk_id": (
+                        segment_root_chunk_id
+                    ),
+                    "segment_chunk_index": (
+                        segment_chunk_index
+                    ),
+                    "is_continuation": (
+                        is_continuation
+                    ),
+                    "continuation_of_chunk_id": (
+                        chunks[index - 1].chunk_id
+                        if is_continuation
+                        else None
+                    ),
+                    "continuation_reason": (
+                        "max_size_split"
+                        if is_continuation
+                        else None
+                    ),
+                }
+            )
+
+        counts: dict[int, int] = defaultdict(int)
+
+        for assignment in assignments:
+            counts[
+                int(
+                    assignment[
+                        "segment_number"
+                    ]
+                )
+            ] += 1
+
+        updated_chunks: list[
+            TranscriptChunk
+        ] = []
+
+        for chunk, assignment in zip(
+            chunks,
+            assignments,
+            strict=True,
+        ):
+            segment_number = int(
+                assignment[
+                    "segment_number"
+                ]
+            )
+
+            segment_chunk_count = counts[
+                segment_number
+            ]
+
+            segment_chunk_index = int(
+                assignment[
+                    "segment_chunk_index"
+                ]
+            )
+
+            if segment_chunk_count == 1:
+                segment_position = "single"
+            elif segment_chunk_index == 1:
+                segment_position = "start"
+            elif (
+                segment_chunk_index
+                == segment_chunk_count
+            ):
+                segment_position = "end"
+            else:
+                segment_position = "middle"
+
+            updates = {
+                "segment_id": (
+                    f"segment_{segment_number:03d}"
+                ),
+                "segment_root_chunk_id": int(
+                    assignment[
+                        "segment_root_chunk_id"
+                    ]
+                ),
+                "segment_chunk_index": (
+                    segment_chunk_index
+                ),
+                "segment_chunk_count": (
+                    segment_chunk_count
+                ),
+                "segment_position": (
+                    segment_position
+                ),
+                "is_continuation": bool(
+                    assignment[
+                        "is_continuation"
+                    ]
+                ),
+                "continuation_of_chunk_id": (
+                    assignment[
+                        "continuation_of_chunk_id"
+                    ]
+                ),
+                "continuation_reason": (
+                    assignment[
+                        "continuation_reason"
+                    ]
+                ),
+            }
+
+            if hasattr(
+                chunk,
+                "model_copy",
+            ):
+                updated = chunk.model_copy(
+                    update=updates
+                )
+            else:
+                updated = chunk.copy(
+                    update=updates
+                )
+
+            updated_chunks.append(
+                updated
+            )
+
+        return updated_chunks
 
     def _find_overlap_start(
         self,
         sentences: list[str],
         core_start_sentence: int,
     ) -> tuple[int, int]:
-        """
-        Select a small number of complete sentences from the previous
-        max-size chunk.
-        """
-
         if (
             self.config.max_size_overlap_words
             <= 0
             or self.config.max_size_overlap_sentences
             <= 0
-            or core_start_sentence
-            <= 0
+            or core_start_sentence <= 0
         ):
             return (
                 core_start_sentence,
@@ -1218,17 +1273,12 @@ class SemanticChunker:
         while (
             sentence_index >= 0
             and overlap_sentences
-            < (
-                self.config
-                .max_size_overlap_sentences
-            )
+            < self.config.max_size_overlap_sentences
         ):
-            sentence_words = (
-                self._word_count(
-                    sentences[
-                        sentence_index
-                    ]
-                )
+            sentence_words = self._word_count(
+                sentences[
+                    sentence_index
+                ]
             )
 
             if (
@@ -1237,31 +1287,18 @@ class SemanticChunker:
                     overlap_words
                     + sentence_words
                 )
-                > (
-                    self.config
-                    .max_size_overlap_words
-                )
+                > self.config.max_size_overlap_words
             ):
                 break
 
-            overlap_start = (
-                sentence_index
-            )
-
-            overlap_words += (
-                sentence_words
-            )
-
+            overlap_start = sentence_index
+            overlap_words += sentence_words
             overlap_sentences += 1
-
             sentence_index -= 1
 
             if (
                 overlap_words
-                >= (
-                    self.config
-                    .max_size_overlap_words
-                )
+                >= self.config.max_size_overlap_words
             ):
                 break
 
