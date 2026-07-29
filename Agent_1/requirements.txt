@@ -3,3 +3,7 @@ groq
 python-dotenv
 pymupdf
 python-docx
+numpy
+sentence-transformers
+SQLAlchemy>=2.0
+psycopg2-binary
