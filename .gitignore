@@ -81,3 +81,24 @@ Agent_1/test_data/
 
 # Local archive files
 *.zip
+
+# Generated pipeline outputs
+tester/
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Virtual environments
+.venv/
+venv/
+
+# Model cache
+models/
+cache/
+
+# Qdrant storage
+qdrant_storage/
