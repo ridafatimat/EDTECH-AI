@@ -352,9 +352,83 @@ def save_readable_output(
         "=" * 100
     )
 
+    primary_topics = [
+        topic
+        for topic in result.merged_topics
+        if topic.topic_role == "primary"
+    ]
+
+    supporting_topics = [
+        topic
+        for topic in result.merged_topics
+        if topic.topic_role == "supporting"
+    ]
+
+    unmapped_topics: list[str] = []
+    seen_unmapped_topics: set[str] = set()
+
+    for chunk_result in result.chunk_results:
+        for signal in chunk_result.unmapped_cs_signals:
+            normalized_topic = " ".join(
+                signal.rough_topic.lower().split()
+            )
+
+            if (
+                not normalized_topic
+                or normalized_topic in seen_unmapped_topics
+            ):
+                continue
+
+            seen_unmapped_topics.add(
+                normalized_topic
+            )
+            unmapped_topics.append(
+                signal.rough_topic
+            )
+
+    lines.append("")
+    lines.append("PRIMARY TOPICS")
+    lines.append("-" * 100)
+
+    if primary_topics:
+        for topic in primary_topics:
+            lines.append(
+                f"- {topic.topic}"
+            )
+    else:
+        lines.append("None")
+
+    lines.append("")
+    lines.append("SUPPORTING TOPICS")
+    lines.append("-" * 100)
+
+    if supporting_topics:
+        for topic in supporting_topics:
+            lines.append(
+                f"- {topic.topic}"
+            )
+    else:
+        lines.append("None")
+
+    lines.append("")
+    lines.append("UNMAPPED / EXTENDED TOPICS")
+    lines.append("-" * 100)
+
+    if unmapped_topics:
+        for topic in unmapped_topics:
+            lines.append(
+                f"- {topic}"
+            )
+    else:
+        lines.append("None")
+
+    lines.append("")
+    lines.append("DETAILED MERGED OFFICIAL TOPICS")
+    lines.append("-" * 100)
+
     if not result.merged_topics:
         lines.append(
-            "No retained CS topics."
+            "No retained official AQA topics."
         )
 
     for topic in result.merged_topics:
@@ -563,22 +637,87 @@ def main() -> None:
         f"{result.llm_fallback_chunk_ids}"
     )
 
+    primary_topics = [
+        topic
+        for topic in result.merged_topics
+        if topic.topic_role == "primary"
+    ]
+
+    supporting_topics = [
+        topic
+        for topic in result.merged_topics
+        if topic.topic_role == "supporting"
+    ]
+
+    unmapped_topics: list[str] = []
+    seen_unmapped_topics: set[str] = set()
+
+    for chunk_result in result.chunk_results:
+        for signal in chunk_result.unmapped_cs_signals:
+            normalized_topic = " ".join(
+                signal.rough_topic.lower().split()
+            )
+
+            if (
+                not normalized_topic
+                or normalized_topic in seen_unmapped_topics
+            ):
+                continue
+
+            seen_unmapped_topics.add(
+                normalized_topic
+            )
+            unmapped_topics.append(
+                signal.rough_topic
+            )
+
     print(
-        "\nMERGED TOPICS"
+        "\nPRIMARY TOPICS"
     )
 
     print(
         "-" * 100
     )
 
-    for topic in result.merged_topics:
-        print(
-            f"{topic.topic} | "
-            f"role={topic.topic_role} | "
-            f"ranking={topic.ranking_score} | "
-            f"confidence={topic.confidence} | "
-            f"chunks={topic.source_chunk_ids}"
-        )
+    if primary_topics:
+        for topic in primary_topics:
+            print(
+                f"- {topic.topic}"
+            )
+    else:
+        print("None")
+
+    print(
+        "\nSUPPORTING TOPICS"
+    )
+
+    print(
+        "-" * 100
+    )
+
+    if supporting_topics:
+        for topic in supporting_topics:
+            print(
+                f"- {topic.topic}"
+            )
+    else:
+        print("None")
+
+    print(
+        "\nUNMAPPED / EXTENDED TOPICS"
+    )
+
+    print(
+        "-" * 100
+    )
+
+    if unmapped_topics:
+        for topic in unmapped_topics:
+            print(
+                f"- {topic}"
+            )
+    else:
+        print("None")
 
     print(
         f"\nJSON saved to:\n"

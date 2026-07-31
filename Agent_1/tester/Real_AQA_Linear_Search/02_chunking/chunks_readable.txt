@@ -1,0 +1,39 @@
+====================================================================================================
+AGENT 1 — MODULE 2 SEMANTIC CHUNKS
+====================================================================================================
+
+Embedding model: sentence-transformers/all-MiniLM-L6-v2
+Semantic threshold: 0.3291
+Total sentences: 136
+Total words: 958
+Final chunks: 3
+
+----------------------------------------------------------------------------------------------------
+CHUNK 1
+Words: 338
+Sentences: 49
+Sentence range: 0 → 48
+Boundary reason: transition_phrase
+Overlap words: 0
+----------------------------------------------------------------------------------------------------
+in this video we consider one of the classic algorithms in computer science the linear search Intro the linear search can be performed on Linear search data in memory perhaps stored in arrays or lists and data stored in files as well the algorithm is very straightforward starting from the beginning of the data set each item is checked in turn to see if it's the one being searched for it doesn't require the data to be in any order unlike another type of search the binary search it will work on any type of storage device and can be efficient for small data sets however it's very inefficient for large data sets if you've watched Wordsearch example one of our previous videos on algorithmic thinking you'd have seen that we used a linear search in that situation we were trying to find a word in a word search where each letter is stored in a grid we examined each letter in turn to see if it matched the first letter of the word we were looking for and if not we moved on to the next letter and the next and the next until we found a match this is a classic example of a linear search it didn't require the letters to be in any order which is just as well because that's the very nature of a word search we can Breakfast cereal example apply a linear search to a whole variety of contexts one might be looking for particular box of cereal on a shelf in a supermarket we could go through each box one at a time until they find the one we're looking for we then take the box to the checkout and the computer will scan the barcode and then it needs to look up the product description and price in a database of products it could do this by starting at the first product and comparing the barcode to see if it matches the one in the database and if
+
+----------------------------------------------------------------------------------------------------
+CHUNK 2
+Words: 260
+Sentences: 34
+Sentence range: 49 → 82
+Boundary reason: semantic_shift
+Overlap words: 0
+----------------------------------------------------------------------------------------------------
+not it could keep checking the next one and the next one until it finds the product or it's not in the list at all so if we apply some algorithmic thinking we can uncover the algorithm for this particular search we can have a boolean variable called found that sets to force initially because we have to find the item in the list well you could then have a variable I which is the index of the item we're looking for we could say while it's not been found and we're not at the end of the data set check each item in the list we could do this with a simple if statement and say if item I is equal to the item to find then found is true and we can output the item and if not then we increment I by one and keep checking the next item and then the next and then the next until we've reached the end of the list or the item has been found the specification at Things you need to know for the exam GCSE requires you to know the mechanics of an algorithm you should understand the advantages and disadvantages of using one algorithm over another to solve the same problem however at GCSE level you're not going to be expected to remember that a needle code lying for line for a given algorithm in the rest of this video we're gonna walk through an example of this algorithm step by step so in Python code the solution
+
+----------------------------------------------------------------------------------------------------
+CHUNK 3
+Words: 360
+Sentences: 53
+Sentence range: 83 → 135
+Boundary reason: end_of_transcript
+Overlap words: 0
+----------------------------------------------------------------------------------------------------
+Linear search coded in Python might look something like this we're storing the data for our products in a 2-dimensional list so we can store the description and the price we've then got a variable called found which we'll set to false initially and the index of the item to be 0 we're asking the user what's the product they want to find and whilst that's not been found and we haven't reached the end of the data set we're going to check if the product matches the one we're looking for and if it does we're going to print to the screen the price with two decimal places and set found to be true because we don't need to check any other products this makes the algorithm just a little bit more efficient if the product was not found we can increment I by one we know that Essential algorithms for A Level Computer Science textbook algorithms are some of the hardest parts of any computer science specification so we've written a book called essential algorithms for a level computer science which is available on Amazon while the title of the book suggests this is only for a level you can see here from the examination board mapping page that we have chapters which cover every algorithm you're required to know for the GCSE this book then would be perfectly appropriate for you to use and also to take on to a level should you choose to carry on studying the subject every chapter is presented in the same way we introduced the algorithm from a high level perspective and provide a link to our videos we then lay out the algorithm in simple structured English so you can get your head around it we illustrate the algorithm in the form of a diagram and then provide an example of stepping through it all of these steps are designed to really get you to understand the algorithm before we present you with pseudocode after the pseudocode we present you an actual code written in both Python and Visual Basic which you could type in and try for yourself Outro

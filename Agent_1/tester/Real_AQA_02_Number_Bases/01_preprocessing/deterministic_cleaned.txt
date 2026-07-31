@@ -1,0 +1,399 @@
+Number bases
+
+in this video we take a look at number
+
+bases and in particular the three base
+
+number systems you need to know about
+
+for the exam binary decimal and
+
+hexadecimal so let's start with the base
+Decimal (Base 10)
+
+10 number system known as decimal and
+
+this is the number system that you are
+
+most familiar with you've been using it
+
+ever since you very first started to
+
+count as you know it contains just 10
+
+unique digits ranging from nought to 9
+
+now have you ever stopped to consider
+
+for a moment why our number system has
+
+evolved this way well the actual answer
+
+is that no one really knows but it is
+
+most likely have to do with the fact
+
+that we have a total of 10 fingers and
+
+thumbs and so it became quite natural to
+
+count off the numbers 1 through 10 on
+
+our fingers so with the decimal system
+
+we don't have a unique single digit for
+
+the number 10 or any higher numbers we
+
+have to put separate digits together so
+
+of course we make up a 10 with a 1
+
+followed by a 0 so let's look at how
+
+that actually works with larger numbers
+
+well we'll start with the 10 and
+
+obviously I've written that out here now
+
+I've got two leading zeros on the
+
+beginning but that doesn't affect the
+
+fact that this is the number 10 0 0 1 0
+
+you will know from basic maths at
+
+primary school that the weighting of the
+
+headings in each of these columns goes
+
+up by 10 each time so what I have here
+
+is nota thousands plus nota hundreds
+
+plus 1 in the tens column plus nought in
+
+the ones column so the number 10 if we
+
+take a bigger number now so for 273 the
+
+exact same principle is applied the
+
+column on the far left is are thousands
+
+columns so we have four times a thousand
+
+we add that to the next column
+
+which is 2 lots of a hundred we add that
+
+to 7 lots of 10
+
+and three lots of ones with 4273 now of
+
+course we don't perform that calculation
+
+our head when we see the number four 273
+
+we are so used to it now that we simply
+
+read it straight out as 4273 notice once
+
+again how the column weightings that's
+
+the headings are increasing by a factor
+
+of 10 every time we move one space to
+
+the left and this is because decimal is
+
+a base 10 number system so there are two
+Base number systems for GCSE
+
+other number systems that you need to
+
+know about for the GCSE that's base 2
+
+binary and base 16 hexadecimal now
+
+everything I've gone through so far
+
+might seem really obvious I mean after
+
+all you've been counting using decimal
+
+ever since primary school but the
+
+principles involved are exactly the same
+
+for any other base number system
+
+including base 2 and base 16 so let's
+
+have a look so with the base 2 binary
+Binary (Base 2)
+
+number system we only have two unique
+
+digits so a 0 and a 1 and that's it all
+
+other numbers in binary must be made up
+
+of a combination of these two digits so
+
+what is the number i've got represented
+
+here well the first thing you'll notice
+
+is the weighting of the column headings
+
+has changed starting on the right we
+
+have the ones column then the twos then
+
+the fours then the eights it's doubling
+
+each time or timesing by two and that's
+
+because we have a base 2 number system
+
+so we just apply the same rules we did
+
+for the decimal system here I have
+
+naught
+
+lots of eights added to naught lots of
+
+fours I've got one two and I'm adding
+
+that to one one so the number one one in
+
+binary is three in decimal and you need
+
+to read this as one one and obviously
+
+not eleven because an eleven is a
+
+decimal number so let's do exactly the
+
+same thing but this time for a slightly
+
+larger number the process although is
+
+identical
+
+so starting on the left here I have a
+
+one in the eighth column so I've got one
+
+lots of 8 I'm adding that to naught lots
+
+of 4 I'm adding that to 1 lot of 2 and
+
+finally 1 lot of 1 so I have an 8 plus a
+
+2 plus a 1 so this number is 11 in
+
+decimal so the binary number 1 0 1 1 is
+
+11 in decimal and again just to
+
+reiterate the weighting of the column
+
+headings is timesing by 2 every time you
+
+move to the left because binary is a
+
+base to number system now obviously to
+
+represent bigger numbers you're going to
+
+need to increase the number of columns
+
+you use at GCSE you're going to be
+
+expected to be able to understand and
+
+represent and write numbers up to 8 bits
+
+in size so that's 8 columns of course
+
+therefore if we start at the right with
+
+our 1 and then we times by 2 every time
+
+we end up with column weightings of 1 2
+
+4 8 16 32 64 and finally a hundred and
+
+twenty-eight this means there's a range
+
+of numbers that you're going to be
+
+expected to know about at GCSE in base 2
+
+binary the smallest number involves
+
+putting a naught in every single column
+
+and of course that represents 0 the
+
+biggest number possible will be putting
+
+a 1 in every single column so that would
+
+be a 128 plus 64 plus of 32 + a 16 + 8 a
+
+4 a 2 and a 1 and that's 255 in decimal
+Hexadecimal (Base 16)
+
+so hexadecimal is a base 16 number
+
+system and it follows exactly the same
+
+principles as the other number systems
+
+we've just been looking at the only
+
+difference is with hex we have 16 unique
+
+digits now this obviously presents us
+
+with a bit of a unique problem what do
+
+we use to represent the hex digits 10 to
+
+15 we can't simply use our decimal
+
+numbers 1 0 4 10 or 1 5 or 15 as these
+
+are two digits stuck together
+
+well we simply choose to replace digits
+
+10 to 15 with the alphabetic letters A
+
+through F so in hex
+
+we have 16 unique digits representing
+
+nought to 15 naught 1 2 3 4 5 6 7 8 and
+
+9 and then a representing 10 from
+
+decimal through to 15 for F so let's
+Number bases summary
+
+just check you've got all that we'll
+
+summarize it here you can see a table
+
+with decimal base 10 on the left hex
+
+base 16 in the middle and binary based 2
+
+on the right
+
+zero is represented exactly the same in
+
+all three bases as is the number 1 when
+
+we get to the number 2 things obviously
+
+have to change a little bit in decimal
+
+we have a 2 available because it's a
+
+base 10 number system in hex we have the
+
+digit 2 available but in binary we don't
+
+we only have a naught and a 1 and we're
+
+going to have to make up the number 2
+
+out of those 2 digits the answer is 1 0
+
+remember this is 1 0 not 10 10 is a
+
+decimal number the binary equivalent of
+
+10 is 1 0 because it's a 0 in the one
+
+column as we move through a left a 1 in
+
+the 2 column we can proceed all the way
+
+down here to 9 so I've got 9 in decimal
+
+I've got 9 in hex and there's 9 in
+
+binary so that's 9 in binary because
+
+starting on the left there I've got 1 in
+
+the 8th column 2 zeros and 1 in the one
+
+column and 8 plus 1 is 9 so what happens
+
+on the next row down well obviously in
+
+decimal so our number system we have to
+
+start putting numbers together so we
+
+have a 1 and a 0 that's what we call 10
+
+hex is still able to use a single digit
+
+to represent the decimal value of 10 but
+
+because we lack a digit for that we use
+
+the capital letter a and so the table
+
+carries on until we get to the decimal
+
+value 15 which is represented by F in
+
+hex and one-one-one-one
+
+in binary so just a quick recap
+Recap
+
+computers and the field of computer
+
+science used different base number
+
+systems binary is base - that's the
+
+digits Naughton 1 and it's easy to
+
+represent two states like on or off or
+
+high or low voltage and this is ideal
+
+for computer science and electronics
+
+based systems our number system is known
+
+as decimal base 10 and it has the unique
+
+digits north through 9 and finally
+
+hexadecimal base 16 15 unique digits
+
+north through 9 followed by a through 2f
+
+hex numbers can be expressed more
+
+compactly than binary numbers and this
+
+is the one of the reasons we use it and
+
+we're actually gonna look at that in a
+
+little more detail in another video

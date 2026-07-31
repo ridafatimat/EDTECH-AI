@@ -203,44 +203,48 @@ def save_readable_result(
     output_path: Path,
 ) -> None:
     """
-    Save a human-readable Module 3 result for one transcript.
+    Save a complete human-readable Module 3 result for one transcript.
+
+    The final lesson-level topics are grouped by role so batch output
+    matches the single-transcript production pipeline.
     """
 
-    lines: list[str] = []
+    primary_topics = [
+        topic
+        for topic in result.merged_topics
+        if getattr(topic, "topic_role", None) == "primary"
+    ]
 
-    lines.append(
-        "=" * 110
-    )
+    supporting_topics = [
+        topic
+        for topic in result.merged_topics
+        if getattr(topic, "topic_role", None) == "supporting"
+    ]
 
-    lines.append(
-        "AGENT 1 — MODULE 3 BATCH TOPIC EXTRACTION"
-    )
+    unmapped_topics: list[Any] = []
+    seen_unmapped: set[str] = set()
 
-    lines.append(
-        "=" * 110
-    )
+    for chunk_result in result.chunk_results:
+        for signal in getattr(
+            chunk_result,
+            "unmapped_cs_signals",
+            [],
+        ):
+            rough_topic = str(
+                getattr(
+                    signal,
+                    "rough_topic",
+                    getattr(signal, "domain", "Unmapped CS topic"),
+                )
+            ).strip()
 
-    lines.append(
-        f"Source chunk file: {source_file}"
-    )
+            key = rough_topic.casefold()
 
-    lines.append(
-        f"Embedding model: {result.embedding_model}"
-    )
+            if not rough_topic or key in seen_unmapped:
+                continue
 
-    lines.append(
-        f"Candidate keep threshold: "
-        f"{result.candidate_keep_threshold}"
-    )
-
-    lines.append(
-        f"Total chunks: {result.total_chunks}"
-    )
-
-    lines.append(
-        f"CS-relevant chunks: "
-        f"{result.cs_relevant_chunks}"
-    )
+            seen_unmapped.add(key)
+            unmapped_topics.append(signal)
 
     classifications = Counter(
         getattr(
@@ -251,178 +255,189 @@ def save_readable_result(
         for chunk_result in result.chunk_results
     )
 
-    lines.append(
-        "Classifications: "
-        + str(
-            dict(
-                classifications
-            )
-        )
-    )
-
-    lines.append(
-        f"LLM fallback chunks: "
-        f"{result.llm_fallback_chunk_ids}"
-    )
-
-    lines.append("")
+    lines: list[str] = [
+        "=" * 110,
+        "AGENT 1 — MODULE 3 BATCH TOPIC EXTRACTION",
+        "=" * 110,
+        f"Source chunk file: {source_file}",
+        f"Embedding model: {result.embedding_model}",
+        (
+            "Candidate keep threshold: "
+            f"{result.candidate_keep_threshold}"
+        ),
+        f"Total chunks: {result.total_chunks}",
+        (
+            "CS-relevant chunks: "
+            f"{result.cs_relevant_chunks}"
+        ),
+        (
+            "Non-CS/no-new-topic chunks: "
+            f"{getattr(result, 'non_cs_chunks', None)}"
+        ),
+        (
+            "Official-topic chunks: "
+            f"{classifications['official_aqa_topic']}"
+        ),
+        (
+            "Mixed official + unmapped chunks: "
+            f"{classifications['mixed_official_and_unmapped']}"
+        ),
+        (
+            "Unmapped-CS chunks: "
+            f"{classifications['cs_related_unmapped']}"
+        ),
+        (
+            "Continuation/no-new-topic chunks: "
+            f"{classifications['continuation_no_new_topic']}"
+        ),
+        (
+            "No-topic chunks: "
+            f"{classifications['no_topic']}"
+        ),
+        (
+            "LLM fallback chunks: "
+            f"{result.llm_fallback_chunk_ids}"
+        ),
+        "",
+    ]
 
     for chunk_result in result.chunk_results:
-        lines.append(
-            "=" * 110
-        )
-
-        lines.append(
-            f"CHUNK {chunk_result.chunk_id}"
-        )
-
-        lines.append(
-            "=" * 110
-        )
-
-        lines.append(
-            f"Source words: "
-            f"{chunk_result.source_word_count}"
-        )
-
-        lines.append(
-            f"Classification: "
-            f"{chunk_result.classification}"
-        )
-
-        lines.append(
-            f"CS relevant: "
-            f"{chunk_result.is_cs_relevant}"
-        )
-
-        lines.append(
-            f"Creates new topic: "
-            f"{chunk_result.creates_new_topic}"
-        )
-
-        lines.append(
-            f"Chunk relevance score: "
-            f"{chunk_result.cs_relevance_score}"
-        )
-
-        lines.append(
-            f"Requires LLM fallback: "
-            f"{chunk_result.requires_llm_fallback}"
+        lines.extend(
+            [
+                "=" * 110,
+                f"CHUNK {chunk_result.chunk_id}",
+                "=" * 110,
+                (
+                    "Source words: "
+                    f"{chunk_result.source_word_count}"
+                ),
+                (
+                    "Classification: "
+                    f"{chunk_result.classification}"
+                ),
+                (
+                    "CS relevant: "
+                    f"{chunk_result.is_cs_relevant}"
+                ),
+                (
+                    "Creates new topic: "
+                    f"{chunk_result.creates_new_topic}"
+                ),
+                (
+                    "Chunk relevance score: "
+                    f"{chunk_result.cs_relevance_score}"
+                ),
+                (
+                    "Requires LLM fallback: "
+                    f"{chunk_result.requires_llm_fallback}"
+                ),
+            ]
         )
 
         if chunk_result.notes:
-            lines.append(
-                "Notes:"
-            )
+            lines.append("Notes:")
 
             for note in chunk_result.notes:
                 lines.append(
                     f"- {note}"
                 )
 
-        lines.append(
-            "\nRETAINED OFFICIAL AQA TOPICS"
-        )
-
-        lines.append(
-            "-" * 110
+        lines.extend(
+            [
+                "",
+                "RETAINED TOPICS",
+                "-" * 110,
+            ]
         )
 
         if not chunk_result.topic_candidates:
-            lines.append(
-                "None"
-            )
+            lines.append("None")
 
         for candidate in chunk_result.topic_candidates:
-            lines.append(
-                f"- {candidate.topic}"
-            )
-
-            lines.append(
-                f"  concept_id: "
-                f"{candidate.concept_id}"
-            )
-
-            lines.append(
-                f"  official reference: "
-                f"{getattr(candidate, 'official_reference', None)}"
-            )
-
-            lines.append(
-                f"  confidence: "
-                f"{candidate.confidence}"
-            )
-
-            lines.append(
-                f"  salience: "
-                f"{getattr(candidate, 'salience_score', None)}"
-            )
-
-            lines.append(
-                f"  keyword score: "
-                f"{candidate.keyword_score}"
-            )
-
-            lines.append(
-                f"  semantic score: "
-                f"{candidate.semantic_score}"
-            )
-
-            lines.append(
-                f"  aliases: "
-                f"{candidate.matched_aliases}"
+            lines.extend(
+                [
+                    f"- {candidate.topic}",
+                    (
+                        "  concept_id: "
+                        f"{candidate.concept_id}"
+                    ),
+                    (
+                        "  domain: "
+                        f"{getattr(candidate, 'domain', None)}"
+                    ),
+                    (
+                        "  official reference: "
+                        f"{getattr(candidate, 'official_reference', None)}"
+                    ),
+                    (
+                        "  confidence: "
+                        f"{candidate.confidence}"
+                    ),
+                    (
+                        "  salience score: "
+                        f"{getattr(candidate, 'salience_score', None)}"
+                    ),
+                    (
+                        "  keyword score: "
+                        f"{candidate.keyword_score}"
+                    ),
+                    (
+                        "  semantic score: "
+                        f"{candidate.semantic_score}"
+                    ),
+                    (
+                        "  method: "
+                        f"{getattr(candidate, 'match_method', None)}"
+                    ),
+                    (
+                        "  matched aliases: "
+                        f"{candidate.matched_aliases}"
+                    ),
+                ]
             )
 
             if candidate.evidence:
-                lines.append(
-                    "  evidence:"
-                )
+                lines.append("  evidence:")
 
                 for evidence in candidate.evidence:
                     lines.append(
                         f"    • {evidence}"
                     )
 
-        unmapped_signals = getattr(
+        chunk_unmapped = getattr(
             chunk_result,
             "unmapped_cs_signals",
             [],
         )
 
-        if unmapped_signals:
-            lines.append(
-                "\nUNMAPPED CS SIGNALS"
+        if chunk_unmapped:
+            lines.extend(
+                [
+                    "",
+                    "UNMAPPED CS SIGNALS",
+                    "-" * 110,
+                ]
             )
 
-            lines.append(
-                "-" * 110
-            )
-
-            for signal in unmapped_signals:
-                lines.append(
-                    f"- {getattr(signal, 'rough_topic', signal.domain)}"
-                )
-
-                lines.append(
-                    f"  domain: {signal.domain}"
-                )
-
-                lines.append(
-                    f"  score: {signal.score}"
-                )
-
-                lines.append(
-                    f"  method: "
-                    f"{getattr(signal, 'detection_method', None)}"
-                )
-
-                lines.append(
-                    f"  aliases: "
-                    f"{getattr(signal, 'matched_aliases', [])}"
-                )
-
-                lines.append(
-                    f"  evidence: {signal.evidence}"
+            for signal in chunk_unmapped:
+                lines.extend(
+                    [
+                        (
+                            "- "
+                            f"{getattr(signal, 'rough_topic', signal.domain)}"
+                        ),
+                        f"  domain: {signal.domain}",
+                        f"  score: {signal.score}",
+                        (
+                            "  method: "
+                            f"{getattr(signal, 'detection_method', None)}"
+                        ),
+                        (
+                            "  matched aliases: "
+                            f"{getattr(signal, 'matched_aliases', [])}"
+                        ),
+                        f"  evidence: {signal.evidence}",
+                    ]
                 )
 
         rejected = getattr(
@@ -432,12 +447,12 @@ def save_readable_result(
         )
 
         if rejected:
-            lines.append(
-                "\nREJECTED / LOW-CONFIDENCE CANDIDATES"
-            )
-
-            lines.append(
-                "-" * 110
+            lines.extend(
+                [
+                    "",
+                    "REJECTED / LOW-CONFIDENCE CANDIDATES",
+                    "-" * 110,
+                ]
             )
 
             for candidate in rejected:
@@ -448,16 +463,64 @@ def save_readable_result(
 
         lines.append("")
 
-    lines.append(
-        "=" * 110
+    lines.extend(
+        [
+            "=" * 110,
+            "MERGED LESSON TOPICS",
+            "=" * 110,
+            "",
+            "PRIMARY TOPICS",
+            "-" * 110,
+        ]
     )
 
-    lines.append(
-        "MERGED LESSON TOPICS"
+    if not primary_topics:
+        lines.append("None")
+    else:
+        for topic in primary_topics:
+            lines.append(
+                f"- {topic.topic}"
+            )
+
+    lines.extend(
+        [
+            "",
+            "SUPPORTING TOPICS",
+            "-" * 110,
+        ]
     )
 
-    lines.append(
-        "=" * 110
+    if not supporting_topics:
+        lines.append("None")
+    else:
+        for topic in supporting_topics:
+            lines.append(
+                f"- {topic.topic}"
+            )
+
+    lines.extend(
+        [
+            "",
+            "UNMAPPED / EXTENDED TOPICS",
+            "-" * 110,
+        ]
+    )
+
+    if not unmapped_topics:
+        lines.append("None")
+    else:
+        for signal in unmapped_topics:
+            lines.append(
+                "- "
+                f"{getattr(signal, 'rough_topic', signal.domain)}"
+            )
+
+    lines.extend(
+        [
+            "",
+            "DETAILED MERGED OFFICIAL TOPICS",
+            "-" * 110,
+        ]
     )
 
     if not result.merged_topics:
@@ -466,57 +529,52 @@ def save_readable_result(
         )
 
     for topic in result.merged_topics:
-        lines.append(
-            f"- {topic.topic}"
-        )
-
-        lines.append(
-            f"  concept_id: {topic.concept_id}"
-        )
-
-        lines.append(
-            f"  role: "
-            f"{getattr(topic, 'topic_role', None)}"
-        )
-
-        lines.append(
-            f"  confidence: {topic.confidence}"
-        )
-
-        lines.append(
-            f"  ranking score: "
-            f"{getattr(topic, 'ranking_score', None)}"
-        )
-
-        lines.append(
-            f"  source chunks: "
-            f"{topic.source_chunk_ids}"
-        )
-
-        lines.append(
-            f"  support spans: "
-            f"{getattr(topic, 'support_span_count', None)}"
-        )
-
-        lines.append(
-            f"  mean semantic score: "
-            f"{getattr(topic, 'mean_semantic_score', None)}"
-        )
-
-        lines.append(
-            f"  mean salience score: "
-            f"{getattr(topic, 'mean_salience_score', None)}"
-        )
-
-        lines.append(
-            f"  coverage score: "
-            f"{getattr(topic, 'coverage_score', None)}"
+        lines.extend(
+            [
+                f"- {topic.topic}",
+                f"  concept_id: {topic.concept_id}",
+                (
+                    "  domain: "
+                    f"{getattr(topic, 'domain', None)}"
+                ),
+                (
+                    "  role: "
+                    f"{getattr(topic, 'topic_role', None)}"
+                ),
+                f"  confidence: {topic.confidence}",
+                (
+                    "  ranking score: "
+                    f"{getattr(topic, 'ranking_score', None)}"
+                ),
+                (
+                    "  source chunks: "
+                    f"{topic.source_chunk_ids}"
+                ),
+                (
+                    "  support spans: "
+                    f"{getattr(topic, 'support_span_count', None)}"
+                ),
+                (
+                    "  mean semantic score: "
+                    f"{getattr(topic, 'mean_semantic_score', None)}"
+                ),
+                (
+                    "  mean salience score: "
+                    f"{getattr(topic, 'mean_salience_score', None)}"
+                ),
+                (
+                    "  coverage score: "
+                    f"{getattr(topic, 'coverage_score', None)}"
+                ),
+                (
+                    "  supporting candidates: "
+                    f"{getattr(topic, 'supporting_candidate_count', None)}"
+                ),
+            ]
         )
 
         if topic.evidence:
-            lines.append(
-                "  evidence:"
-            )
+            lines.append("  evidence:")
 
             for evidence in topic.evidence:
                 lines.append(
@@ -529,12 +587,9 @@ def save_readable_result(
     )
 
     output_path.write_text(
-        "\n".join(
-            lines
-        ),
+        "\n".join(lines).strip() + "\n",
         encoding="utf-8",
     )
-
 
 # =========================================================
 # SUMMARY CREATION

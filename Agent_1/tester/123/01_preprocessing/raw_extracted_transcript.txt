@@ -1,0 +1,411 @@
+Algorithm efficiency
+0:00
+in this video we'll be taking a look at
+0:02
+algorithm efficiency there are four
+Algorithm efficiency
+0:12
+algorithms you need to know about for
+0:14
+the GCSE there's two searching
+0:16
+algorithms the binary and linear search
+0:18
+and two sorting algorithms the merge and
+0:22
+bubble sort we have separate videos in
+0:25
+this section that look at each of these
+0:26
+in depth in this video though we're
+0:29
+focusing on algorithm efficiency so
+0:31
+which version of each of these is more
+0:34
+efficient and what do we even mean by
+0:36
+the efficiency of an algorithm well
+0:39
+talking about the efficiency of an
+0:41
+algorithm is actually quite a complex
+0:43
+process and we look at this in depth in
+0:46
+the later half of the video when we go
+0:47
+beyond the GCSE specification but the
+0:50
+point of view of your exam we're simply
+0:53
+meaning here which algorithm is
+0:55
+typically quicker at performing a task
+0:58
+on a data set so on the screen we have
+Which algorithm will sort quicker?
+1:03
+two algorithms two functions called some
+1:07
+integers and they both taking a single
+1:09
+parameter n if you called either of
+1:13
+these functions with the value 10 then
+1:16
+both of them would perform the
+1:18
+calculation 1 plus 2 plus 3 all the way
+1:21
+up to 10 and they'd return 55 likewise
+1:25
+if you supplied the integer 100 when you
+1:27
+called some integers it would sum up the
+1:30
+numbers 1 plus 2 plus 3 all the way
+1:32
+through to a hundred the point to note
+1:35
+here is that both of these algorithms do
+1:37
+exactly the same thing they return the
+1:41
+combination of all the numbers added
+1:43
+together so which one is more efficient
+1:46
+and how can we tell if we take the
+1:51
+algorithm on the Left we can see there's
+1:54
+a line of code here which has to be
+1:56
+executed and that is assigning the value
+2:00
+0 to sum so I've written that out there
+2:03
+below and then you can see we have this
+2:07
+line of code to execute and it says sum
+2:10
+becomes equal to the current value
+2:13
+some plus n so if we assume n is 10 for
+2:18
+example so that's the value of the
+2:20
+parameter that you've passed in then
+2:23
+this line of code would execute 10 times
+2:26
+the first time around the loop it would
+2:29
+perform the calculation naught plus 1
+2:31
+the second time 1 plus 2 and then 3 plus
+2:36
+3 so there's 10 additional lines of code
+2:39
+that need to be executed and I've
+2:41
+written those out below as well on the
+2:46
+right here we can see that we have a
+2:49
+again a single line of code sum becomes
+2:52
+equal to n times n plus 1 divided by 2
+2:58
+that's not inside an iterative statement
+3:02
+like a for loop that line of code simply
+3:05
+runs once and that is it so even though
+3:11
+both algorithms do exactly the same
+3:14
+thing the left-hand version takes far
+3:18
+longer to execute indeed if we take this
+3:22
+to the extreme and imagine increasing
+3:25
+the value of n to a million then the
+3:28
+left-hand version would take
+3:29
+significantly longer whereas the
+3:32
+right-hand version would be just as
+3:34
+quick no matter what the value of N and
+3:37
+was entered well that is certainly
+Going beyond the GCSE specification
+3:43
+enough for the GCSE specification to get
+3:46
+you to appreciate that although many
+3:48
+algorithms can be written to perform the
+3:51
+same purpose it doesn't necessarily mean
+3:54
+they are all as efficient at each other
+3:56
+however if you're finding the topic of
+3:59
+algorithms quite interesting you can put
+4:01
+your pen down now and we're going to go
+4:03
+over some of the content which will be
+4:06
+covered in the a-level
+4:07
+and it'll make a great introduction to
+4:09
+that part of the course so when we talk
+Time-wise efficient algorithms vs space-wise efficient algorithms
+4:16
+about algorithm efficiency especially
+4:18
+beyond GCSE we can measure efficiency in
+4:21
+two ways
+4:22
+we have the time complexity so that's
+4:25
+how much time an hour the
+4:27
+needs to solve a problem and we have
+4:31
+space complexity so that's amount of
+4:34
+resources eg memory the algorithm
+4:37
+requires to complete some algorithms are
+4:40
+more efficient timewise than others
+4:42
+whereas others are more efficient space
+4:45
+wise than others if you didn't go back
+Big O notation
+4:50
+to the example we looked at in the
+4:52
+previous part of the video we can go a
+4:55
+step further now that we're going beyond
+4:56
+the GCC spec let's ignore that first
+5:00
+line of code that's executed because
+5:02
+it's only executed once whereas the blue
+5:06
+line is executed 10 times
+5:08
+it's the significant part of this
+5:10
+algorithm indeed as the value of n grows
+5:13
+if n was a hundred or a thousand the
+5:16
+fact that that first red line is
+5:18
+executing once really becomes very
+5:20
+insignificant so if we just focus on the
+5:23
+blue line we can see here that this
+5:25
+algorithm has what we call a linear time
+5:29
+complexity the app the algorithms
+5:32
+performance declines in a constant and
+5:35
+direct relation as the size of the data
+5:37
+set grows the version of the algorithm
+5:42
+on the right has a constant time
+5:45
+complexity the algorithm is always going
+5:49
+to execute in the same time regardless
+5:52
+of how big the value of n is now these
+5:57
+words constant and linear are actually
+6:00
+something you'll learn about at a level
+6:01
+you're starting to notice we can now
+6:04
+compare algorithms by expressing how
+6:07
+complex they are as a function relative
+6:10
+to the size of the problem they're
+6:12
+trying to solve and Big O notation is a
+6:16
+special way for classifying algorithms
+6:19
+based on how their computational times
+6:22
+grow as their input size grows on the
+6:26
+screen here are a range of Big O
+6:29
+notation z' and some descriptions again
+6:34
+if we just look back at the example we
+6:35
+covered at the start of the video you
+6:37
+can see here the left-hand version of
+6:39
+our original
+6:40
+algorithm has a linear complexity
+6:44
+whereas the right-hand version has a
+6:46
+constant complexity it's a much more
+6:49
+efficient version of the algorithm at
+Limits of algorithms- Intractable problems
+6:55
+eye level you also start to study the
+6:57
+limits of algorithms including what we
+6:59
+call intractable problems as computer
+7:03
+scientists we're actually only really
+7:05
+interested in algorithms which can solve
+7:07
+problems in a reasonable amount of time
+7:09
+using a reasonable amount of memory
+7:14
+tractable problems therefore any
+7:17
+problems which are solvable
+7:19
+according to Big O notation in
+7:21
+polynomial time or better in other words
+7:25
+the algorithm to solve this problem will
+7:27
+one run quickly enough to be useful to
+7:30
+you algorithms which execute
+7:36
+exponentially or they are worse in Big O
+7:39
+notations than polynomial unknown has
+7:42
+intractable problems now it should be
+7:46
+noted this doesn't mean these problems
+7:48
+can't be solved by an algorithm indeed
+7:50
+they can and we have a Big O notation
+7:52
+for them it's just that as soon as the
+7:54
+input size increases to anything covered
+7:57
+in a very small data set it becomes
+8:00
+impractical for computers to solve it in
+8:03
+any reasonable timeframe which would be
+8:05
+useful to us now we've definitely gone
+8:07
+way beyond the GCC spec here so you
+8:09
+really don't need to worry but it's a
+8:11
+good insight into how this area of the
+8:13
+specification can lead on into a level
+8:16
+and it's an area which will deepen in
+8:18
+your understanding
+Essential algorithms for A Level Computer Science text book
+8:20
+we know that algorithms are some of the
+8:23
+hardest parts of any computer science
+8:25
+specification so we've written a book
+8:27
+called essential algorithms for a level
+8:30
+computer science which is available on
+8:32
+Amazon while the title of the book
+8:36
+suggests this is only for a level you
+8:38
+can see here from the examination board
+8:40
+mapping page that we have chapters which
+8:43
+cover every algorithm you're required to
+8:45
+know for the GCSE this book then would
+8:49
+be perfectly appropriate for you to use
+8:51
+and also to take on to a level
+8:54
+should you choose to carry on studying
+8:55
+the subject every chapter is presented
+9:00
+in the same way we introduced the
+9:03
+algorithm from a high-level perspective
+9:05
+and provide a link to our videos we then
+9:08
+lay out the algorithm in simple
+9:10
+structured English so you can get your
+9:12
+head around it we illustrate the
+9:14
+algorithm in the form of a diagram and
+9:16
+then provide an example of stepping
+9:19
+through it all of these steps are
+9:23
+designed to really get you to understand
+9:25
+the algorithm before we present you with
+9:27
+pseudocode after the pseudocode we
+9:31
+present you an actual code written in
+9:33
+both Python and Visual Basic which you
+9:35
+could type in and try for yourself
+Outro
+9:41
+[Music]

@@ -1,0 +1,49 @@
+{
+  "run_name": "Another",
+  "source_file": "C:\\Users\\hp\\EDTECH\\Agent_1\\test_data\\Another .docx",
+  "run_directory": "C:\\Users\\hp\\EDTECH\\Agent_1\\tester\\Another",
+  "created_at": "2026-07-31T00:24:24.083800+05:00",
+  "updated_at": "2026-07-31T00:24:44.465642+05:00",
+  "status": "completed",
+  "current_stage": null,
+  "stages": {
+    "module_1_preprocessing": {
+      "status": "completed",
+      "duration_seconds": 0.051,
+      "outputs": {
+        "raw_extracted_transcript": "C:\\Users\\hp\\EDTECH\\Agent_1\\tester\\Another\\01_preprocessing\\raw_extracted_transcript.txt",
+        "deterministic_cleaned": "C:\\Users\\hp\\EDTECH\\Agent_1\\tester\\Another\\01_preprocessing\\deterministic_cleaned.txt",
+        "audit": "C:\\Users\\hp\\EDTECH\\Agent_1\\tester\\Another\\01_preprocessing\\preprocessing_audit.json"
+      }
+    },
+    "module_2_chunking": {
+      "status": "completed",
+      "duration_seconds": 9.234,
+      "input": "C:\\Users\\hp\\EDTECH\\Agent_1\\tester\\Another\\01_preprocessing\\cleaned_transcript.txt",
+      "outputs": {
+        "chunks_json": "C:\\Users\\hp\\EDTECH\\Agent_1\\tester\\Another\\02_chunking\\chunks.json",
+        "chunks_readable": "C:\\Users\\hp\\EDTECH\\Agent_1\\tester\\Another\\02_chunking\\chunks_readable.txt"
+      },
+      "chunk_count": 3
+    },
+    "module_3_topic_extraction": {
+      "status": "completed",
+      "duration_seconds": 5.932,
+      "input": "C:\\Users\\hp\\EDTECH\\Agent_1\\tester\\Another\\02_chunking\\chunks.json",
+      "outputs": {
+        "topics_json": "C:\\Users\\hp\\EDTECH\\Agent_1\\tester\\Another\\03_topic_extraction\\topics.json",
+        "topics_readable": "C:\\Users\\hp\\EDTECH\\Agent_1\\tester\\Another\\03_topic_extraction\\topics_readable.txt"
+      },
+      "merged_topic_count": 3
+    },
+    "module_1_technical_normalisation": {
+      "status": "completed",
+      "duration_seconds": 5.153,
+      "outputs": {
+        "cleaned_transcript": "C:\\Users\\hp\\EDTECH\\Agent_1\\tester\\Another\\01_preprocessing\\cleaned_transcript.txt",
+        "audit": "C:\\Users\\hp\\EDTECH\\Agent_1\\tester\\Another\\01_preprocessing\\technical_normalisation_audit.json"
+      }
+    }
+  },
+  "error": null
+}

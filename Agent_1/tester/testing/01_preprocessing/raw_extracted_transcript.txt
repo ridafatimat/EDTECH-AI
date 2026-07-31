@@ -1,0 +1,264 @@
+Tracing algorithms
+0:00
+in this video we take a look at a really
+0:02
+important skill which can help you spot
+0:05
+errors especially logic errors in your
+0:07
+programs and this is trace tables so
+Trace tables overview
+0:13
+this vital skill can help you understand
+0:16
+how a program works it is a great way to
+0:19
+spot logic errors and test the accuracy
+0:22
+of an algorithm and its underlying logic
+0:25
+it typically involves examining a
+0:28
+printed extract of code and then running
+0:30
+through the program is if you were the
+0:32
+computer you would take each line one at
+0:36
+a time and write out in a trace table
+0:39
+the current state of each variable you
+0:42
+would note down any output the program
+0:44
+produces as it happens every variable in
+0:48
+the program would have its own column in
+0:49
+the trace table and you will add a new
+0:52
+row under any column if the state of
+0:54
+that variable changed this can all sound
+0:57
+a little abstract so let's work through
+0:59
+a simple program and use a trace table
+1:02
+to figure out what it's doing so first
+Trace tables example
+1:08
+we start by identifying any variables in
+1:11
+the program and we put each one into its
+1:13
+own column to create our trace table so
+1:18
+we can see we've got a variable called
+1:19
+number so that goes into a column we've
+1:22
+got a variable called counter so that
+1:24
+goes into another column and we've got a
+1:27
+variable called total so that goes into
+1:29
+a third column we've also popped an
+1:35
+output window down here where we're
+1:36
+going to show any output as it occurs
+1:38
+and your note down the bottom there it
+1:41
+says when the first line of code
+1:42
+executes number equals print enter a
+1:46
+number we're going to assume the user
+1:48
+enters the integer five so we're gonna
+1:51
+work through this code line by line as
+1:53
+if we were the computer executing this
+1:56
+program so the first line of code
+2:00
+executes and the user enters a five so
+2:03
+the contents of the variable number has
+2:06
+changed it now contains five whenever
+2:09
+this happens you update the row four
+2:13
+variable in the trace table so number
+2:16
+now holds five and of course we've
+2:18
+updated our output window the next line
+2:21
+is total becomes equal to one so we've
+2:24
+updated that in our trace table for
+2:27
+counter equals one so we've initialized
+2:30
+counter to one and you can see we've
+2:32
+updated that and our trace table to
+2:34
+number
+2:35
+so we enter our for loop total equals
+2:39
+total which is one times counter which
+2:42
+is one or one times one is one and that
+2:45
+figure goes into total over writing what
+2:48
+was there so the total of that the value
+2:52
+of total has changed from one to one
+2:56
+now you might not update this in the
+2:59
+trace table but to be really accurate
+3:01
+it's probably a good idea to do that to
+3:03
+show that you know the value of one is
+3:05
+being replaced by another value of one
+3:09
+we then hit the end of the for loop next
+3:12
+counter and this increments the value of
+3:14
+counter by one so we've updated our
+3:17
+traced able to show that counter has
+3:18
+gone from one to two we go back to the
+3:22
+top of the for loop total now equals
+3:25
+total which was one times counter which
+3:29
+was two or one times two is two and that
+3:32
+gets overwritten and stored back in
+3:34
+total so we've updated our trace table
+3:36
+we reached into the for loop and we
+3:38
+increment counter from two till three we
+3:42
+go back to the start of the for loop
+3:44
+total now comes equal to the current
+3:47
+total which is two times the value of
+3:50
+counter which is three or two times
+3:52
+three is six and that gets written back
+3:55
+in total and we hit the end of the for
+3:57
+loop and increment the value of counter
+3:59
+from three to four notice were very
+4:02
+carefully stepping through the algorithm
+4:04
+methodically one line at a time as if we
+4:07
+were the computer program executing
+4:10
+every time a variable updates we change
+4:13
+its value in the trace table by adding
+4:15
+an extra row so back to the top again
+4:18
+we're doing four counter equals one to
+4:21
+number
+4:21
+well numbers five and counters four so
+4:23
+is still going into this for loop total
+4:26
+becomes equal
+4:27
+to the current value of total that six
+4:29
+times counter which is 4 6 times 4 is 24
+4:33
+and this gets placed into total to have
+4:35
+updated it next counter so we increment
+4:39
+counter to 5 we go back to start the for
+4:43
+loop for counter which is currently 5 -
+4:46
+number or numbers 5 so 5 still equals 5
+4:50
+so this is okay we're going to go into
+4:52
+the for loop one more time total becomes
+4:55
+equal to the current value of total 24
+4:57
+times the value of counter 5 24 times 5
+5:01
+is 120 and we update that into the value
+5:04
+total we increment counter to 6 we go
+5:09
+back to the start of the for loop for
+5:11
+counter equals 1 to the value in number
+5:15
+or the value in number is 5 counter is 6
+5:18
+so now we do not execute the for loop
+5:21
+and we skip beyond the end of the for
+5:24
+loop and we output the value of total
+5:26
+which currently stands at 120 so what
+5:32
+does this program actually doing well
+5:34
+having stepped through it line by line
+5:36
+noting down the contents noting down the
+5:38
+output noting down the variables as they
+5:41
+change you've probably figured it out
+5:44
+it's outputting the factorial of the
+5:47
+number entered factorial 5 for example
+5:50
+is 1 times 2 times 3 times 4 times 5
+5:55
+which is 120 and it's the value we ended
+5:58
+up with
+Outro
+6:03
+[Music]
+6:10
+you
+6:10
+[Music]

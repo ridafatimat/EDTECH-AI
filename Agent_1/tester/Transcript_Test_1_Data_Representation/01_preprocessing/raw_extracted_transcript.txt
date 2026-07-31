@@ -1,0 +1,86 @@
+Transcript Test 1 - Data Representation
+Synthetic raw lesson transcript for EDTech Module 1 + Module 2 testing
+00:00:02 Teacher: Hi hi, can you hear me? um, can you hear me now?
+00:00:06 Student: Yeah yeah I can hear you, sorry my mic was muted.
+00:00:10 Teacher: No worries. How was school today? You had that maths quiz, right?
+00:00:15 Student: Yeah it was okay. I think I got one question wrong but, uh, hopefully fine.
+00:00:22 Teacher: Good. And did you end up watching the football yesterday or no?
+00:00:27 Student: Only the first half. [background noise] My brother was watching it.
+00:00:33 Teacher: Right, right. Okay let's start. Last lesson we were doing binary and denary conversion, and I want to quickly check that before we move on.
+00:00:43 Teacher: So if I give you denary thirteen, how would you represent thirteen in eight-bit binary?
+00:00:51 Student: Umm, eight, four, two, one... so 00001101.
+00:00:57 Teacher: Correct. Correct. And why is the left side padded with zeroes?
+00:01:02 Student: Because we need eight bits, and those places are not being used.
+00:01:08 Teacher: Exactly. A bit is a single binary digit, either zero or one, and eight bits make one byte.
+00:01:16 Student: Byte, yeah.
+00:01:19 Teacher: Now let's reverse it. 00110110. Don't rush. Start from the place values.
+00:01:28 Student: Thirty-two plus sixteen plus, wait, no no, thirty-two plus sixteen plus four plus two, so fifty-four.
+00:01:35 Teacher: Yes, fifty-four. Nice. The main mistake students make here is they read the digits like a normal number instead of using powers of two.
+00:01:44 Teacher: Okay, before we move on, one more thing. What is the largest unsigned value we can represent using eight bits?
+00:01:51 Student: Two hundred and fifty-five.
+00:01:54 Teacher: Why?
+00:01:55 Student: Because all eight bits are one, so 128 plus 64 plus 32 plus 16 plus 8 plus 4 plus 2 plus 1.
+00:02:05 Teacher: Perfect. So that's still the same topic, binary representation. We haven't changed topic yet.
+00:02:12 Teacher: Now, let's move on to hexadecimal. This is the new bit.
+00:02:19 Student: We did a little bit in school but I don't really get why we use it.
+00:02:25 Teacher: Good question. Hexadecimal is base sixteen. It uses zero to nine and then A, B, C, D, E, F for values ten to fifteen.
+00:02:35 Teacher: The useful thing is that one hexadecimal digit maps neatly to four binary bits.
+00:02:42 Teacher: For example binary 1111 is hexadecimal F. Binary 1010 is hexadecimal A.
+00:02:50 Student: So 1100 would be C?
+00:02:53 Teacher: Exactly. And if you had 1010 1111, split it into two groups of four. 1010 is A and 1111 is F, so AF.
+00:03:05 Student: Okay that makes more sense.
+00:03:08 Teacher: Why might programmers prefer hexadecimal over writing long binary strings?
+00:03:15 Student: Because it's shorter and easier to read?
+00:03:18 Teacher: Exactly. Same information, more compact representation.
+00:03:25 Teacher: Let's do one more. Convert hexadecimal 3C to binary.
+00:03:31 Student: Three is 0011, C is 1100, so 00111100.
+00:03:38 Teacher: Yes. [inaudible] sorry, my internet froze for a second.
+00:03:42 Student: I heard you.
+00:03:45 Teacher: Great. Great. Great. So that finishes hexadecimal for today.
+00:03:52 Teacher: Next topic: character encoding. Have you heard of ASCII and Unicode?
+00:03:59 Student: ASCII yes, Unicode not really.
+00:04:05 Teacher: Think of character encoding as assigning numeric codes to characters. Computers ultimately store binary, so letters need number representations too.
+00:04:15 Teacher: ASCII can represent a limited set of characters. Unicode supports a much wider set of writing systems and symbols.
+00:04:25 Student: So emojis would be Unicode?
+00:04:28 Teacher: Yes, many emojis and characters from many languages are represented through Unicode standards.
+00:04:35 Teacher: Suppose a text file stores one thousand characters and each character uses one byte in a simplified question. Roughly how many bytes?
+00:04:44 Student: One thousand bytes.
+00:04:46 Teacher: Correct. In real Unicode encodings it can be more complicated, but GCSE questions may simplify it depending on the wording.
+00:04:57 Student: Okay.
+00:04:59 Teacher: Let's move on to images now.
+00:05:04 Teacher: A bitmap image can be thought of as a grid of pixels. Each pixel stores a colour value.
+00:05:12 Teacher: Two terms matter a lot: resolution and colour depth.
+00:05:18 Student: Resolution is width times height, right?
+00:05:21 Teacher: Right. If an image is 800 by 600 pixels, that's 480,000 pixels.
+00:05:30 Teacher: Colour depth is the number of bits used to represent the colour of each pixel.
+00:05:38 Teacher: So a rough uncompressed file size question can use number of pixels multiplied by colour depth, then convert bits to bytes.
+00:05:49 Student: Wait, do we divide by eight at the end?
+00:05:52 Teacher: Yes, if the question asks for bytes. Repeat that: bits to bytes, divide by eight.
+00:05:58 Student: Bits to bytes divide by eight. Bits to bytes divide by eight.
+00:06:03 Teacher: Exactly. Let's do 100 by 100 image, colour depth 8 bits.
+00:06:09 Student: Ten thousand pixels times eight is eighty thousand bits, then ten thousand bytes.
+00:06:15 Teacher: Correct.
+00:06:17 [notification sound]
+00:06:18 Student: Sorry, message popped up.
+00:06:21 Teacher: No issue. Now if resolution increases but everything else stays the same, what happens to file size?
+00:06:27 Student: It increases.
+00:06:29 Teacher: And if colour depth increases?
+00:06:32 Student: Also increases.
+00:06:35 Teacher: Good. Higher resolution can give more detail; higher colour depth allows more possible colours. Both generally require more storage.
+00:06:47 Teacher: Okay, before we finish, let's briefly look at sound representation.
+00:06:54 Teacher: Analogue sound is continuous, but computers store digital values, so the sound wave is sampled.
+00:07:04 Teacher: Sample rate means how many samples are taken per second. Sample resolution, sometimes called sample depth, is how many bits are used per sample.
+00:07:15 Student: So higher sample rate means more accurate sound?
+00:07:19 Teacher: Generally a better representation of the original wave, but also a larger file.
+00:07:26 Teacher: Same with sample resolution: more possible values, potentially better fidelity, but bigger files.
+00:07:36 Teacher: For an uncompressed mono sound file, a simplified calculation might use sample rate times sample resolution times duration.
+00:07:45 Student: And divide by eight if it asks bytes.
+00:07:48 Teacher: Exactly. You're seeing the pattern.
+00:07:54 Teacher: Let me give you a quick one. 8,000 samples per second, 8 bits per sample, 10 seconds.
+00:08:01 Student: 8,000 times 8 times 10 equals 640,000 bits, then 80,000 bytes.
+00:08:07 Teacher: Perfect.
+00:08:09 Teacher: So today we covered binary recap, hexadecimal, character encoding, bitmap images, and digital sound.
+00:08:18 Student: Yeah.
+00:08:19 Teacher: Next lesson we'll probably do compression, but don't revise that now. Just practise conversions and file size questions.
+00:08:29 Student: Okay, thanks.
+00:08:31 Teacher: Alright, see you next week. bye bye.

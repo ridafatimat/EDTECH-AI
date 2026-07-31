@@ -18,6 +18,10 @@ class PreprocessingStats(BaseModel):
     repeated_words_removed: int = 0
     repeated_sentences_removed: int = 0
 
+    # High-confidence non-lesson document metadata removed before chunking.
+    metadata_lines_removed: int = 0
+    metadata_characters_removed: int = 0
+
 
 class PreprocessingResult(BaseModel):
     """
@@ -30,6 +34,12 @@ class PreprocessingResult(BaseModel):
 
     # Non-fatal issues which later stages may want to know about.
     warnings: list[str] = Field(
+        default_factory=list
+    )
+
+    # Preserved in the audit output so removals can be reviewed. These values
+    # must never be passed into semantic chunking or topic extraction.
+    removed_metadata_lines: list[str] = Field(
         default_factory=list
     )
 

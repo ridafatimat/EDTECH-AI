@@ -1,0 +1,49 @@
+{
+  "run_name": "Real_AQA_02_Number_Bases",
+  "source_file": "C:\\Users\\hp\\EDTECH\\Agent_1\\test_data\\Real_AQA_02_Number_Bases.docx",
+  "run_directory": "C:\\Users\\hp\\EDTECH\\Agent_1\\tester\\Real_AQA_02_Number_Bases",
+  "created_at": "2026-07-31T16:00:48.682805+05:00",
+  "updated_at": "2026-07-31T16:01:01.239854+05:00",
+  "status": "completed",
+  "current_stage": null,
+  "stages": {
+    "module_1_preprocessing": {
+      "status": "completed",
+      "duration_seconds": 0.071,
+      "outputs": {
+        "raw_extracted_transcript": "C:\\Users\\hp\\EDTECH\\Agent_1\\tester\\Real_AQA_02_Number_Bases\\01_preprocessing\\raw_extracted_transcript.txt",
+        "deterministic_cleaned": "C:\\Users\\hp\\EDTECH\\Agent_1\\tester\\Real_AQA_02_Number_Bases\\01_preprocessing\\deterministic_cleaned.txt",
+        "audit": "C:\\Users\\hp\\EDTECH\\Agent_1\\tester\\Real_AQA_02_Number_Bases\\01_preprocessing\\preprocessing_audit.json"
+      }
+    },
+    "module_2_chunking": {
+      "status": "completed",
+      "duration_seconds": 8.103,
+      "input": "C:\\Users\\hp\\EDTECH\\Agent_1\\tester\\Real_AQA_02_Number_Bases\\01_preprocessing\\cleaned_transcript.txt",
+      "outputs": {
+        "chunks_json": "C:\\Users\\hp\\EDTECH\\Agent_1\\tester\\Real_AQA_02_Number_Bases\\02_chunking\\chunks.json",
+        "chunks_readable": "C:\\Users\\hp\\EDTECH\\Agent_1\\tester\\Real_AQA_02_Number_Bases\\02_chunking\\chunks_readable.txt"
+      },
+      "chunk_count": 5
+    },
+    "module_3_topic_extraction": {
+      "status": "completed",
+      "duration_seconds": 2.811,
+      "input": "C:\\Users\\hp\\EDTECH\\Agent_1\\tester\\Real_AQA_02_Number_Bases\\02_chunking\\chunks.json",
+      "outputs": {
+        "topics_json": "C:\\Users\\hp\\EDTECH\\Agent_1\\tester\\Real_AQA_02_Number_Bases\\03_topic_extraction\\topics.json",
+        "topics_readable": "C:\\Users\\hp\\EDTECH\\Agent_1\\tester\\Real_AQA_02_Number_Bases\\03_topic_extraction\\topics_readable.txt"
+      },
+      "merged_topic_count": 1
+    },
+    "module_1_technical_normalisation": {
+      "status": "completed",
+      "duration_seconds": 1.566,
+      "outputs": {
+        "cleaned_transcript": "C:\\Users\\hp\\EDTECH\\Agent_1\\tester\\Real_AQA_02_Number_Bases\\01_preprocessing\\cleaned_transcript.txt",
+        "audit": "C:\\Users\\hp\\EDTECH\\Agent_1\\tester\\Real_AQA_02_Number_Bases\\01_preprocessing\\technical_normalisation_audit.json"
+      }
+    }
+  },
+  "error": null
+}

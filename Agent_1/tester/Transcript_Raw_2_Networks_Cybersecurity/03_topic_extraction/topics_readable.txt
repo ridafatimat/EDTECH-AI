@@ -1,0 +1,563 @@
+====================================================================================================
+AGENT 1 — MODULE 3 ROUGH TOPIC EXTRACTION
+====================================================================================================
+
+Embedding model: sentence-transformers/all-MiniLM-L6-v2
+Candidate keep threshold: 0.46
+Total chunks: 6
+CS-relevant chunks: 6
+Non-CS/no-new-topic chunks: 0
+Official-topic chunks: 4
+Mixed official + unmapped chunks: 2
+Unmapped-CS chunks: 0
+Continuation/no-new-topic chunks: 0
+No-topic chunks: 0
+LLM fallback chunks: [3, 4]
+
+====================================================================================================
+CHUNK 1
+====================================================================================================
+Source words: 433
+Classification: official_aqa_topic
+CS relevant: True
+Creates new topic: True
+Chunk relevance score: 0.8326
+Requires LLM fallback: False
+
+RETAINED TOPICS
+----------------------------------------------------------------------------------------------------
+- PAN, LAN and WAN
+  concept_id: aqa_3_5_network_types
+  domain: Fundamentals of computer networks
+  official reference: 3.5
+  confidence: 0.8472
+  salience score: 0.7515
+  keyword score: 1.0
+  semantic score: 0.5482
+  method: None
+  matched aliases: ['lan', 'local area network', 'wan', 'wide area network']
+  evidence:
+    • okay so I was thinking today we continue the networks part because last time we did some of it but I don't think we properly finished it and there were one or two things you were still mixing up like LAN and WAN and then we also had protocols so we'll do that and then maybe security if we have time.
+    • now remember LAN and WAN.
+    • what was LAN?
+
+====================================================================================================
+CHUNK 2
+====================================================================================================
+Source words: 331
+Classification: official_aqa_topic
+CS relevant: True
+Creates new topic: True
+Chunk relevance score: 0.7753
+Requires LLM fallback: False
+
+RETAINED TOPICS
+----------------------------------------------------------------------------------------------------
+- Network protocols
+  concept_id: aqa_3_5_protocols
+  domain: Fundamentals of computer networks
+  official reference: 3.5
+  confidence: 0.7577
+  salience score: 0.7932
+  keyword score: 1.0
+  semantic score: 0.624
+  method: None
+  matched aliases: ['protocol', 'ethernet', 'tcp', 'http', 'https', 'ftp', 'smtp', 'imap']
+  evidence:
+    • protocol means agreed rules for communication.
+    • and if one packet is missing then protocols can help detect and request retransmission depending on the protocol behavior.
+    • what is ethernet?
+- Wired and wireless networks
+  concept_id: aqa_3_5_wired_wireless
+  domain: Fundamentals of computer networks
+  official reference: 3.5
+  confidence: 0.6443
+  salience score: 0.5115
+  keyword score: 0.79
+  semantic score: 0.4451
+  method: None
+  matched aliases: ['wi fi']
+  evidence:
+    • number of users, hardware, media, Wi-Fi interference, distance and walls can all affect performance.
+    • yes, and Wi-Fi is wireless.
+
+====================================================================================================
+CHUNK 3
+====================================================================================================
+Source words: 226
+Classification: mixed_official_and_unmapped
+CS relevant: True
+Creates new topic: True
+Chunk relevance score: 0.763
+Requires LLM fallback: True
+Notes:
+- Unmapped CS evidence is semantic-only, borderline or ambiguous, so later fallback should refine the rough topic without inventing an AQA label.
+
+RETAINED TOPICS
+----------------------------------------------------------------------------------------------------
+- Social engineering, blagging, phishing and shouldering
+  concept_id: aqa_3_6_2_1_social_engineering
+  domain: Cyber security
+  official reference: 3.6.2.1
+  confidence: 0.8408
+  salience score: 0.7033
+  keyword score: 1.0
+  semantic score: 0.4605
+  method: None
+  matched aliases: ['social engineering', 'phishing', 'fake email']
+  evidence:
+    • social engineering is broader, manipulating people.
+    • phishing.
+    • fake email or message designed to trick user into giving credentials or clicking a malicious link.
+- Cyber security fundamentals
+  concept_id: aqa_3_6_1_cyber_security
+  domain: Cyber security
+  official reference: 3.6.1
+  confidence: 0.7628
+  salience score: 0.7623
+  keyword score: 0.89
+  semantic score: 0.7194
+  method: None
+  matched aliases: ['cyber security', 'unauthorized access']
+  evidence:
+    • okay now let's move on to cyber security.
+    • cyber security is protecting systems, networks and data from unauthorized access, damage, theft, disruption and attacks.
+- Malware, viruses, Trojans and spyware
+  concept_id: aqa_3_6_2_2_malware
+  domain: Cyber security
+  official reference: 3.6.2.2
+  confidence: 0.7223
+  salience score: 0.7728
+  keyword score: 0.97
+  semantic score: 0.5869
+  method: None
+  matched aliases: ['malware', 'virus', 'trojan', 'spyware']
+  evidence:
+    • first malware.
+    • virus worm trojan spyware ransomware.
+    • virus usually attaches to files or programs and spreads when executed or shared.
+- Network security methods
+  concept_id: aqa_3_5_network_security
+  domain: Fundamentals of computer networks
+  official reference: 3.5
+  confidence: 0.5091
+  salience score: 0.5056
+  keyword score: 0.5
+  semantic score: 0.586
+  method: None
+  matched aliases: ['authentication']
+  evidence:
+    • account lockout, rate limiting, strong passwords, two factor authentication can reduce the risk.
+
+UNMAPPED CS SIGNALS
+----------------------------------------------------------------------------------------------------
+- Unmapped Computer Science content
+  domain: Networks and cyber security
+  score: 0.5241
+  method: semantic
+  matched aliases: []
+  evidence: I know this chapter kind of feels like a separate chapter but networks and security overlap a lot so you might hear me go back to network examples.
+- Unmapped Computer Science content
+  domain: Networks and cyber security
+  score: 0.5162
+  method: semantic
+  matched aliases: []
+  evidence: no security control stops everything, we use layers.
+
+REJECTED / LOW-CONFIDENCE CANDIDATES
+----------------------------------------------------------------------------------------------------
+- Database and relational database concepts: 0.4265
+
+====================================================================================================
+CHUNK 4
+====================================================================================================
+Source words: 370
+Classification: mixed_official_and_unmapped
+CS relevant: True
+Creates new topic: True
+Chunk relevance score: 0.701
+Requires LLM fallback: True
+Notes:
+- Unmapped CS evidence is semantic-only, borderline or ambiguous, so later fallback should refine the rough topic without inventing an AQA label.
+
+RETAINED TOPICS
+----------------------------------------------------------------------------------------------------
+- Network security methods
+  concept_id: aqa_3_5_network_security
+  domain: Fundamentals of computer networks
+  official reference: 3.5
+  confidence: 0.7297
+  salience score: 0.808
+  keyword score: 0.89
+  semantic score: 0.651
+  method: None
+  matched aliases: ['authentication', 'encryption', 'firewall']
+  evidence:
+    • authentication checks identity.
+    • firewall at the network edge, accounts with authentication, user permissions, device security, encrypted HTTPS connections, filtering.
+    • encryption transforms data so it is unreadable without correct key.
+- Social engineering, blagging, phishing and shouldering
+  concept_id: aqa_3_6_2_1_social_engineering
+  domain: Cyber security
+  official reference: 3.6.2.1
+  confidence: 0.7163
+  salience score: 0.5703
+  keyword score: 0.87
+  semantic score: 0.3702
+  method: None
+  matched aliases: ['phishing', 'fake email']
+  evidence:
+    • phishing.
+    • attack where fake email asks for password?
+- Penetration testing
+  concept_id: aqa_3_6_2_penetration_testing
+  domain: Cyber security
+  official reference: 3.6.2
+  confidence: 0.5822
+  salience score: 0.4588
+  keyword score: 0.72
+  semantic score: 0.5009
+  method: None
+  matched aliases: ['penetration testing']
+  evidence:
+    • penetration testing is authorized testing to find weaknesses before attackers do.
+- Network protocols
+  concept_id: aqa_3_5_protocols
+  domain: Fundamentals of computer networks
+  official reference: 3.5
+  confidence: 0.5521
+  salience score: 0.6812
+  keyword score: 0.8
+  semantic score: 0.4204
+  method: None
+  matched aliases: ['protocol', 'https', 'smtp']
+  evidence:
+    • protocol for sending email?
+    • firewall at the network edge, accounts with authentication, user permissions, device security, encrypted HTTPS connections, filtering.
+    • SMTP.
+
+UNMAPPED CS SIGNALS
+----------------------------------------------------------------------------------------------------
+- Unmapped Computer Science content
+  domain: Networks and cyber security
+  score: 0.5652
+  method: semantic
+  matched aliases: []
+  evidence: where could security controls exist?
+- Unmapped Computer Science content
+  domain: Networks and cyber security
+  score: 0.5303
+  method: semantic
+  matched aliases: []
+  evidence: firewall monitors and controls traffic according to rules.
+
+REJECTED / LOW-CONFIDENCE CANDIDATES
+----------------------------------------------------------------------------------------------------
+- Malware, viruses, Trojans and spyware: 0.4516
+- PAN, LAN and WAN: 0.4423
+
+====================================================================================================
+CHUNK 5
+====================================================================================================
+Source words: 520
+Classification: official_aqa_topic
+CS relevant: True
+Creates new topic: True
+Chunk relevance score: 0.7
+Requires LLM fallback: False
+
+RETAINED TOPICS
+----------------------------------------------------------------------------------------------------
+- Star and bus network topologies
+  concept_id: aqa_3_5_topologies
+  domain: Fundamentals of computer networks
+  official reference: 3.5
+  confidence: 0.7461
+  salience score: 0.6841
+  keyword score: 0.89
+  semantic score: 0.5771
+  method: None
+  matched aliases: ['star topology', 'central switch']
+  evidence:
+    • star topology means devices connect to a central switch or hub, usually switch.
+    • if one cable to one device fails, other devices may still work, but if central switch fails communication can be disrupted.
+- Social engineering, blagging, phishing and shouldering
+  concept_id: aqa_3_6_2_1_social_engineering
+  domain: Cyber security
+  official reference: 3.6.2.1
+  confidence: 0.6642
+  salience score: 0.4699
+  keyword score: 0.82
+  semantic score: 0.3391
+  method: None
+  matched aliases: ['social engineering', 'phishing']
+  evidence:
+    • phishing, social engineering.
+- Network security methods
+  concept_id: aqa_3_5_network_security
+  domain: Fundamentals of computer networks
+  official reference: 3.5
+  confidence: 0.588
+  salience score: 0.7103
+  keyword score: 0.81
+  semantic score: 0.4732
+  method: None
+  matched aliases: ['encryption', 'firewall']
+  evidence:
+    • password hashing also protects stored credentials if database compromised, but don't mix hashing with encryption exactly, different ideas.
+    • student says encryption stops hackers reading everything.
+    • encryption protects confidentiality when implemented correctly, but if attacker steals credentials or device is already unlocked, encryption alone may not solve everything.
+- PAN, LAN and WAN
+  concept_id: aqa_3_5_network_types
+  domain: Fundamentals of computer networks
+  official reference: 3.5
+  confidence: 0.5567
+  salience score: 0.6011
+  keyword score: 0.57
+  semantic score: 0.6081
+  method: None
+  matched aliases: ['wan']
+  evidence:
+    • student asks is internet a WAN.
+    • you can say the internet is a global network of networks and it involves WAN-scale connectivity, but don't force every definition.
+- Cyber security fundamentals
+  concept_id: aqa_3_6_1_cyber_security
+  domain: Cyber security
+  official reference: 3.6.1
+  confidence: 0.5749
+  salience score: 0.3824
+  keyword score: 0.72
+  semantic score: 0.362
+  method: None
+  matched aliases: ['cyber security']
+  evidence:
+    • okay let me jump to cyber security scenario.
+- Malware, viruses, Trojans and spyware
+  concept_id: aqa_3_6_2_2_malware
+  domain: Cyber security
+  official reference: 3.6.2.2
+  confidence: 0.5338
+  salience score: 0.5896
+  keyword score: 0.79
+  semantic score: 0.4053
+  method: None
+  matched aliases: ['malware', 'trojan', 'spyware']
+  evidence:
+    • that's malware, likely spyware or Trojan behavior.
+    • a Trojan may disguise itself as legitimate software, spyware gathers information.
+
+====================================================================================================
+CHUNK 6
+====================================================================================================
+Source words: 314
+Classification: official_aqa_topic
+CS relevant: True
+Creates new topic: True
+Chunk relevance score: 0.6129
+Requires LLM fallback: False
+
+RETAINED TOPICS
+----------------------------------------------------------------------------------------------------
+- Network security methods
+  concept_id: aqa_3_5_network_security
+  domain: Fundamentals of computer networks
+  official reference: 3.5
+  confidence: 0.5584
+  salience score: 0.6833
+  keyword score: 0.81
+  semantic score: 0.4242
+  method: None
+  matched aliases: ['authentication', 'encryption']
+  evidence:
+    • authorization versus authentication again because students mix.
+    • authentication who are you, authorization what are you allowed to do.
+    • student says encryption stops hackers reading everything.
+- Wired and wireless networks
+  concept_id: aqa_3_5_wired_wireless
+  domain: Fundamentals of computer networks
+  official reference: 3.5
+  confidence: 0.5795
+  salience score: 0.4312
+  keyword score: 0.72
+  semantic score: 0.4506
+  method: None
+  matched aliases: ['wi fi']
+  evidence:
+    • devices connect through switches, router connects LAN to other networks and internet, server provides services, WAP gives Wi-Fi, protocols define communication rules, packets carry data, security controls protect traffic accounts and devices.
+
+====================================================================================================
+MERGED LESSON TOPICS
+====================================================================================================
+
+PRIMARY TOPICS
+----------------------------------------------------------------------------------------------------
+- Network security methods
+
+SUPPORTING TOPICS
+----------------------------------------------------------------------------------------------------
+- PAN, LAN and WAN
+- Social engineering, blagging, phishing and shouldering
+- Network protocols
+- Malware, viruses, Trojans and spyware
+- Cyber security fundamentals
+- Star and bus network topologies
+- Wired and wireless networks
+- Penetration testing
+
+UNMAPPED / EXTENDED TOPICS
+----------------------------------------------------------------------------------------------------
+- Unmapped Computer Science content
+
+DETAILED MERGED OFFICIAL TOPICS
+----------------------------------------------------------------------------------------------------
+- Network security methods
+  concept_id: aqa_3_5_network_security
+  domain: Fundamentals of computer networks
+  role: primary
+  confidence: 0.701
+  ranking score: 0.6489
+  source chunks: [3, 4, 5, 6]
+  support spans: 1
+  mean semantic score: 0.5336
+  mean salience score: 0.6768
+  coverage score: 0.6667
+  supporting candidates: 4
+  evidence:
+    • account lockout, rate limiting, strong passwords, two factor authentication can reduce the risk.
+    • authentication checks identity.
+    • firewall at the network edge, accounts with authentication, user permissions, device security, encrypted HTTPS connections, filtering.
+    • encryption transforms data so it is unreadable without correct key.
+    • password hashing also protects stored credentials if database compromised, but don't mix hashing with encryption exactly, different ideas.
+- PAN, LAN and WAN
+  concept_id: aqa_3_5_network_types
+  domain: Fundamentals of computer networks
+  role: supporting
+  confidence: 0.8526
+  ranking score: 0.5547
+  source chunks: [1, 5]
+  support spans: 2
+  mean semantic score: 0.5781
+  mean salience score: 0.6763
+  coverage score: 0.3333
+  supporting candidates: 2
+  evidence:
+    • okay so I was thinking today we continue the networks part because last time we did some of it but I don't think we properly finished it and there were one or two things you were still mixing up like LAN and WAN and then we also had protocols so we'll do that and then maybe security if we have time.
+    • now remember LAN and WAN.
+    • what was LAN?
+    • student asks is internet a WAN.
+    • you can say the internet is a global network of networks and it involves WAN-scale connectivity, but don't force every definition.
+- Social engineering, blagging, phishing and shouldering
+  concept_id: aqa_3_6_2_1_social_engineering
+  domain: Cyber security
+  role: supporting
+  confidence: 0.763
+  ranking score: 0.5468
+  source chunks: [3, 4, 5]
+  support spans: 1
+  mean semantic score: 0.3899
+  mean salience score: 0.5812
+  coverage score: 0.5
+  supporting candidates: 3
+  evidence:
+    • social engineering is broader, manipulating people.
+    • phishing.
+    • fake email or message designed to trick user into giving credentials or clicking a malicious link.
+    • attack where fake email asks for password?
+    • phishing, social engineering.
+- Network protocols
+  concept_id: aqa_3_5_protocols
+  domain: Fundamentals of computer networks
+  role: supporting
+  confidence: 0.7953
+  ranking score: 0.5443
+  source chunks: [2, 4]
+  support spans: 2
+  mean semantic score: 0.5222
+  mean salience score: 0.7372
+  coverage score: 0.3333
+  supporting candidates: 2
+  evidence:
+    • protocol means agreed rules for communication.
+    • and if one packet is missing then protocols can help detect and request retransmission depending on the protocol behavior.
+    • what is ethernet?
+    • protocol for sending email?
+    • firewall at the network edge, accounts with authentication, user permissions, device security, encrypted HTTPS connections, filtering.
+- Malware, viruses, Trojans and spyware
+  concept_id: aqa_3_6_2_2_malware
+  domain: Cyber security
+  role: supporting
+  confidence: 0.7096
+  ranking score: 0.5107
+  source chunks: [3, 5]
+  support spans: 2
+  mean semantic score: 0.4961
+  mean salience score: 0.6812
+  coverage score: 0.3333
+  supporting candidates: 2
+  evidence:
+    • first malware.
+    • virus worm trojan spyware ransomware.
+    • virus usually attaches to files or programs and spreads when executed or shared.
+    • that's malware, likely spyware or Trojan behavior.
+    • a Trojan may disguise itself as legitimate software, spyware gathers information.
+- Cyber security fundamentals
+  concept_id: aqa_3_6_1_cyber_security
+  domain: Cyber security
+  role: supporting
+  confidence: 0.7455
+  ranking score: 0.505
+  source chunks: [3, 5]
+  support spans: 2
+  mean semantic score: 0.5407
+  mean salience score: 0.5724
+  coverage score: 0.3333
+  supporting candidates: 2
+  evidence:
+    • okay now let's move on to cyber security.
+    • cyber security is protecting systems, networks and data from unauthorized access, damage, theft, disruption and attacks.
+    • okay let me jump to cyber security scenario.
+- Star and bus network topologies
+  concept_id: aqa_3_5_topologies
+  domain: Fundamentals of computer networks
+  role: supporting
+  confidence: 0.7
+  ranking score: 0.4589
+  source chunks: [5]
+  support spans: 1
+  mean semantic score: 0.5771
+  mean salience score: 0.6841
+  coverage score: 0.1667
+  supporting candidates: 1
+  evidence:
+    • star topology means devices connect to a central switch or hub, usually switch.
+    • if one cable to one device fails, other devices may still work, but if central switch fails communication can be disrupted.
+- Wired and wireless networks
+  concept_id: aqa_3_5_wired_wireless
+  domain: Fundamentals of computer networks
+  role: supporting
+  confidence: 0.6272
+  ranking score: 0.4426
+  source chunks: [2, 6]
+  support spans: 2
+  mean semantic score: 0.4478
+  mean salience score: 0.4713
+  coverage score: 0.3333
+  supporting candidates: 2
+  evidence:
+    • number of users, hardware, media, Wi-Fi interference, distance and walls can all affect performance.
+    • yes, and Wi-Fi is wireless.
+    • devices connect through switches, router connects LAN to other networks and internet, server provides services, WAP gives Wi-Fi, protocols define communication rules, packets carry data, security controls protect traffic accounts and devices.
+- Penetration testing
+  concept_id: aqa_3_6_2_penetration_testing
+  domain: Cyber security
+  role: supporting
+  confidence: 0.562
+  ranking score: 0.371
+  source chunks: [4]
+  support spans: 1
+  mean semantic score: 0.5009
+  mean salience score: 0.4588
+  coverage score: 0.1667
+  supporting candidates: 1
+  evidence:
+    • penetration testing is authorized testing to find weaknesses before attackers do.

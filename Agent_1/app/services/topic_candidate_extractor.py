@@ -38,6 +38,12 @@ class TopicExtractionConfig:
     single_word_min_evidence_sentences: int = 2
     single_word_min_distinct_aliases: int = 2
 
+    # Ambiguous aliases require contextual confirmation. This prevents a
+    # valid but overloaded word such as "binary" from mapping to number
+    # bases when the phrase actually refers to binary search.
+    ambiguous_alias_semantic_floor: float = 0.50
+    ambiguous_alias_min_context_terms: int = 1
+
     max_raw_candidates: int = 12
     max_final_candidates: int = 6
     max_evidence_per_candidate: int = 3
@@ -60,6 +66,7 @@ class TopicExtractionConfig:
             "raw_candidate_floor",
             "semantic_only_threshold",
             "single_word_semantic_floor",
+            "ambiguous_alias_semantic_floor",
             "parent_suppression_margin",
             "duplicate_evidence_overlap",
             "duplicate_alias_token_overlap",
@@ -71,6 +78,11 @@ class TopicExtractionConfig:
         if self.max_raw_candidates < 1 or self.max_final_candidates < 1:
             raise ValueError("Candidate limits must be at least 1.")
 
+        if self.ambiguous_alias_min_context_terms < 1:
+            raise ValueError(
+                "ambiguous_alias_min_context_terms must be at least 1."
+            )
+
 
 @dataclass(frozen=True)
 class KeywordEvidence:
@@ -80,6 +92,10 @@ class KeywordEvidence:
     total_hits: int
     excluded_hits: int
     single_word_alias_only: bool
+    ambiguous_alias_only: bool
+    matched_context_terms: list[str]
+    matched_conflicting_context_terms: list[str]
+    minimum_context_hits: int
 
 
 class TopicCandidateExtractor:
@@ -213,6 +229,12 @@ class TopicCandidateExtractor:
                     total_alias_hits=keyword.total_hits,
                     evidence_sentence_count=len(keyword.evidence_sentences),
                     single_word_alias_only=keyword.single_word_alias_only,
+                    ambiguous_alias_only=keyword.ambiguous_alias_only,
+                    matched_context_terms=keyword.matched_context_terms,
+                    matched_conflicting_context_terms=(
+                        keyword.matched_conflicting_context_terms
+                    ),
+                    minimum_context_hits=keyword.minimum_context_hits,
                     evidence=evidence,
                     parent_concept_id=concept.parent_concept_id,
                 )
@@ -388,10 +410,44 @@ class TopicCandidateExtractor:
                 total_hits=0,
                 excluded_hits=excluded_hits,
                 single_word_alias_only=False,
+                ambiguous_alias_only=False,
+                matched_context_terms=[],
+                matched_conflicting_context_terms=[],
+                minimum_context_hits=concept.minimum_context_hits,
             )
 
         evidence = self._unique_strings(evidence)
         matched_aliases = self._unique_strings(matched_aliases)
+
+        normalized_ambiguous_aliases = {
+            self._normalize_for_match(alias)
+            for alias in concept.ambiguous_aliases
+            if self._normalize_for_match(alias)
+        }
+
+        normalized_matched_aliases = {
+            self._normalize_for_match(alias)
+            for alias in matched_aliases
+            if self._normalize_for_match(alias)
+        }
+
+        ambiguous_alias_only = bool(
+            normalized_matched_aliases
+            and normalized_matched_aliases.issubset(
+                normalized_ambiguous_aliases
+            )
+        )
+
+        matched_context_terms = self._matched_context_terms(
+            full_text=full_text,
+            context_terms=concept.supporting_context_terms,
+            excluded_phrases=concept.excluded_phrases,
+        )
+        matched_conflicting_context_terms = self._matched_context_terms(
+            full_text=full_text,
+            context_terms=concept.conflicting_context_terms,
+            excluded_phrases=concept.excluded_phrases,
+        )
 
         strongest_alias = max(alias_weights)
         distinct_bonus = 0.08 * max(0, len(matched_aliases) - 1)
@@ -415,7 +471,55 @@ class TopicCandidateExtractor:
             single_word_alias_only=all(
                 word_count == 1 for word_count in matched_word_counts
             ),
+            ambiguous_alias_only=ambiguous_alias_only,
+            matched_context_terms=matched_context_terms,
+            matched_conflicting_context_terms=(
+                matched_conflicting_context_terms
+            ),
+            minimum_context_hits=concept.minimum_context_hits,
         )
+
+    @classmethod
+    def _matched_context_terms(
+        cls,
+        full_text: str,
+        context_terms: tuple[str, ...],
+        excluded_phrases: tuple[str, ...],
+    ) -> list[str]:
+        """
+        Return catalogue-provided context terms found outside blocked phrases.
+
+        A context term cannot confirm an ambiguous alias when its occurrence
+        exists only inside a known confusable compound phrase.
+        """
+
+        normalized_text = cls._normalize_for_match(full_text)
+        blocked_ranges = cls._excluded_ranges(
+            text=normalized_text,
+            excluded_phrases=excluded_phrases,
+        )
+
+        matched: list[str] = []
+
+        for term in context_terms:
+            normalized_term = cls._normalize_for_match(term)
+            if not normalized_term:
+                continue
+
+            pattern = re.compile(
+                r"(?<!\w)"
+                + re.escape(normalized_term).replace(r"\ ", r"\s+")
+                + r"(?!\w)",
+                re.IGNORECASE,
+            )
+
+            if any(
+                not cls._overlaps_any(match.span(), blocked_ranges)
+                for match in pattern.finditer(normalized_text)
+            ):
+                matched.append(term)
+
+        return cls._unique_strings(matched)
 
     @classmethod
     def _excluded_ranges(
@@ -469,6 +573,17 @@ class TopicCandidateExtractor:
         keyword: KeywordEvidence,
         semantic_score: float,
     ) -> bool:
+        # Ambiguous aliases are stricter than ordinary single-word aliases.
+        # They must be confirmed by catalogue-provided contextual language.
+        # This is generic and applies to any future ambiguous catalogue term.
+        if keyword.ambiguous_alias_only:
+            return (
+                semantic_score
+                >= self.config.ambiguous_alias_semantic_floor
+                and len(keyword.matched_context_terms)
+                >= self.config.ambiguous_alias_min_context_terms
+            )
+
         if not keyword.single_word_alias_only:
             return True
 

@@ -1,0 +1,364 @@
+Bubble sort
+0:00
+in this video we take a look at the
+0:02
+bubble sort algorithm so before we work
+Bubble sort
+0:12
+through an example of the bubble sort
+0:14
+algorithm
+0:15
+let's first summarize its key features
+0:18
+it sorts unordered lists of items it
+0:22
+compares each item with the next one and
+0:24
+then swaps them after out of order the
+0:27
+algorithm finishes when no more swaps
+0:29
+need to be made in effect it bubbles up
+0:33
+the largest or smallest item to the end
+0:36
+of the list in successive passes this is
+0:39
+the most inefficient of the sorting
+0:41
+algorithms but it's very easy to
+0:43
+implement this makes it a popular choice
+0:46
+for very small data sets so here's a
+Breakfast cereal example
+0:52
+data set of breakfast cereals the
+0:54
+original data to sort is shown on the
+0:56
+left and the sorted data that we're
+0:58
+trying to achieve is shown in green on
+1:01
+the right and the object is to put them
+1:03
+in alphabetical order with the lowest
+1:06
+one at the bottom so cornflakes crunchy
+1:09
+nut clusters fruit and fiber sugar puffs
+1:11
+and Weetabix at the top we're now going
+1:14
+to go through the steps of the algorithm
+1:15
+to see how we can get to the sorted data
+1:18
+set so we start by comparing the first
+1:23
+two items of the list are they in the
+1:26
+right order well they're not in the
+1:30
+right order so we swap them over we now
+1:35
+compare the next two items in our list
+1:37
+so that's Weetabix and Sugar Puffs are
+1:39
+they in the right order well yes they
+1:44
+are so we leave them exactly where they
+1:46
+are we now compare the next two items in
+1:50
+our list fruit and fiber and Weetabix
+1:53
+are they in the right order well they're
+1:57
+not in the right order so we swap them
+1:59
+over and finally we compare the last two
+2:04
+items our list corn flakes and Weetabix
+2:07
+are they in the right order or no
+2:11
+they're not so
+2:12
+swap them over now we've completed what
+2:15
+we call off first pass now what we can
+2:18
+be sure of is that Weetabix is now in
+2:20
+the correct place in effect it's bubbled
+2:24
+up to the top of the list we now have to
+2:27
+perform a second pass so Weetabix in the
+2:33
+correct place so we can ignore that but
+2:35
+we repeat the algorithm starting with
+2:37
+comparing Sugar Puffs and crunch nut
+2:39
+clusters cuz they're the first two items
+2:41
+of the list and we ask are they in the
+2:44
+right order they are so we need them
+2:48
+where they are we compare the next two
+2:51
+items on our list are they in the right
+2:53
+order well they're not so we swap them
+2:57
+over we compare the next two items in
+3:01
+our list abdi in the right order and
+3:05
+they're not so we swap them over we've
+3:09
+now completed our second pass and we can
+3:12
+be sure that Weetabix and Sugar Puffs
+3:15
+which has just bubbled up to the top are
+3:17
+in the correct place so we now have to
+3:19
+do a third pass so compare the first two
+3:24
+items of the list that's fruit and fiber
+3:26
+and crunch nut clusters are they in the
+3:29
+right order while they are in the right
+3:32
+order so we leave them where they are we
+3:36
+now compare the next two items
+3:37
+cornflakes and fruit and nut fiber are
+3:41
+they in the right order then not in the
+3:45
+right order so we swap them over we've
+3:48
+now completed our third pass and we can
+3:51
+be sure that Weetabix sugar puffs and
+3:53
+fruit and fiber are all in the correct
+3:55
+place we simply repeat our algorithm on
+3:59
+the unsorted part of the list or the
+4:04
+unsorted part of the list is only the
+4:06
+first two items so we compare them just
+4:09
+like before and we ask are they in the
+4:11
+right order they're not in the right
+4:14
+order so we swap them over and we've now
+4:17
+completed our fourth paths we can now
+4:21
+can be sure that Weetabix sugar puff
+4:23
+fruit and fiber crunch
+4:25
+clusters and cornflakes are all in the
+4:28
+correct order the specification at GCSE
+Thing you need to know for the exam
+4:32
+requires you to know the mechanics of an
+4:35
+algorithm you should understand the
+4:37
+advantages and disadvantages of using
+4:40
+one algorithm over another to solve the
+4:43
+same problem however at GCSE level
+4:46
+you're not going to be expected to
+4:48
+remember that a needle code line for
+4:51
+line for a given algorithm in the rest
+4:54
+of this video we're gonna walk through
+4:55
+an example of this algorithm step by
+4:59
+step
+Bubble sort in code
+5:03
+so we start by sitting into the length
+5:06
+of the list and we initialized our swap
+5:08
+flag to true we then enter a while loop
+5:13
+which we keep running as long as n is
+5:16
+greater than zero and we're still making
+5:18
+swaps we set our swap flag to false and
+5:24
+we decrement the number of items to
+5:26
+check by one as our list is zero indexed
+5:31
+we enter a for loop to run up until n in
+5:35
+other words check every item we use an
+5:41
+if statement to check an item with its
+5:43
+adjacent item if the item is greater
+5:48
+than the one we're comparing it to then
+5:50
+it needs to be swapped now we use a
+5:53
+temporary variable in order to perform a
+5:56
+direct swap and set our swap flag to
+5:59
+true in the rest of this video we're
+Merge sort vs bubble sort
+6:02
+going to compare the two GCSE sorting
+6:05
+algorithms that you need to know about
+6:06
+the merge sort and the bubble sort if
+6:10
+you've not watched the video on the
+6:11
+merge sort yet go back and watch that
+6:13
+first before watching the rest of this
+6:16
+video so on the left-hand side we have
+6:20
+the merge sort and on the right the
+6:22
+bubble sort so a merge sort items in one
+6:26
+list are compared to items in another
+6:28
+list to create new lists or the bubble
+6:32
+sort
+6:32
+adjacent items are compared and swapped
+6:35
+if they're out of order a merge sort is
+6:40
+typically a very quick sort algorithm
+6:43
+where the bubble sort is typically quite
+6:46
+slow a merge sort therefore is a very
+6:52
+suitable form of sorting algorithm for
+6:55
+large numbers of items whereas the
+6:57
+bubble sort really is only suitable for
+6:59
+learning about algorithms or indeed
+7:02
+handling a small list of items
+7:08
+on the other hand though merge sorts are
+7:10
+a lot more difficult to program whereas
+7:12
+a bubble saw is much easier and finally
+7:18
+due to the nature of a merge sort the
+7:19
+amount of memory it takes up or what we
+7:21
+call the memory footprint can increase
+7:24
+as the algorithm executes with a bubble
+7:27
+sort we have a known memory footprint we
+Essential algorithms for A Level Computer Science text book
+7:32
+know that algorithms are some of the
+7:34
+hardest parts of any computer science
+7:36
+specification so we've written a book
+7:39
+called essential algorithms for a level
+7:41
+computer science which is available on
+7:43
+Amazon while the title of the book
+7:47
+suggests this is only for a level you
+7:49
+can see here from the examination board
+7:51
+mapping page that we have chapters which
+7:54
+cover every algorithm you're required to
+7:56
+know for the GCSE this book then would
+8:00
+be perfectly appropriate for you to use
+8:02
+and also to take onto a level should you
+8:05
+choose to carry on studying the subject
+8:09
+every chapter is presented in the same
+8:12
+way we introduced the algorithm from a
+8:15
+high-level perspective and provide a
+8:17
+link to our videos we then lay out the
+8:20
+algorithm in simple structured English
+8:22
+so you can get your head around it we
+8:25
+illustrate the algorithm in the form of
+8:27
+a diagram and then provide an example of
+8:30
+stepping through it all of these steps
+8:34
+are designed to really get you to
+8:35
+understand the algorithm before we
+8:38
+present you with pseudocode after the
+8:41
+pseudocode we present you an actual code
+8:43
+written in both Python and Visual Basic
+8:46
+which you could type in and try for
+8:48
+yourself
+Outro
+8:52
+[Music]

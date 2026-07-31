@@ -1,0 +1,318 @@
+{
+  "chunk_results": [
+    {
+      "chunk_id": 1,
+      "source_word_count": 265,
+      "classification": "official_aqa_topic",
+      "is_cs_relevant": true,
+      "creates_new_topic": true,
+      "cs_relevance_score": 0.7449,
+      "topic_candidates": [
+        {
+          "concept_id": "aqa_3_1_1_algorithm_purpose_trace",
+          "topic": "Algorithm tracing and program execution",
+          "domain": "Fundamentals of algorithms",
+          "official_reference": "3.1.1",
+          "chapter_reference": "3.1",
+          "official_title": "Representing algorithms",
+          "paper": "Paper 1",
+          "source_pages": [
+            10
+          ],
+          "confidence": 0.7802,
+          "keyword_score": 0.94,
+          "semantic_score": 0.6138,
+          "salience_score": 0.6209,
+          "extraction_method": "keyword_embedding",
+          "matched_aliases": [
+            "trace table",
+            "tracking changing program values"
+          ],
+          "total_alias_hits": 5,
+          "evidence_sentence_count": 1,
+          "single_word_alias_only": false,
+          "ambiguous_alias_only": false,
+          "matched_context_terms": [],
+          "matched_conflicting_context_terms": [],
+          "minimum_context_hits": 1,
+          "context_collision": false,
+          "teaching_depth_level": 2,
+          "teaching_depth_label": "explanation",
+          "evidence_quality_score": 0.654,
+          "shared_evidence_penalty": 0.0,
+          "evidence_quality_notes": [
+            "Teaching depth: explanation (2)."
+          ],
+          "recap_evidence_only": false,
+          "recap_evidence_count": 0,
+          "substantive_evidence_count": 1,
+          "comparison_evidence_only": false,
+          "comparison_evidence_count": 0,
+          "independent_evidence_count": 4,
+          "evidence": [
+            "Tracing algorithms in this video we take a look at a really important skill which can help you spot errors especially logic errors in your programs and this is trace tables so Trace tables overview this vital skill can help you understand how a program works it is a great way to spot logic errors and test the accuracy of an algorithm and its underlying logic it typically involves examining a printed extract of code and then running through the program is if you were the computer you would take each line one at a time and write out in a trace table the current state of each variable you would note down any output the program produces as it happens every variable in the program would have its own column in the trace table and you will add a new row under any column if the state of that variable changed this can all sound a little abstract so let's work through a simple program and use a trace table to figure out what it's doing so first Trace tables example we start by identifying any variables in the program and we put each one into its own column to create our trace table so we can see we've got a variable called number so that goes into a column we've got a variable called counter so that goes into another column and we've got a variable called total so that goes into a third column we've also popped an output window down here where we're going to show any output as it occurs"
+          ],
+          "parent_concept_id": "aqa_3_1_1_algorithm",
+          "cs_relevance_score": 0.7449,
+          "cs_relevant": true
+        }
+      ],
+      "rejected_candidates": [],
+      "has_unmapped_cs_content": false,
+      "unmapped_cs_signals": [],
+      "continuation_of_chunk_id": null,
+      "requires_llm_fallback": false,
+      "notes": []
+    },
+    {
+      "chunk_id": 2,
+      "source_word_count": 508,
+      "classification": "official_aqa_topic",
+      "is_cs_relevant": true,
+      "creates_new_topic": true,
+      "cs_relevance_score": 0.7006,
+      "topic_candidates": [
+        {
+          "concept_id": "aqa_3_1_1_algorithm_purpose_trace",
+          "topic": "Algorithm tracing and program execution",
+          "domain": "Fundamentals of algorithms",
+          "official_reference": "3.1.1",
+          "chapter_reference": "3.1",
+          "official_title": "Representing algorithms",
+          "paper": "Paper 1",
+          "source_pages": [
+            10
+          ],
+          "confidence": 0.7699,
+          "keyword_score": 0.94,
+          "semantic_score": 0.4636,
+          "salience_score": 0.5383,
+          "extraction_method": "keyword_embedding",
+          "matched_aliases": [
+            "trace table",
+            "tracking changing program values"
+          ],
+          "total_alias_hits": 10,
+          "evidence_sentence_count": 1,
+          "single_word_alias_only": false,
+          "ambiguous_alias_only": false,
+          "matched_context_terms": [],
+          "matched_conflicting_context_terms": [],
+          "minimum_context_hits": 1,
+          "context_collision": false,
+          "teaching_depth_level": 1,
+          "teaching_depth_label": "definition",
+          "evidence_quality_score": 0.5223,
+          "shared_evidence_penalty": 0.0,
+          "evidence_quality_notes": [
+            "Teaching depth: definition (1)."
+          ],
+          "recap_evidence_only": false,
+          "recap_evidence_count": 0,
+          "substantive_evidence_count": 1,
+          "comparison_evidence_only": false,
+          "comparison_evidence_count": 0,
+          "independent_evidence_count": 6,
+          "evidence": [
+            "and your note down the bottom there it says when the first line of code executes number equals print enter a number we're going to assume the user enters the integer five so we're gonna work through this code line by line as if we were the computer executing this program so the first line of code executes and the user enters a five so the contents of the variable number has changed it now contains five whenever this happens you update the row four variable in the trace table so number now holds five and of course we've updated our output window the next line is total becomes equal to one so we've updated that in our trace table for counter equals one so we've initialized counter to one and you can see we've updated that and our trace table to number so we enter our for loop total equals total which is one times counter which is one or one times one is one and that figure goes into total over writing what was there so the total of that the value of total has changed from one to one now you might not update this in the trace table but to be really accurate it's probably a good idea to do that to show that you know the value of one is being replaced by another value of one we then hit the end of the for loop next counter and this increments the value of counter by one so we've updated our traced able to show that counter has gone from one to two we go back to the top of the for loop total now equals total which was one times counter which was two or one times two is two and that gets overwritten and stored back in total so we've updated our trace table we reached into the for loop and we increment counter from two till three we go back to the start of the for loop total now comes equal to the current total which is two times the value of counter which is three or two times three is six and that gets written back in total and we hit the end of the for loop and increment the value of counter from three to four notice were very carefully stepping through the algorithm methodically one line at a time as if we were the computer program executing every time a variable updates we change its value in the trace table by adding an extra row so back to the top again we're doing four counter equals one to number well numbers five and counters four so is still going into this for loop total becomes equal to the current value of total that six times counter which is 4 6 times 4 is 24 and this gets placed into total to have updated it next counter so we increment counter to 5 we go back to start the for loop for counter which is currently 5 -"
+          ],
+          "parent_concept_id": "aqa_3_1_1_algorithm",
+          "cs_relevance_score": 0.7006,
+          "cs_relevant": true
+        },
+        {
+          "concept_id": "aqa_3_2_2_iteration",
+          "topic": "Iteration",
+          "domain": "Programming",
+          "official_reference": "3.2.2",
+          "chapter_reference": "3.2",
+          "official_title": "Programming concepts",
+          "paper": "Paper 1",
+          "source_pages": [
+            12,
+            13
+          ],
+          "confidence": 0.6394,
+          "keyword_score": 0.8,
+          "semantic_score": 0.3729,
+          "salience_score": 0.3884,
+          "extraction_method": "keyword_embedding",
+          "matched_aliases": [
+            "for loop"
+          ],
+          "total_alias_hits": 8,
+          "evidence_sentence_count": 1,
+          "single_word_alias_only": false,
+          "ambiguous_alias_only": false,
+          "matched_context_terms": [],
+          "matched_conflicting_context_terms": [],
+          "minimum_context_hits": 1,
+          "context_collision": false,
+          "teaching_depth_level": 1,
+          "teaching_depth_label": "definition",
+          "evidence_quality_score": 0.4667,
+          "shared_evidence_penalty": 0.0,
+          "evidence_quality_notes": [
+            "Teaching depth: definition (1)."
+          ],
+          "recap_evidence_only": false,
+          "recap_evidence_count": 0,
+          "substantive_evidence_count": 1,
+          "comparison_evidence_only": false,
+          "comparison_evidence_count": 0,
+          "independent_evidence_count": 8,
+          "evidence": [
+            "and your note down the bottom there it says when the first line of code executes number equals print enter a number we're going to assume the user enters the integer five so we're gonna work through this code line by line as if we were the computer executing this program so the first line of code executes and the user enters a five so the contents of the variable number has changed it now contains five whenever this happens you update the row four variable in the trace table so number now holds five and of course we've updated our output window the next line is total becomes equal to one so we've updated that in our trace table for counter equals one so we've initialized counter to one and you can see we've updated that and our trace table to number so we enter our for loop total equals total which is one times counter which is one or one times one is one and that figure goes into total over writing what was there so the total of that the value of total has changed from one to one now you might not update this in the trace table but to be really accurate it's probably a good idea to do that to show that you know the value of one is being replaced by another value of one we then hit the end of the for loop next counter and this increments the value of counter by one so we've updated our traced able to show that counter has gone from one to two we go back to the top of the for loop total now equals total which was one times counter which was two or one times two is two and that gets overwritten and stored back in total so we've updated our trace table we reached into the for loop and we increment counter from two till three we go back to the start of the for loop total now comes equal to the current total which is two times the value of counter which is three or two times three is six and that gets written back in total and we hit the end of the for loop and increment the value of counter from three to four notice were very carefully stepping through the algorithm methodically one line at a time as if we were the computer program executing every time a variable updates we change its value in the trace table by adding an extra row so back to the top again we're doing four counter equals one to number well numbers five and counters four so is still going into this for loop total becomes equal to the current value of total that six times counter which is 4 6 times 4 is 24 and this gets placed into total to have updated it next counter so we increment counter to 5 we go back to start the for loop for counter which is currently 5 -"
+          ],
+          "parent_concept_id": null,
+          "cs_relevance_score": 0.591,
+          "cs_relevant": true
+        }
+      ],
+      "rejected_candidates": [],
+      "has_unmapped_cs_content": false,
+      "unmapped_cs_signals": [],
+      "continuation_of_chunk_id": null,
+      "requires_llm_fallback": false,
+      "notes": []
+    },
+    {
+      "chunk_id": 3,
+      "source_word_count": 206,
+      "classification": "continuation_no_new_topic",
+      "is_cs_relevant": false,
+      "creates_new_topic": false,
+      "cs_relevance_score": 0.6461,
+      "topic_candidates": [
+        {
+          "concept_id": "aqa_3_2_2_iteration",
+          "topic": "Iteration",
+          "domain": "Programming",
+          "official_reference": "3.2.2",
+          "chapter_reference": "3.2",
+          "official_title": "Programming concepts",
+          "paper": "Paper 1",
+          "source_pages": [
+            12,
+            13
+          ],
+          "confidence": 0.6446,
+          "keyword_score": 0.8,
+          "semantic_score": 0.4624,
+          "salience_score": 0.4376,
+          "extraction_method": "keyword_embedding",
+          "matched_aliases": [
+            "for loop"
+          ],
+          "total_alias_hits": 5,
+          "evidence_sentence_count": 1,
+          "single_word_alias_only": false,
+          "ambiguous_alias_only": false,
+          "matched_context_terms": [],
+          "matched_conflicting_context_terms": [],
+          "minimum_context_hits": 1,
+          "context_collision": false,
+          "teaching_depth_level": 3,
+          "teaching_depth_label": "worked_example",
+          "evidence_quality_score": 0.6499,
+          "shared_evidence_penalty": 0.0,
+          "evidence_quality_notes": [
+            "Teaching depth: worked_example (3)."
+          ],
+          "recap_evidence_only": false,
+          "recap_evidence_count": 0,
+          "substantive_evidence_count": 1,
+          "comparison_evidence_only": false,
+          "comparison_evidence_count": 0,
+          "independent_evidence_count": 5,
+          "evidence": [
+            "counter to 5 we go back to start the for loop for counter which is currently 5 - number or numbers 5 so 5 still equals 5 so this is okay we're going to go into the for loop one more time total becomes equal to the current value of total 24 times the value of counter 5 24 times 5 is 120 and we update that into the value total we increment counter to 6 we go back to the start of the for loop for counter equals 1 to the value in number or the value in number is 5 counter is 6 so now we do not execute the for loop and we skip beyond the end of the for loop and we output the value of total which currently stands at 120 so what does this program actually doing well having stepped through it line by line noting down the contents noting down the output noting down the variables as they change you've probably figured it out it's outputting the factorial of the number entered factorial 5 for example is 1 times 2 times 3 times 4 times 5 which is 120 and it's the value we ended up with Outro you"
+          ],
+          "parent_concept_id": null,
+          "cs_relevance_score": 0.6461,
+          "cs_relevant": true
+        }
+      ],
+      "rejected_candidates": [],
+      "has_unmapped_cs_content": false,
+      "unmapped_cs_signals": [],
+      "continuation_of_chunk_id": 2,
+      "requires_llm_fallback": false,
+      "notes": [
+        "No new standalone topic was detected; the chunk continues the previous overlapped discussion. Matching evidence is preserved for lesson-level merging."
+      ]
+    }
+  ],
+  "merged_topics": [
+    {
+      "concept_id": "aqa_3_1_1_algorithm_purpose_trace",
+      "topic": "Algorithm tracing and program execution",
+      "domain": "Fundamentals of algorithms",
+      "official_reference": "3.1.1",
+      "chapter_reference": "3.1",
+      "official_title": "Representing algorithms",
+      "paper": "Paper 1",
+      "source_pages": [
+        10
+      ],
+      "confidence": 0.7449,
+      "ranking_score": 0.6393,
+      "topic_role": "primary",
+      "source_chunk_ids": [
+        1,
+        2
+      ],
+      "support_span_count": 1,
+      "mean_semantic_score": 0.5387,
+      "mean_keyword_score": 0.94,
+      "mean_salience_score": 0.5796,
+      "coverage_score": 0.6667,
+      "evidence": [
+        "Tracing algorithms in this video we take a look at a really important skill which can help you spot errors especially logic errors in your programs and this is trace tables so Trace tables overview this vital skill can help you understand how a program works it is a great way to spot logic errors and test the accuracy of an algorithm and its underlying logic it typically involves examining a printed extract of code and then running through the program is if you were the computer you would take each line one at a time and write out in a trace table the current state of each variable you would note down any output the program produces as it happens every variable in the program would have its own column in the trace table and you will add a new row under any column if the state of that variable changed this can all sound a little abstract so let's work through a simple program and use a trace table to figure out what it's doing so first Trace tables example we start by identifying any variables in the program and we put each one into its own column to create our trace table so we can see we've got a variable called number so that goes into a column we've got a variable called counter so that goes into another column and we've got a variable called total so that goes into a third column we've also popped an output window down here where we're going to show any output as it occurs",
+        "and your note down the bottom there it says when the first line of code executes number equals print enter a number we're going to assume the user enters the integer five so we're gonna work through this code line by line as if we were the computer executing this program so the first line of code executes and the user enters a five so the contents of the variable number has changed it now contains five whenever this happens you update the row four variable in the trace table so number now holds five and of course we've updated our output window the next line is total becomes equal to one so we've updated that in our trace table for counter equals one so we've initialized counter to one and you can see we've updated that and our trace table to number so we enter our for loop total equals total which is one times counter which is one or one times one is one and that figure goes into total over writing what was there so the total of that the value of total has changed from one to one now you might not update this in the trace table but to be really accurate it's probably a good idea to do that to show that you know the value of one is being replaced by another value of one we then hit the end of the for loop next counter and this increments the value of counter by one so we've updated our traced able to show that counter has gone from one to two we go back to the top of the for loop total now equals total which was one times counter which was two or one times two is two and that gets overwritten and stored back in total so we've updated our trace table we reached into the for loop and we increment counter from two till three we go back to the start of the for loop total now comes equal to the current total which is two times the value of counter which is three or two times three is six and that gets written back in total and we hit the end of the for loop and increment the value of counter from three to four notice were very carefully stepping through the algorithm methodically one line at a time as if we were the computer program executing every time a variable updates we change its value in the trace table by adding an extra row so back to the top again we're doing four counter equals one to number well numbers five and counters four so is still going into this for loop total becomes equal to the current value of total that six times counter which is 4 6 times 4 is 24 and this gets placed into total to have updated it next counter so we increment counter to 5 we go back to start the for loop for counter which is currently 5 -"
+      ],
+      "supporting_candidate_count": 2
+    },
+    {
+      "concept_id": "aqa_3_2_2_iteration",
+      "topic": "Iteration",
+      "domain": "Programming",
+      "official_reference": "3.2.2",
+      "chapter_reference": "3.2",
+      "official_title": "Programming concepts",
+      "paper": "Paper 1",
+      "source_pages": [
+        12,
+        13
+      ],
+      "confidence": 0.6461,
+      "ranking_score": 0.562,
+      "topic_role": "primary",
+      "source_chunk_ids": [
+        2,
+        3
+      ],
+      "support_span_count": 1,
+      "mean_semantic_score": 0.4176,
+      "mean_keyword_score": 0.8,
+      "mean_salience_score": 0.413,
+      "coverage_score": 0.6667,
+      "evidence": [
+        "and your note down the bottom there it says when the first line of code executes number equals print enter a number we're going to assume the user enters the integer five so we're gonna work through this code line by line as if we were the computer executing this program so the first line of code executes and the user enters a five so the contents of the variable number has changed it now contains five whenever this happens you update the row four variable in the trace table so number now holds five and of course we've updated our output window the next line is total becomes equal to one so we've updated that in our trace table for counter equals one so we've initialized counter to one and you can see we've updated that and our trace table to number so we enter our for loop total equals total which is one times counter which is one or one times one is one and that figure goes into total over writing what was there so the total of that the value of total has changed from one to one now you might not update this in the trace table but to be really accurate it's probably a good idea to do that to show that you know the value of one is being replaced by another value of one we then hit the end of the for loop next counter and this increments the value of counter by one so we've updated our traced able to show that counter has gone from one to two we go back to the top of the for loop total now equals total which was one times counter which was two or one times two is two and that gets overwritten and stored back in total so we've updated our trace table we reached into the for loop and we increment counter from two till three we go back to the start of the for loop total now comes equal to the current total which is two times the value of counter which is three or two times three is six and that gets written back in total and we hit the end of the for loop and increment the value of counter from three to four notice were very carefully stepping through the algorithm methodically one line at a time as if we were the computer program executing every time a variable updates we change its value in the trace table by adding an extra row so back to the top again we're doing four counter equals one to number well numbers five and counters four so is still going into this for loop total becomes equal to the current value of total that six times counter which is 4 6 times 4 is 24 and this gets placed into total to have updated it next counter so we increment counter to 5 we go back to start the for loop for counter which is currently 5 -",
+        "counter to 5 we go back to start the for loop for counter which is currently 5 - number or numbers 5 so 5 still equals 5 so this is okay we're going to go into the for loop one more time total becomes equal to the current value of total 24 times the value of counter 5 24 times 5 is 120 and we update that into the value total we increment counter to 6 we go back to the start of the for loop for counter equals 1 to the value in number or the value in number is 5 counter is 6 so now we do not execute the for loop and we skip beyond the end of the for loop and we output the value of total which currently stands at 120 so what does this program actually doing well having stepped through it line by line noting down the contents noting down the output noting down the variables as they change you've probably figured it out it's outputting the factorial of the number entered factorial 5 for example is 1 times 2 times 3 times 4 times 5 which is 120 and it's the value we ended up with Outro you"
+      ],
+      "supporting_candidate_count": 2
+    }
+  ],
+  "total_chunks": 3,
+  "cs_relevant_chunks": 2,
+  "non_cs_chunks": 1,
+  "official_topic_chunks": 2,
+  "mixed_official_unmapped_chunks": 0,
+  "unmapped_cs_chunks": 0,
+  "continuation_chunks": 1,
+  "no_topic_chunks": 0,
+  "llm_fallback_chunk_ids": [],
+  "embedding_model": "sentence-transformers/all-MiniLM-L6-v2",
+  "candidate_keep_threshold": 0.46
+}

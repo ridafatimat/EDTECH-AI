@@ -1,0 +1,2489 @@
+{
+  "chunk_results": [
+    {
+      "chunk_id": 1,
+      "source_word_count": 353,
+      "classification": "official_aqa_topic",
+      "is_cs_relevant": true,
+      "creates_new_topic": true,
+      "cs_relevance_score": 0.7971,
+      "topic_candidates": [
+        {
+          "concept_id": "aqa_3_1_3_binary_search",
+          "topic": "Binary search",
+          "domain": "Fundamentals of algorithms",
+          "official_reference": "3.1.3",
+          "chapter_reference": "3.1",
+          "official_title": "Searching algorithms",
+          "paper": "Paper 1",
+          "source_pages": [
+            11
+          ],
+          "confidence": 0.7969,
+          "keyword_score": 0.94,
+          "semantic_score": 0.5554,
+          "salience_score": 0.7555,
+          "extraction_method": "keyword_embedding",
+          "matched_aliases": [
+            "binary search",
+            "discard half"
+          ],
+          "total_alias_hits": 3,
+          "evidence_sentence_count": 3,
+          "single_word_alias_only": false,
+          "ambiguous_alias_only": false,
+          "matched_context_terms": [],
+          "matched_conflicting_context_terms": [],
+          "minimum_context_hits": 1,
+          "context_collision": false,
+          "teaching_depth_level": 4,
+          "teaching_depth_label": "sustained_teaching",
+          "evidence_quality_score": 0.7975,
+          "shared_evidence_penalty": 0.0,
+          "evidence_quality_notes": [
+            "Teaching depth: sustained_teaching (4)."
+          ],
+          "recap_evidence_only": false,
+          "recap_evidence_count": 0,
+          "substantive_evidence_count": 3,
+          "comparison_evidence_only": false,
+          "comparison_evidence_count": 0,
+          "independent_evidence_count": 3,
+          "evidence": [
+            "now let's move on to binary search.",
+            "why is binary search generally efficient?",
+            "we look at the middle, compare target, discard half."
+          ],
+          "parent_concept_id": null,
+          "cs_relevance_score": 0.7971,
+          "cs_relevant": true
+        },
+        {
+          "concept_id": "aqa_3_1_3_linear_search",
+          "topic": "Linear search",
+          "domain": "Fundamentals of algorithms",
+          "official_reference": "3.1.3",
+          "chapter_reference": "3.1",
+          "official_title": "Searching algorithms",
+          "paper": "Paper 1",
+          "source_pages": [
+            11
+          ],
+          "confidence": 0.8024,
+          "keyword_score": 0.95,
+          "semantic_score": 0.6953,
+          "salience_score": 0.7324,
+          "extraction_method": "keyword_embedding",
+          "matched_aliases": [
+            "linear search"
+          ],
+          "total_alias_hits": 5,
+          "evidence_sentence_count": 5,
+          "single_word_alias_only": false,
+          "ambiguous_alias_only": false,
+          "matched_context_terms": [],
+          "matched_conflicting_context_terms": [],
+          "minimum_context_hits": 1,
+          "context_collision": false,
+          "teaching_depth_level": 1,
+          "teaching_depth_label": "definition",
+          "evidence_quality_score": 0.6172,
+          "shared_evidence_penalty": 0.0,
+          "evidence_quality_notes": [
+            "Teaching depth: definition (1)."
+          ],
+          "recap_evidence_only": false,
+          "recap_evidence_count": 0,
+          "substantive_evidence_count": 3,
+          "comparison_evidence_only": false,
+          "comparison_evidence_count": 0,
+          "independent_evidence_count": 5,
+          "evidence": [
+            "first thing, linear search.",
+            "what does linear search do?",
+            "okay before we move on, what is worst case for linear search?"
+          ],
+          "parent_concept_id": null,
+          "cs_relevance_score": 0.7505,
+          "cs_relevant": true
+        },
+        {
+          "concept_id": "aqa_3_1_3_search_comparison",
+          "topic": "Comparing linear and binary search",
+          "domain": "Fundamentals of algorithms",
+          "official_reference": "3.1.3",
+          "chapter_reference": "3.1",
+          "official_title": "Searching algorithms",
+          "paper": "Paper 1",
+          "source_pages": [
+            11
+          ],
+          "confidence": 0.4835,
+          "keyword_score": 0.0,
+          "semantic_score": 0.6524,
+          "salience_score": 0.3588,
+          "extraction_method": "embedding",
+          "matched_aliases": [],
+          "total_alias_hits": 0,
+          "evidence_sentence_count": 0,
+          "single_word_alias_only": false,
+          "ambiguous_alias_only": false,
+          "matched_context_terms": [],
+          "matched_conflicting_context_terms": [],
+          "minimum_context_hits": 1,
+          "context_collision": false,
+          "teaching_depth_level": 1,
+          "teaching_depth_label": "definition",
+          "evidence_quality_score": 0.5152,
+          "shared_evidence_penalty": 0.0,
+          "evidence_quality_notes": [
+            "Teaching depth: definition (1)."
+          ],
+          "recap_evidence_only": false,
+          "recap_evidence_count": 0,
+          "substantive_evidence_count": 1,
+          "comparison_evidence_only": false,
+          "comparison_evidence_count": 0,
+          "independent_evidence_count": 0,
+          "evidence": [
+            "okay before we move on, what is worst case for linear search? target at end or not present, so you check everything. yes exactly. notice I said before we move on but we are still on linear search, so don't get confused by my wording. we're still same topic same topic. now let's move on to binary search. this is a different algorithm."
+          ],
+          "parent_concept_id": null,
+          "cs_relevance_score": 0.4924,
+          "cs_relevant": true
+        }
+      ],
+      "rejected_candidates": [],
+      "has_unmapped_cs_content": false,
+      "unmapped_cs_signals": [],
+      "continuation_of_chunk_id": null,
+      "requires_llm_fallback": false,
+      "notes": []
+    },
+    {
+      "chunk_id": 2,
+      "source_word_count": 281,
+      "classification": "official_aqa_topic",
+      "is_cs_relevant": true,
+      "creates_new_topic": true,
+      "cs_relevance_score": 0.7769,
+      "topic_candidates": [
+        {
+          "concept_id": "aqa_3_1_4_bubble_sort",
+          "topic": "Bubble sort",
+          "domain": "Fundamentals of algorithms",
+          "official_reference": "3.1.4",
+          "chapter_reference": "3.1",
+          "official_title": "Sorting algorithms",
+          "paper": "Paper 1",
+          "source_pages": [
+            11
+          ],
+          "confidence": 0.8477,
+          "keyword_score": 1.0,
+          "semantic_score": 0.5549,
+          "salience_score": 0.7552,
+          "extraction_method": "keyword_embedding",
+          "matched_aliases": [
+            "bubble sort",
+            "compare adjacent values",
+            "no swaps"
+          ],
+          "total_alias_hits": 6,
+          "evidence_sentence_count": 5,
+          "single_word_alias_only": false,
+          "ambiguous_alias_only": false,
+          "matched_context_terms": [],
+          "matched_conflicting_context_terms": [],
+          "minimum_context_hits": 1,
+          "context_collision": false,
+          "teaching_depth_level": 1,
+          "teaching_depth_label": "definition",
+          "evidence_quality_score": 0.5948,
+          "shared_evidence_penalty": 0.0,
+          "evidence_quality_notes": [
+            "Teaching depth: definition (1)."
+          ],
+          "recap_evidence_only": false,
+          "recap_evidence_count": 0,
+          "substantive_evidence_count": 3,
+          "comparison_evidence_only": false,
+          "comparison_evidence_count": 0,
+          "independent_evidence_count": 6,
+          "evidence": [
+            "bubble sort first.",
+            "bubble sort bubble sort okay.",
+            "yes conceptually more steps, but much more efficient for large datasets than bubble sort in general."
+          ],
+          "parent_concept_id": "aqa_3_1_4_sorting_algorithms",
+          "cs_relevance_score": 0.7769,
+          "cs_relevant": true
+        }
+      ],
+      "rejected_candidates": [
+        {
+          "concept_id": "aqa_3_1_4_sort_comparison",
+          "topic": "Comparing merge sort and bubble sort",
+          "domain": "Fundamentals of algorithms",
+          "official_reference": "3.1.4",
+          "chapter_reference": "3.1",
+          "official_title": "Sorting algorithms",
+          "paper": "Paper 1",
+          "source_pages": [
+            11
+          ],
+          "confidence": 0.4382,
+          "keyword_score": 0.0,
+          "semantic_score": 0.5944,
+          "salience_score": 0.3269,
+          "extraction_method": "embedding",
+          "matched_aliases": [],
+          "total_alias_hits": 0,
+          "evidence_sentence_count": 0,
+          "single_word_alias_only": false,
+          "ambiguous_alias_only": false,
+          "matched_context_terms": [],
+          "matched_conflicting_context_terms": [],
+          "minimum_context_hits": 1,
+          "context_collision": false,
+          "teaching_depth_level": 0,
+          "teaching_depth_label": "mention_only",
+          "evidence_quality_score": 0.0,
+          "shared_evidence_penalty": 0.0,
+          "evidence_quality_notes": [],
+          "recap_evidence_only": false,
+          "recap_evidence_count": 0,
+          "substantive_evidence_count": 0,
+          "comparison_evidence_only": false,
+          "comparison_evidence_count": 0,
+          "independent_evidence_count": 0,
+          "evidence": [
+            "okay next question compare them. linear works on unsorted data but may inspect many items. binary needs sorted data and repeatedly halves search area. that's enough for the compare question. right let's move on to sorting algorithms. bubble sort first. compare adjacent values, swap if wrong order. 5 2 4 1. compare five and two swap, two five four one."
+          ],
+          "parent_concept_id": "aqa_3_1_4_sorting_algorithms",
+          "cs_relevance_score": 0.4382,
+          "cs_relevant": false
+        },
+        {
+          "concept_id": "aqa_3_1_3_search_comparison",
+          "topic": "Comparing linear and binary search",
+          "domain": "Fundamentals of algorithms",
+          "official_reference": "3.1.3",
+          "chapter_reference": "3.1",
+          "official_title": "Searching algorithms",
+          "paper": "Paper 1",
+          "source_pages": [
+            11
+          ],
+          "confidence": 0.3887,
+          "keyword_score": 0.0,
+          "semantic_score": 0.5304,
+          "salience_score": 0.2917,
+          "extraction_method": "embedding",
+          "matched_aliases": [],
+          "total_alias_hits": 0,
+          "evidence_sentence_count": 0,
+          "single_word_alias_only": false,
+          "ambiguous_alias_only": false,
+          "matched_context_terms": [],
+          "matched_conflicting_context_terms": [],
+          "minimum_context_hits": 1,
+          "context_collision": false,
+          "teaching_depth_level": 0,
+          "teaching_depth_label": "mention_only",
+          "evidence_quality_score": 0.0,
+          "shared_evidence_penalty": 0.0,
+          "evidence_quality_notes": [],
+          "recap_evidence_only": false,
+          "recap_evidence_count": 0,
+          "substantive_evidence_count": 0,
+          "comparison_evidence_only": false,
+          "comparison_evidence_count": 0,
+          "independent_evidence_count": 0,
+          "evidence": [
+            "okay next question compare them. linear works on unsorted data but may inspect many items. binary needs sorted data and repeatedly halves search area. that's enough for the compare question. right let's move on to sorting algorithms. bubble sort first. compare adjacent values, swap if wrong order. 5 2 4 1. compare five and two swap, two five four one."
+          ],
+          "parent_concept_id": null,
+          "cs_relevance_score": 0.3887,
+          "cs_relevant": false
+        },
+        {
+          "concept_id": "aqa_3_1_4_merge_sort",
+          "topic": "Merge sort",
+          "domain": "Fundamentals of algorithms",
+          "official_reference": "3.1.4",
+          "chapter_reference": "3.1",
+          "official_title": "Sorting algorithms",
+          "paper": "Paper 1",
+          "source_pages": [
+            11
+          ],
+          "confidence": 0.5815,
+          "keyword_score": 0.72,
+          "semantic_score": 0.4877,
+          "salience_score": 0.4516,
+          "extraction_method": "keyword_embedding",
+          "matched_aliases": [
+            "merge sort"
+          ],
+          "total_alias_hits": 1,
+          "evidence_sentence_count": 1,
+          "single_word_alias_only": false,
+          "ambiguous_alias_only": false,
+          "matched_context_terms": [],
+          "matched_conflicting_context_terms": [],
+          "minimum_context_hits": 1,
+          "context_collision": false,
+          "teaching_depth_level": 0,
+          "teaching_depth_label": "mention_only",
+          "evidence_quality_score": 0.34,
+          "shared_evidence_penalty": 0.0,
+          "evidence_quality_notes": [
+            "Teaching depth: mention_only (0).",
+            "Rejected because the evidence is an isolated mention rather than definition, explanation, example or practice."
+          ],
+          "recap_evidence_only": false,
+          "recap_evidence_count": 0,
+          "substantive_evidence_count": 1,
+          "comparison_evidence_only": false,
+          "comparison_evidence_count": 0,
+          "independent_evidence_count": 1,
+          "evidence": [
+            "let's move on to merge sort."
+          ],
+          "parent_concept_id": "aqa_3_1_4_sorting_algorithms",
+          "cs_relevance_score": 0.5139,
+          "cs_relevant": false
+        }
+      ],
+      "has_unmapped_cs_content": false,
+      "unmapped_cs_signals": [],
+      "continuation_of_chunk_id": null,
+      "requires_llm_fallback": false,
+      "notes": [
+        "Evidence-quality evaluation rejected 1 candidate(s)."
+      ]
+    },
+    {
+      "chunk_id": 3,
+      "source_word_count": 372,
+      "classification": "official_aqa_topic",
+      "is_cs_relevant": true,
+      "creates_new_topic": true,
+      "cs_relevance_score": 0.7976,
+      "topic_candidates": [
+        {
+          "concept_id": "aqa_3_2_6_arrays",
+          "topic": "One- and two-dimensional arrays",
+          "domain": "Programming",
+          "official_reference": "3.2.6",
+          "chapter_reference": "3.2",
+          "official_title": "Data structures",
+          "paper": "Paper 1",
+          "source_pages": [
+            15
+          ],
+          "confidence": 0.8299,
+          "keyword_score": 1.0,
+          "semantic_score": 0.3098,
+          "salience_score": 0.6204,
+          "extraction_method": "keyword_embedding",
+          "matched_aliases": [
+            "array",
+            "array length"
+          ],
+          "total_alias_hits": 15,
+          "evidence_sentence_count": 9,
+          "single_word_alias_only": false,
+          "ambiguous_alias_only": false,
+          "matched_context_terms": [],
+          "matched_conflicting_context_terms": [],
+          "minimum_context_hits": 1,
+          "context_collision": false,
+          "teaching_depth_level": 4,
+          "teaching_depth_label": "sustained_teaching",
+          "evidence_quality_score": 0.7146,
+          "shared_evidence_penalty": 0.0,
+          "evidence_quality_notes": [
+            "Teaching depth: sustained_teaching (4)."
+          ],
+          "recap_evidence_only": false,
+          "recap_evidence_count": 0,
+          "substantive_evidence_count": 3,
+          "comparison_evidence_only": false,
+          "comparison_evidence_count": 0,
+          "independent_evidence_count": 3,
+          "evidence": [
+            "suppose total equals zero and array is 2 4 1 3.",
+            "for i from zero while i less than length, total total plus array i.",
+            "what is common array mistake?"
+          ],
+          "parent_concept_id": "aqa_3_2_6_data_structures",
+          "cs_relevance_score": 0.7976,
+          "cs_relevant": true
+        },
+        {
+          "concept_id": "aqa_3_2_2_selection",
+          "topic": "Selection",
+          "domain": "Programming",
+          "official_reference": "3.2.2",
+          "chapter_reference": "3.2",
+          "official_title": "Programming concepts",
+          "paper": "Paper 1",
+          "source_pages": [
+            12,
+            13
+          ],
+          "confidence": 0.706,
+          "keyword_score": 0.87,
+          "semantic_score": 0.2076,
+          "salience_score": 0.4808,
+          "extraction_method": "keyword_embedding",
+          "matched_aliases": [
+            "if statement",
+            "if condition"
+          ],
+          "total_alias_hits": 2,
+          "evidence_sentence_count": 2,
+          "single_word_alias_only": false,
+          "ambiguous_alias_only": false,
+          "matched_context_terms": [],
+          "matched_conflicting_context_terms": [],
+          "minimum_context_hits": 1,
+          "context_collision": false,
+          "teaching_depth_level": 1,
+          "teaching_depth_label": "definition",
+          "evidence_quality_score": 0.4567,
+          "shared_evidence_penalty": 0.0,
+          "evidence_quality_notes": [
+            "Teaching depth: definition (1)."
+          ],
+          "recap_evidence_only": false,
+          "recap_evidence_count": 0,
+          "substantive_evidence_count": 2,
+          "comparison_evidence_only": false,
+          "comparison_evidence_count": 0,
+          "independent_evidence_count": 2,
+          "evidence": [
+            "what if increment happens only inside an if statement?",
+            "if condition was greater than or equal, the second eleven would increment too."
+          ],
+          "parent_concept_id": null,
+          "cs_relevance_score": 0.6362,
+          "cs_relevant": true
+        },
+        {
+          "concept_id": "aqa_3_2_2_iteration",
+          "topic": "Iteration",
+          "domain": "Programming",
+          "official_reference": "3.2.2",
+          "chapter_reference": "3.2",
+          "official_title": "Programming concepts",
+          "paper": "Paper 1",
+          "source_pages": [
+            12,
+            13
+          ],
+          "confidence": 0.5802,
+          "keyword_score": 0.72,
+          "semantic_score": 0.4639,
+          "salience_score": 0.4385,
+          "extraction_method": "keyword_embedding",
+          "matched_aliases": [
+            "while loop"
+          ],
+          "total_alias_hits": 1,
+          "evidence_sentence_count": 1,
+          "single_word_alias_only": false,
+          "ambiguous_alias_only": false,
+          "matched_context_terms": [],
+          "matched_conflicting_context_terms": [],
+          "minimum_context_hits": 1,
+          "context_collision": false,
+          "teaching_depth_level": 4,
+          "teaching_depth_label": "sustained_teaching",
+          "evidence_quality_score": 0.6999,
+          "shared_evidence_penalty": 0.0,
+          "evidence_quality_notes": [
+            "Teaching depth: sustained_teaching (4)."
+          ],
+          "recap_evidence_only": false,
+          "recap_evidence_count": 0,
+          "substantive_evidence_count": 1,
+          "comparison_evidence_only": false,
+          "comparison_evidence_count": 0,
+          "independent_evidence_count": 1,
+          "evidence": [
+            "now I want to show while loop version because you said loops question was weird."
+          ],
+          "parent_concept_id": null,
+          "cs_relevance_score": 0.6137,
+          "cs_relevant": true
+        },
+        {
+          "concept_id": "aqa_3_1_1_algorithm_purpose_trace",
+          "topic": "Algorithm tracing and program execution",
+          "domain": "Fundamentals of algorithms",
+          "official_reference": "3.1.1",
+          "chapter_reference": "3.1",
+          "official_title": "Representing algorithms",
+          "paper": "Paper 1",
+          "source_pages": [
+            10
+          ],
+          "confidence": 0.5784,
+          "keyword_score": 0.72,
+          "semantic_score": 0.4298,
+          "salience_score": 0.4197,
+          "extraction_method": "keyword_embedding",
+          "matched_aliases": [
+            "trace table"
+          ],
+          "total_alias_hits": 1,
+          "evidence_sentence_count": 1,
+          "single_word_alias_only": false,
+          "ambiguous_alias_only": false,
+          "matched_context_terms": [],
+          "matched_conflicting_context_terms": [],
+          "minimum_context_hits": 1,
+          "context_collision": false,
+          "teaching_depth_level": 1,
+          "teaching_depth_label": "definition",
+          "evidence_quality_score": 0.4859,
+          "shared_evidence_penalty": 0.0,
+          "evidence_quality_notes": [
+            "Teaching depth: definition (1)."
+          ],
+          "recap_evidence_only": false,
+          "recap_evidence_count": 0,
+          "substantive_evidence_count": 1,
+          "comparison_evidence_only": false,
+          "comparison_evidence_count": 0,
+          "independent_evidence_count": 1,
+          "evidence": [
+            "trace table records variable values as algorithm executes."
+          ],
+          "parent_concept_id": "aqa_3_1_1_algorithm",
+          "cs_relevance_score": 0.5525,
+          "cs_relevant": true
+        }
+      ],
+      "rejected_candidates": [],
+      "has_unmapped_cs_content": false,
+      "unmapped_cs_signals": [],
+      "continuation_of_chunk_id": null,
+      "requires_llm_fallback": false,
+      "notes": []
+    },
+    {
+      "chunk_id": 4,
+      "source_word_count": 335,
+      "classification": "official_aqa_topic",
+      "is_cs_relevant": true,
+      "creates_new_topic": true,
+      "cs_relevance_score": 0.7744,
+      "topic_candidates": [
+        {
+          "concept_id": "aqa_3_2_11_validation",
+          "topic": "Data validation routines",
+          "domain": "Programming",
+          "official_reference": "3.2.11",
+          "chapter_reference": "3.2",
+          "official_title": "Robust and secure programming",
+          "paper": "Paper 1",
+          "source_pages": [
+            17
+          ],
+          "confidence": 0.8423,
+          "keyword_score": 1.0,
+          "semantic_score": 0.4805,
+          "salience_score": 0.7143,
+          "extraction_method": "keyword_embedding",
+          "matched_aliases": [
+            "range check",
+            "length check",
+            "presence check"
+          ],
+          "total_alias_hits": 6,
+          "evidence_sentence_count": 4,
+          "single_word_alias_only": false,
+          "ambiguous_alias_only": false,
+          "matched_context_terms": [
+            "range check",
+            "length check",
+            "presence check"
+          ],
+          "matched_conflicting_context_terms": [],
+          "minimum_context_hits": 1,
+          "context_collision": false,
+          "teaching_depth_level": 1,
+          "teaching_depth_label": "definition",
+          "evidence_quality_score": 0.5997,
+          "shared_evidence_penalty": 0.0,
+          "evidence_quality_notes": [
+            "Teaching depth: definition (1).",
+            "Supporting context: range check, length check, presence check."
+          ],
+          "recap_evidence_only": false,
+          "recap_evidence_count": 0,
+          "substantive_evidence_count": 3,
+          "comparison_evidence_only": false,
+          "comparison_evidence_count": 0,
+          "independent_evidence_count": 6,
+          "evidence": [
+            "range check, type check, length check, presence check, format check.",
+            "student asks so if age must be between 0 and 120 that's range check?",
+            "password minimum eight characters length check."
+          ],
+          "parent_concept_id": null,
+          "cs_relevance_score": 0.7744,
+          "cs_relevant": true
+        },
+        {
+          "concept_id": "aqa_3_2_10_parameters_returns",
+          "topic": "Parameters and return values",
+          "domain": "Programming",
+          "official_reference": "3.2.10",
+          "chapter_reference": "3.2",
+          "official_title": "Structured programming and subroutines (procedures and functions)",
+          "paper": "Paper 1",
+          "source_pages": [
+            16
+          ],
+          "confidence": 0.6952,
+          "keyword_score": 0.81,
+          "semantic_score": 0.6479,
+          "salience_score": 0.8063,
+          "extraction_method": "keyword_embedding",
+          "matched_aliases": [
+            "parameters",
+            "arguments"
+          ],
+          "total_alias_hits": 5,
+          "evidence_sentence_count": 4,
+          "single_word_alias_only": true,
+          "ambiguous_alias_only": false,
+          "matched_context_terms": [],
+          "matched_conflicting_context_terms": [],
+          "minimum_context_hits": 1,
+          "context_collision": false,
+          "teaching_depth_level": 1,
+          "teaching_depth_label": "definition",
+          "evidence_quality_score": 0.6262,
+          "shared_evidence_penalty": 0.0,
+          "evidence_quality_notes": [
+            "Teaching depth: definition (1)."
+          ],
+          "recap_evidence_only": false,
+          "recap_evidence_count": 0,
+          "substantive_evidence_count": 3,
+          "comparison_evidence_only": false,
+          "comparison_evidence_count": 0,
+          "independent_evidence_count": 0,
+          "evidence": [
+            "function versus procedure, parameters, local variables.",
+            "parameters are variables in definition, arguments are actual values passed when calling.",
+            "a and b parameters."
+          ],
+          "parent_concept_id": "aqa_3_2_10_subroutines",
+          "cs_relevance_score": 0.6759,
+          "cs_relevant": true
+        },
+        {
+          "concept_id": "aqa_3_1_3_linear_search",
+          "topic": "Linear search",
+          "domain": "Fundamentals of algorithms",
+          "official_reference": "3.1.3",
+          "chapter_reference": "3.1",
+          "official_title": "Searching algorithms",
+          "paper": "Paper 1",
+          "source_pages": [
+            11
+          ],
+          "confidence": 0.6459,
+          "keyword_score": 0.79,
+          "semantic_score": 0.4737,
+          "salience_score": 0.5272,
+          "extraction_method": "keyword_embedding",
+          "matched_aliases": [
+            "linear search"
+          ],
+          "total_alias_hits": 2,
+          "evidence_sentence_count": 2,
+          "single_word_alias_only": false,
+          "ambiguous_alias_only": false,
+          "matched_context_terms": [],
+          "matched_conflicting_context_terms": [],
+          "minimum_context_hits": 1,
+          "context_collision": false,
+          "teaching_depth_level": 4,
+          "teaching_depth_label": "sustained_teaching",
+          "evidence_quality_score": 0.724,
+          "shared_evidence_penalty": 0.0,
+          "evidence_quality_notes": [
+            "Teaching depth: sustained_teaching (4)."
+          ],
+          "recap_evidence_only": false,
+          "recap_evidence_count": 0,
+          "substantive_evidence_count": 2,
+          "comparison_evidence_only": false,
+          "comparison_evidence_count": 0,
+          "independent_evidence_count": 2,
+          "evidence": [
+            "this is exactly how linear search can stop early.",
+            "so see how lesson loops back: linear search, Boolean logic, arrays, while loops."
+          ],
+          "parent_concept_id": null,
+          "cs_relevance_score": 0.6678,
+          "cs_relevant": true
+        },
+        {
+          "concept_id": "aqa_3_2_2_subroutine_statement",
+          "topic": "Subroutine statements",
+          "domain": "Programming",
+          "official_reference": "3.2.2",
+          "chapter_reference": "3.2",
+          "official_title": "Programming concepts",
+          "paper": "Paper 1",
+          "source_pages": [
+            12
+          ],
+          "confidence": 0.6783,
+          "keyword_score": 0.81,
+          "semantic_score": 0.6208,
+          "salience_score": 0.7914,
+          "extraction_method": "keyword_embedding",
+          "matched_aliases": [
+            "procedure",
+            "function"
+          ],
+          "total_alias_hits": 7,
+          "evidence_sentence_count": 5,
+          "single_word_alias_only": true,
+          "ambiguous_alias_only": false,
+          "matched_context_terms": [],
+          "matched_conflicting_context_terms": [],
+          "minimum_context_hits": 1,
+          "context_collision": false,
+          "teaching_depth_level": 1,
+          "teaching_depth_label": "definition",
+          "evidence_quality_score": 0.617,
+          "shared_evidence_penalty": 0.0,
+          "evidence_quality_notes": [
+            "Teaching depth: definition (1)."
+          ],
+          "recap_evidence_only": false,
+          "recap_evidence_count": 0,
+          "substantive_evidence_count": 3,
+          "comparison_evidence_only": false,
+          "comparison_evidence_count": 0,
+          "independent_evidence_count": 0,
+          "evidence": [
+            "function versus procedure, parameters, local variables.",
+            "function returns value, procedure performs task.",
+            "local variable only exists within that function scope."
+          ],
+          "parent_concept_id": "aqa_3_2_10_subroutines",
+          "cs_relevance_score": 0.6611,
+          "cs_relevant": true
+        },
+        {
+          "concept_id": "aqa_3_2_10_local_variables",
+          "topic": "Local variables",
+          "domain": "Programming",
+          "official_reference": "3.2.10",
+          "chapter_reference": "3.2",
+          "official_title": "Structured programming and subroutines (procedures and functions)",
+          "paper": "Paper 1",
+          "source_pages": [
+            16
+          ],
+          "confidence": 0.6348,
+          "keyword_score": 0.72,
+          "semantic_score": 0.6536,
+          "salience_score": 0.5428,
+          "extraction_method": "keyword_embedding",
+          "matched_aliases": [
+            "local variable"
+          ],
+          "total_alias_hits": 1,
+          "evidence_sentence_count": 1,
+          "single_word_alias_only": false,
+          "ambiguous_alias_only": false,
+          "matched_context_terms": [],
+          "matched_conflicting_context_terms": [],
+          "minimum_context_hits": 1,
+          "context_collision": false,
+          "teaching_depth_level": 1,
+          "teaching_depth_label": "definition",
+          "evidence_quality_score": 0.5614,
+          "shared_evidence_penalty": 0.0,
+          "evidence_quality_notes": [
+            "Teaching depth: definition (1).",
+            "Comparison evidence detected: 1 hit(s); independent evidence: 1 hit(s)."
+          ],
+          "recap_evidence_only": false,
+          "recap_evidence_count": 0,
+          "substantive_evidence_count": 1,
+          "comparison_evidence_only": false,
+          "comparison_evidence_count": 1,
+          "independent_evidence_count": 1,
+          "evidence": [
+            "local variable only exists within that function scope."
+          ],
+          "parent_concept_id": "aqa_3_2_10_subroutines",
+          "cs_relevance_score": 0.6143,
+          "cs_relevant": true
+        },
+        {
+          "concept_id": "aqa_3_2_5_boolean_operations",
+          "topic": "Boolean operations in programming",
+          "domain": "Programming",
+          "official_reference": "3.2.5",
+          "chapter_reference": "3.2",
+          "official_title": "Boolean operations in a programming language",
+          "paper": "Paper 1",
+          "source_pages": [
+            14
+          ],
+          "confidence": 0.6438,
+          "keyword_score": 0.79,
+          "semantic_score": 0.4379,
+          "salience_score": 0.5075,
+          "extraction_method": "keyword_embedding",
+          "matched_aliases": [
+            "both conditions"
+          ],
+          "total_alias_hits": 2,
+          "evidence_sentence_count": 2,
+          "single_word_alias_only": false,
+          "ambiguous_alias_only": false,
+          "matched_context_terms": [],
+          "matched_conflicting_context_terms": [],
+          "minimum_context_hits": 1,
+          "context_collision": false,
+          "teaching_depth_level": 1,
+          "teaching_depth_label": "definition",
+          "evidence_quality_score": 0.5095,
+          "shared_evidence_penalty": 0.0,
+          "evidence_quality_notes": [
+            "Teaching depth: definition (1)."
+          ],
+          "recap_evidence_only": false,
+          "recap_evidence_count": 0,
+          "substantive_evidence_count": 2,
+          "comparison_evidence_only": false,
+          "comparison_evidence_count": 0,
+          "independent_evidence_count": 2,
+          "evidence": [
+            "AND means both conditions true.",
+            "both conditions need true for loop to continue."
+          ],
+          "parent_concept_id": null,
+          "cs_relevance_score": 0.6062,
+          "cs_relevant": true
+        }
+      ],
+      "rejected_candidates": [],
+      "has_unmapped_cs_content": false,
+      "unmapped_cs_signals": [],
+      "continuation_of_chunk_id": null,
+      "requires_llm_fallback": false,
+      "notes": []
+    },
+    {
+      "chunk_id": 5,
+      "source_word_count": 192,
+      "classification": "mixed_official_and_unmapped",
+      "is_cs_relevant": true,
+      "creates_new_topic": true,
+      "cs_relevance_score": 0.5721,
+      "topic_candidates": [
+        {
+          "concept_id": "aqa_3_2_2_selection",
+          "topic": "Selection",
+          "domain": "Programming",
+          "official_reference": "3.2.2",
+          "chapter_reference": "3.2",
+          "official_title": "Programming concepts",
+          "paper": "Paper 1",
+          "source_pages": [
+            12,
+            13
+          ],
+          "confidence": 0.5772,
+          "keyword_score": 0.72,
+          "semantic_score": 0.4066,
+          "salience_score": 0.407,
+          "extraction_method": "keyword_embedding",
+          "matched_aliases": [
+            "if condition"
+          ],
+          "total_alias_hits": 1,
+          "evidence_sentence_count": 1,
+          "single_word_alias_only": false,
+          "ambiguous_alias_only": false,
+          "matched_context_terms": [],
+          "matched_conflicting_context_terms": [],
+          "minimum_context_hits": 1,
+          "context_collision": false,
+          "teaching_depth_level": 2,
+          "teaching_depth_label": "explanation",
+          "evidence_quality_score": 0.5591,
+          "shared_evidence_penalty": 0.0,
+          "evidence_quality_notes": [
+            "Teaching depth: explanation (2)."
+          ],
+          "recap_evidence_only": false,
+          "recap_evidence_count": 0,
+          "substantive_evidence_count": 1,
+          "comparison_evidence_only": false,
+          "comparison_evidence_count": 0,
+          "independent_evidence_count": 1,
+          "evidence": [
+            "if condition was greater than fifty instead of greater than or equal, then fifty would not count, so three."
+          ],
+          "parent_concept_id": null,
+          "cs_relevance_score": 0.5721,
+          "cs_relevant": true
+        },
+        {
+          "concept_id": "aqa_3_1_3_binary_search",
+          "topic": "Binary search",
+          "domain": "Fundamentals of algorithms",
+          "official_reference": "3.1.3",
+          "chapter_reference": "3.1",
+          "official_title": "Searching algorithms",
+          "paper": "Paper 1",
+          "source_pages": [
+            11
+          ],
+          "confidence": 0.5815,
+          "keyword_score": 0.72,
+          "semantic_score": 0.4879,
+          "salience_score": 0.4517,
+          "extraction_method": "keyword_embedding",
+          "matched_aliases": [
+            "binary search"
+          ],
+          "total_alias_hits": 1,
+          "evidence_sentence_count": 1,
+          "single_word_alias_only": false,
+          "ambiguous_alias_only": false,
+          "matched_context_terms": [],
+          "matched_conflicting_context_terms": [],
+          "minimum_context_hits": 1,
+          "context_collision": false,
+          "teaching_depth_level": 1,
+          "teaching_depth_label": "definition",
+          "evidence_quality_score": 0.5055,
+          "shared_evidence_penalty": 0.0,
+          "evidence_quality_notes": [
+            "Teaching depth: definition (1)."
+          ],
+          "recap_evidence_only": false,
+          "recap_evidence_count": 0,
+          "substantive_evidence_count": 1,
+          "comparison_evidence_only": false,
+          "comparison_evidence_count": 0,
+          "independent_evidence_count": 1,
+          "evidence": [
+            "linear search, binary search, bubble sort, merge sort, trace tables, array bounds, while loops, subroutines, validation verification, Boolean logic."
+          ],
+          "parent_concept_id": null,
+          "cs_relevance_score": 0.5602,
+          "cs_relevant": true
+        },
+        {
+          "concept_id": "aqa_3_1_4_merge_sort",
+          "topic": "Merge sort",
+          "domain": "Fundamentals of algorithms",
+          "official_reference": "3.1.4",
+          "chapter_reference": "3.1",
+          "official_title": "Sorting algorithms",
+          "paper": "Paper 1",
+          "source_pages": [
+            11
+          ],
+          "confidence": 0.5801,
+          "keyword_score": 0.72,
+          "semantic_score": 0.462,
+          "salience_score": 0.4375,
+          "extraction_method": "keyword_embedding",
+          "matched_aliases": [
+            "merge sort"
+          ],
+          "total_alias_hits": 1,
+          "evidence_sentence_count": 1,
+          "single_word_alias_only": false,
+          "ambiguous_alias_only": false,
+          "matched_context_terms": [],
+          "matched_conflicting_context_terms": [],
+          "minimum_context_hits": 1,
+          "context_collision": false,
+          "teaching_depth_level": 1,
+          "teaching_depth_label": "definition",
+          "evidence_quality_score": 0.4968,
+          "shared_evidence_penalty": 0.0,
+          "evidence_quality_notes": [
+            "Teaching depth: definition (1)."
+          ],
+          "recap_evidence_only": false,
+          "recap_evidence_count": 0,
+          "substantive_evidence_count": 1,
+          "comparison_evidence_only": false,
+          "comparison_evidence_count": 0,
+          "independent_evidence_count": 1,
+          "evidence": [
+            "linear search, binary search, bubble sort, merge sort, trace tables, array bounds, while loops, subroutines, validation verification, Boolean logic."
+          ],
+          "parent_concept_id": "aqa_3_1_4_sorting_algorithms",
+          "cs_relevance_score": 0.5568,
+          "cs_relevant": true
+        },
+        {
+          "concept_id": "aqa_3_1_3_linear_search",
+          "topic": "Linear search",
+          "domain": "Fundamentals of algorithms",
+          "official_reference": "3.1.3",
+          "chapter_reference": "3.1",
+          "official_title": "Searching algorithms",
+          "paper": "Paper 1",
+          "source_pages": [
+            11
+          ],
+          "confidence": 0.5794,
+          "keyword_score": 0.72,
+          "semantic_score": 0.4486,
+          "salience_score": 0.4301,
+          "extraction_method": "keyword_embedding",
+          "matched_aliases": [
+            "linear search"
+          ],
+          "total_alias_hits": 1,
+          "evidence_sentence_count": 1,
+          "single_word_alias_only": false,
+          "ambiguous_alias_only": false,
+          "matched_context_terms": [],
+          "matched_conflicting_context_terms": [],
+          "minimum_context_hits": 1,
+          "context_collision": false,
+          "teaching_depth_level": 1,
+          "teaching_depth_label": "definition",
+          "evidence_quality_score": 0.4922,
+          "shared_evidence_penalty": 0.0,
+          "evidence_quality_notes": [
+            "Teaching depth: definition (1)."
+          ],
+          "recap_evidence_only": false,
+          "recap_evidence_count": 0,
+          "substantive_evidence_count": 1,
+          "comparison_evidence_only": false,
+          "comparison_evidence_count": 0,
+          "independent_evidence_count": 1,
+          "evidence": [
+            "linear search, binary search, bubble sort, merge sort, trace tables, array bounds, while loops, subroutines, validation verification, Boolean logic."
+          ],
+          "parent_concept_id": null,
+          "cs_relevance_score": 0.555,
+          "cs_relevant": true
+        },
+        {
+          "concept_id": "aqa_3_1_4_bubble_sort",
+          "topic": "Bubble sort",
+          "domain": "Fundamentals of algorithms",
+          "official_reference": "3.1.4",
+          "chapter_reference": "3.1",
+          "official_title": "Sorting algorithms",
+          "paper": "Paper 1",
+          "source_pages": [
+            11
+          ],
+          "confidence": 0.5793,
+          "keyword_score": 0.72,
+          "semantic_score": 0.4461,
+          "salience_score": 0.4287,
+          "extraction_method": "keyword_embedding",
+          "matched_aliases": [
+            "bubble sort"
+          ],
+          "total_alias_hits": 1,
+          "evidence_sentence_count": 1,
+          "single_word_alias_only": false,
+          "ambiguous_alias_only": false,
+          "matched_context_terms": [],
+          "matched_conflicting_context_terms": [],
+          "minimum_context_hits": 1,
+          "context_collision": false,
+          "teaching_depth_level": 1,
+          "teaching_depth_label": "definition",
+          "evidence_quality_score": 0.4914,
+          "shared_evidence_penalty": 0.0,
+          "evidence_quality_notes": [
+            "Teaching depth: definition (1)."
+          ],
+          "recap_evidence_only": false,
+          "recap_evidence_count": 0,
+          "substantive_evidence_count": 1,
+          "comparison_evidence_only": false,
+          "comparison_evidence_count": 0,
+          "independent_evidence_count": 1,
+          "evidence": [
+            "linear search, binary search, bubble sort, merge sort, trace tables, array bounds, while loops, subroutines, validation verification, Boolean logic."
+          ],
+          "parent_concept_id": "aqa_3_1_4_sorting_algorithms",
+          "cs_relevance_score": 0.5547,
+          "cs_relevant": true
+        }
+      ],
+      "rejected_candidates": [
+        {
+          "concept_id": "aqa_3_1_1_algorithm_representation",
+          "topic": "Pseudocode, program code and flowcharts",
+          "domain": "Fundamentals of algorithms",
+          "official_reference": "3.1.1",
+          "chapter_reference": "3.1",
+          "official_title": "Representing algorithms",
+          "paper": "Paper 1",
+          "source_pages": [
+            10
+          ],
+          "confidence": 0.4352,
+          "keyword_score": 0.5,
+          "semantic_score": 0.4577,
+          "salience_score": 0.4351,
+          "extraction_method": "keyword_embedding",
+          "matched_aliases": [
+            "pseudocode"
+          ],
+          "total_alias_hits": 1,
+          "evidence_sentence_count": 1,
+          "single_word_alias_only": true,
+          "ambiguous_alias_only": false,
+          "matched_context_terms": [],
+          "matched_conflicting_context_terms": [],
+          "minimum_context_hits": 1,
+          "context_collision": false,
+          "teaching_depth_level": 0,
+          "teaching_depth_label": "mention_only",
+          "evidence_quality_score": 0.0,
+          "shared_evidence_penalty": 0.0,
+          "evidence_quality_notes": [],
+          "recap_evidence_only": false,
+          "recap_evidence_count": 0,
+          "substantive_evidence_count": 0,
+          "comparison_evidence_only": false,
+          "comparison_evidence_count": 0,
+          "independent_evidence_count": 0,
+          "evidence": [
+            "now next question is pseudocode and I want you to trace it."
+          ],
+          "parent_concept_id": "aqa_3_1_1_algorithm",
+          "cs_relevance_score": 0.4352,
+          "cs_relevant": false
+        }
+      ],
+      "has_unmapped_cs_content": true,
+      "unmapped_cs_signals": [
+        {
+          "rough_topic": "Unmapped Computer Science content",
+          "domain": "Programming and software development",
+          "score": 0.604,
+          "evidence": "lots of programming but all within algorithms and programming techniques.",
+          "matched_aliases": [],
+          "detection_method": "semantic"
+        }
+      ],
+      "continuation_of_chunk_id": null,
+      "requires_llm_fallback": true,
+      "notes": [
+        "Unmapped CS evidence is semantic-only, borderline or ambiguous, so later fallback should refine the rough topic without inventing an AQA label."
+      ]
+    },
+    {
+      "chunk_id": 6,
+      "source_word_count": 203,
+      "classification": "official_aqa_topic",
+      "is_cs_relevant": true,
+      "creates_new_topic": true,
+      "cs_relevance_score": 0.7169,
+      "topic_candidates": [
+        {
+          "concept_id": "aqa_3_1_1_algorithm_purpose_trace",
+          "topic": "Algorithm tracing and program execution",
+          "domain": "Fundamentals of algorithms",
+          "official_reference": "3.1.1",
+          "chapter_reference": "3.1",
+          "official_title": "Representing algorithms",
+          "paper": "Paper 1",
+          "source_pages": [
+            10
+          ],
+          "confidence": 0.7168,
+          "keyword_score": 0.87,
+          "semantic_score": 0.379,
+          "salience_score": 0.5751,
+          "extraction_method": "keyword_embedding",
+          "matched_aliases": [
+            "trace table",
+            "dry run"
+          ],
+          "total_alias_hits": 2,
+          "evidence_sentence_count": 2,
+          "single_word_alias_only": false,
+          "ambiguous_alias_only": false,
+          "matched_context_terms": [],
+          "matched_conflicting_context_terms": [],
+          "minimum_context_hits": 1,
+          "context_collision": false,
+          "teaching_depth_level": 4,
+          "teaching_depth_label": "sustained_teaching",
+          "evidence_quality_score": 0.7171,
+          "shared_evidence_penalty": 0.0,
+          "evidence_quality_notes": [
+            "Teaching depth: sustained_teaching (4)."
+          ],
+          "recap_evidence_only": false,
+          "recap_evidence_count": 0,
+          "substantive_evidence_count": 2,
+          "comparison_evidence_only": false,
+          "comparison_evidence_count": 0,
+          "independent_evidence_count": 2,
+          "evidence": [
+            "homework is two search questions and one trace table.",
+            "actually I want one more dry run because this is where exam questions get messy."
+          ],
+          "parent_concept_id": "aqa_3_1_1_algorithm",
+          "cs_relevance_score": 0.7169,
+          "cs_relevant": true
+        },
+        {
+          "concept_id": "aqa_3_2_6_arrays",
+          "topic": "One- and two-dimensional arrays",
+          "domain": "Programming",
+          "official_reference": "3.2.6",
+          "chapter_reference": "3.2",
+          "official_title": "Data structures",
+          "paper": "Paper 1",
+          "source_pages": [
+            15
+          ],
+          "confidence": 0.6244,
+          "keyword_score": 0.74,
+          "semantic_score": 0.5794,
+          "salience_score": 0.7687,
+          "extraction_method": "keyword_embedding",
+          "matched_aliases": [
+            "array",
+            "arrays"
+          ],
+          "total_alias_hits": 4,
+          "evidence_sentence_count": 3,
+          "single_word_alias_only": true,
+          "ambiguous_alias_only": false,
+          "matched_context_terms": [],
+          "matched_conflicting_context_terms": [],
+          "minimum_context_hits": 1,
+          "context_collision": false,
+          "teaching_depth_level": 4,
+          "teaching_depth_label": "sustained_teaching",
+          "evidence_quality_score": 0.8056,
+          "shared_evidence_penalty": 0.0,
+          "evidence_quality_notes": [
+            "Teaching depth: sustained_teaching (4)."
+          ],
+          "recap_evidence_only": false,
+          "recap_evidence_count": 0,
+          "substantive_evidence_count": 3,
+          "comparison_evidence_only": false,
+          "comparison_evidence_count": 0,
+          "independent_evidence_count": 0,
+          "evidence": [
+            "array 3 8 2 9 4 9 1.",
+            "for i from zero to length minus one, if array i greater than five then total equals total plus array i and count equals count plus one.",
+            "two dimensional arrays are not today's main target but nested loops appear in algorithms."
+          ],
+          "parent_concept_id": "aqa_3_2_6_data_structures",
+          "cs_relevance_score": 0.6751,
+          "cs_relevant": true
+        },
+        {
+          "concept_id": "aqa_3_2_2_nested_structures",
+          "topic": "Nested selection and iteration",
+          "domain": "Programming",
+          "official_reference": "3.2.2",
+          "chapter_reference": "3.2",
+          "official_title": "Programming concepts",
+          "paper": "Paper 1",
+          "source_pages": [
+            13
+          ],
+          "confidence": 0.5752,
+          "keyword_score": 0.72,
+          "semantic_score": 0.3673,
+          "salience_score": 0.3854,
+          "extraction_method": "keyword_embedding",
+          "matched_aliases": [
+            "nested loop"
+          ],
+          "total_alias_hits": 1,
+          "evidence_sentence_count": 1,
+          "single_word_alias_only": false,
+          "ambiguous_alias_only": false,
+          "matched_context_terms": [],
+          "matched_conflicting_context_terms": [],
+          "minimum_context_hits": 1,
+          "context_collision": false,
+          "teaching_depth_level": 1,
+          "teaching_depth_label": "definition",
+          "evidence_quality_score": 0.4648,
+          "shared_evidence_penalty": 0.0,
+          "evidence_quality_notes": [
+            "Teaching depth: definition (1)."
+          ],
+          "recap_evidence_only": false,
+          "recap_evidence_count": 0,
+          "substantive_evidence_count": 1,
+          "comparison_evidence_only": false,
+          "comparison_evidence_count": 0,
+          "independent_evidence_count": 1,
+          "evidence": [
+            "okay nested loop briefly."
+          ],
+          "parent_concept_id": null,
+          "cs_relevance_score": 0.5443,
+          "cs_relevant": true
+        },
+        {
+          "concept_id": "aqa_3_1_4_merge_sort",
+          "topic": "Merge sort",
+          "domain": "Fundamentals of algorithms",
+          "official_reference": "3.1.4",
+          "chapter_reference": "3.1",
+          "official_title": "Sorting algorithms",
+          "paper": "Paper 1",
+          "source_pages": [
+            11
+          ],
+          "confidence": 0.5745,
+          "keyword_score": 0.72,
+          "semantic_score": 0.3542,
+          "salience_score": 0.3782,
+          "extraction_method": "keyword_embedding",
+          "matched_aliases": [
+            "merge sort"
+          ],
+          "total_alias_hits": 1,
+          "evidence_sentence_count": 1,
+          "single_word_alias_only": false,
+          "ambiguous_alias_only": false,
+          "matched_context_terms": [],
+          "matched_conflicting_context_terms": [],
+          "minimum_context_hits": 1,
+          "context_collision": false,
+          "teaching_depth_level": 1,
+          "teaching_depth_label": "definition",
+          "evidence_quality_score": 0.4604,
+          "shared_evidence_penalty": 0.0,
+          "evidence_quality_notes": [
+            "Teaching depth: definition (1)."
+          ],
+          "recap_evidence_only": false,
+          "recap_evidence_count": 0,
+          "substantive_evidence_count": 1,
+          "comparison_evidence_only": false,
+          "comparison_evidence_count": 0,
+          "independent_evidence_count": 1,
+          "evidence": [
+            "don't do merge sort implementation, just trace it."
+          ],
+          "parent_concept_id": "aqa_3_1_4_sorting_algorithms",
+          "cs_relevance_score": 0.5425,
+          "cs_relevant": true
+        },
+        {
+          "concept_id": "aqa_3_2_3_arithmetic_operations",
+          "topic": "Arithmetic operations",
+          "domain": "Programming",
+          "official_reference": "3.2.3",
+          "chapter_reference": "3.2",
+          "official_title": "Arithmetic operations in a programming language",
+          "paper": "Paper 1",
+          "source_pages": [
+            14
+          ],
+          "confidence": 0.5708,
+          "keyword_score": 0.72,
+          "semantic_score": 0.2831,
+          "salience_score": 0.3391,
+          "extraction_method": "keyword_embedding",
+          "matched_aliases": [
+            "integer division"
+          ],
+          "total_alias_hits": 1,
+          "evidence_sentence_count": 1,
+          "single_word_alias_only": false,
+          "ambiguous_alias_only": false,
+          "matched_context_terms": [
+            "integer division"
+          ],
+          "matched_conflicting_context_terms": [],
+          "minimum_context_hits": 1,
+          "context_collision": false,
+          "teaching_depth_level": 1,
+          "teaching_depth_label": "definition",
+          "evidence_quality_score": 0.4664,
+          "shared_evidence_penalty": 0.0,
+          "evidence_quality_notes": [
+            "Teaching depth: definition (1).",
+            "Supporting context: integer division."
+          ],
+          "recap_evidence_only": false,
+          "recap_evidence_count": 0,
+          "substantive_evidence_count": 1,
+          "comparison_evidence_only": false,
+          "comparison_evidence_count": 0,
+          "independent_evidence_count": 1,
+          "evidence": [
+            "average of selected values if asked would be total divided count, but be careful integer division depending language."
+          ],
+          "parent_concept_id": null,
+          "cs_relevance_score": 0.5416,
+          "cs_relevant": true
+        }
+      ],
+      "rejected_candidates": [],
+      "has_unmapped_cs_content": false,
+      "unmapped_cs_signals": [],
+      "continuation_of_chunk_id": null,
+      "requires_llm_fallback": false,
+      "notes": []
+    },
+    {
+      "chunk_id": 7,
+      "source_word_count": 441,
+      "classification": "mixed_official_and_unmapped",
+      "is_cs_relevant": true,
+      "creates_new_topic": true,
+      "cs_relevance_score": 0.8205,
+      "topic_candidates": [
+        {
+          "concept_id": "aqa_3_2_6_arrays",
+          "topic": "One- and two-dimensional arrays",
+          "domain": "Programming",
+          "official_reference": "3.2.6",
+          "chapter_reference": "3.2",
+          "official_title": "Data structures",
+          "paper": "Paper 1",
+          "source_pages": [
+            15
+          ],
+          "confidence": 0.8412,
+          "keyword_score": 1.0,
+          "semantic_score": 0.4657,
+          "salience_score": 0.7061,
+          "extraction_method": "keyword_embedding",
+          "matched_aliases": [
+            "array",
+            "arrays",
+            "array index"
+          ],
+          "total_alias_hits": 8,
+          "evidence_sentence_count": 6,
+          "single_word_alias_only": false,
+          "ambiguous_alias_only": false,
+          "matched_context_terms": [],
+          "matched_conflicting_context_terms": [],
+          "minimum_context_hits": 1,
+          "context_collision": false,
+          "teaching_depth_level": 4,
+          "teaching_depth_label": "sustained_teaching",
+          "evidence_quality_score": 0.7672,
+          "shared_evidence_penalty": 0.0,
+          "evidence_quality_notes": [
+            "Teaching depth: sustained_teaching (4)."
+          ],
+          "recap_evidence_only": false,
+          "recap_evidence_count": 0,
+          "substantive_evidence_count": 3,
+          "comparison_evidence_only": false,
+          "comparison_evidence_count": 0,
+          "independent_evidence_count": 1,
+          "evidence": [
+            "student asks difference array and array list.",
+            "array fixed size in many languages, array list or dynamic list can grow.",
+            "if array index equals target then found true else index plus one."
+          ],
+          "parent_concept_id": "aqa_3_2_6_data_structures",
+          "cs_relevance_score": 0.8205,
+          "cs_relevant": true
+        },
+        {
+          "concept_id": "aqa_3_2_11_validation",
+          "topic": "Data validation routines",
+          "domain": "Programming",
+          "official_reference": "3.2.11",
+          "chapter_reference": "3.2",
+          "official_title": "Robust and secure programming",
+          "paper": "Paper 1",
+          "source_pages": [
+            17
+          ],
+          "confidence": 0.8443,
+          "keyword_score": 1.0,
+          "semantic_score": 0.5077,
+          "salience_score": 0.7292,
+          "extraction_method": "keyword_embedding",
+          "matched_aliases": [
+            "range check",
+            "length check",
+            "presence check"
+          ],
+          "total_alias_hits": 3,
+          "evidence_sentence_count": 3,
+          "single_word_alias_only": false,
+          "ambiguous_alias_only": false,
+          "matched_context_terms": [
+            "range check",
+            "length check",
+            "presence check"
+          ],
+          "matched_conflicting_context_terms": [],
+          "minimum_context_hits": 1,
+          "context_collision": false,
+          "teaching_depth_level": 1,
+          "teaching_depth_label": "definition",
+          "evidence_quality_score": 0.6088,
+          "shared_evidence_penalty": 0.0,
+          "evidence_quality_notes": [
+            "Teaching depth: definition (1).",
+            "Supporting context: range check, length check, presence check."
+          ],
+          "recap_evidence_only": false,
+          "recap_evidence_count": 0,
+          "substantive_evidence_count": 3,
+          "comparison_evidence_only": false,
+          "comparison_evidence_count": 0,
+          "independent_evidence_count": 3,
+          "evidence": [
+            "input age 250, range check fails.",
+            "password abc, length check fails.",
+            "username blank, presence check fails."
+          ],
+          "parent_concept_id": null,
+          "cs_relevance_score": 0.7784,
+          "cs_relevant": true
+        },
+        {
+          "concept_id": "aqa_3_2_1_data_types",
+          "topic": "Data types",
+          "domain": "Programming",
+          "official_reference": "3.2.1",
+          "chapter_reference": "3.2",
+          "official_title": "Data types",
+          "paper": "Paper 1",
+          "source_pages": [
+            11,
+            12
+          ],
+          "confidence": 0.7159,
+          "keyword_score": 0.87,
+          "semantic_score": 0.364,
+          "salience_score": 0.5669,
+          "extraction_method": "keyword_embedding",
+          "matched_aliases": [
+            "data type",
+            "boolean"
+          ],
+          "total_alias_hits": 2,
+          "evidence_sentence_count": 2,
+          "single_word_alias_only": false,
+          "ambiguous_alias_only": false,
+          "matched_context_terms": [
+            "data type",
+            "variable"
+          ],
+          "matched_conflicting_context_terms": [],
+          "minimum_context_hits": 1,
+          "context_collision": false,
+          "teaching_depth_level": 1,
+          "teaching_depth_label": "definition",
+          "evidence_quality_score": 0.5395,
+          "shared_evidence_penalty": 0.0,
+          "evidence_quality_notes": [
+            "Teaching depth: definition (1).",
+            "Supporting context: data type, variable."
+          ],
+          "recap_evidence_only": false,
+          "recap_evidence_count": 0,
+          "substantive_evidence_count": 2,
+          "comparison_evidence_only": false,
+          "comparison_evidence_count": 0,
+          "independent_evidence_count": 1,
+          "evidence": [
+            "type check makes sure value is expected data type.",
+            "okay trace table plus Boolean."
+          ],
+          "parent_concept_id": null,
+          "cs_relevance_score": 0.6665,
+          "cs_relevant": true
+        },
+        {
+          "concept_id": "aqa_3_2_10_parameters_returns",
+          "topic": "Parameters and return values",
+          "domain": "Programming",
+          "official_reference": "3.2.10",
+          "chapter_reference": "3.2",
+          "official_title": "Structured programming and subroutines (procedures and functions)",
+          "paper": "Paper 1",
+          "source_pages": [
+            16
+          ],
+          "confidence": 0.6659,
+          "keyword_score": 0.82,
+          "semantic_score": 0.3666,
+          "salience_score": 0.485,
+          "extraction_method": "keyword_embedding",
+          "matched_aliases": [
+            "parameter",
+            "return value"
+          ],
+          "total_alias_hits": 2,
+          "evidence_sentence_count": 1,
+          "single_word_alias_only": false,
+          "ambiguous_alias_only": false,
+          "matched_context_terms": [],
+          "matched_conflicting_context_terms": [],
+          "minimum_context_hits": 1,
+          "context_collision": false,
+          "teaching_depth_level": 1,
+          "teaching_depth_label": "definition",
+          "evidence_quality_score": 0.4896,
+          "shared_evidence_penalty": 0.0,
+          "evidence_quality_notes": [
+            "Teaching depth: definition (1)."
+          ],
+          "recap_evidence_only": false,
+          "recap_evidence_count": 0,
+          "substantive_evidence_count": 1,
+          "comparison_evidence_only": false,
+          "comparison_evidence_count": 0,
+          "independent_evidence_count": 1,
+          "evidence": [
+            "parameter array, local max, return value maximum."
+          ],
+          "parent_concept_id": "aqa_3_2_10_subroutines",
+          "cs_relevance_score": 0.6165,
+          "cs_relevant": true
+        },
+        {
+          "concept_id": "aqa_3_1_3_binary_search",
+          "topic": "Binary search",
+          "domain": "Fundamentals of algorithms",
+          "official_reference": "3.1.3",
+          "chapter_reference": "3.1",
+          "official_title": "Searching algorithms",
+          "paper": "Paper 1",
+          "source_pages": [
+            11
+          ],
+          "confidence": 0.648,
+          "keyword_score": 0.79,
+          "semantic_score": 0.5104,
+          "salience_score": 0.5474,
+          "extraction_method": "keyword_embedding",
+          "matched_aliases": [
+            "binary search"
+          ],
+          "total_alias_hits": 2,
+          "evidence_sentence_count": 2,
+          "single_word_alias_only": false,
+          "ambiguous_alias_only": false,
+          "matched_context_terms": [],
+          "matched_conflicting_context_terms": [],
+          "minimum_context_hits": 1,
+          "context_collision": false,
+          "teaching_depth_level": 1,
+          "teaching_depth_label": "definition",
+          "evidence_quality_score": 0.5339,
+          "shared_evidence_penalty": 0.0,
+          "evidence_quality_notes": [
+            "Teaching depth: definition (1)."
+          ],
+          "recap_evidence_only": false,
+          "recap_evidence_count": 0,
+          "substantive_evidence_count": 2,
+          "comparison_evidence_only": false,
+          "comparison_evidence_count": 0,
+          "independent_evidence_count": 2,
+          "evidence": [
+            "binary search pseudocode uses low high mid.",
+            "student says can binary search work on names alphabetically."
+          ],
+          "parent_concept_id": null,
+          "cs_relevance_score": 0.6161,
+          "cs_relevant": true
+        },
+        {
+          "concept_id": "aqa_3_2_10_local_variables",
+          "topic": "Local variables",
+          "domain": "Programming",
+          "official_reference": "3.2.10",
+          "chapter_reference": "3.2",
+          "official_title": "Structured programming and subroutines (procedures and functions)",
+          "paper": "Paper 1",
+          "source_pages": [
+            16
+          ],
+          "confidence": 0.5855,
+          "keyword_score": 0.72,
+          "semantic_score": 0.5655,
+          "salience_score": 0.4943,
+          "extraction_method": "keyword_embedding",
+          "matched_aliases": [
+            "local variable"
+          ],
+          "total_alias_hits": 1,
+          "evidence_sentence_count": 1,
+          "single_word_alias_only": false,
+          "ambiguous_alias_only": false,
+          "matched_context_terms": [],
+          "matched_conflicting_context_terms": [],
+          "minimum_context_hits": 1,
+          "context_collision": false,
+          "teaching_depth_level": 1,
+          "teaching_depth_label": "definition",
+          "evidence_quality_score": 0.5317,
+          "shared_evidence_penalty": 0.0,
+          "evidence_quality_notes": [
+            "Teaching depth: definition (1)."
+          ],
+          "recap_evidence_only": false,
+          "recap_evidence_count": 0,
+          "substantive_evidence_count": 1,
+          "comparison_evidence_only": false,
+          "comparison_evidence_count": 0,
+          "independent_evidence_count": 1,
+          "evidence": [
+            "local variable inside function normally unavailable outside."
+          ],
+          "parent_concept_id": "aqa_3_2_10_subroutines",
+          "cs_relevance_score": 0.5704,
+          "cs_relevant": true
+        }
+      ],
+      "rejected_candidates": [],
+      "has_unmapped_cs_content": true,
+      "unmapped_cs_signals": [
+        {
+          "rough_topic": "Dynamic arrays and list collections",
+          "domain": "Programming and software development",
+          "score": 0.8132,
+          "evidence": "student asks difference array and array list.",
+          "matched_aliases": [
+            "array list",
+            "array lists"
+          ],
+          "detection_method": "lexical"
+        }
+      ],
+      "continuation_of_chunk_id": null,
+      "requires_llm_fallback": false,
+      "notes": [
+        "Strong specific unmapped-CS evidence was retained directly; no LLM fallback is required."
+      ]
+    },
+    {
+      "chunk_id": 8,
+      "source_word_count": 225,
+      "classification": "official_aqa_topic",
+      "is_cs_relevant": true,
+      "creates_new_topic": true,
+      "cs_relevance_score": 0.782,
+      "topic_candidates": [
+        {
+          "concept_id": "aqa_3_2_11_errors_debugging",
+          "topic": "Syntax errors, logic errors and debugging",
+          "domain": "Programming",
+          "official_reference": "3.2.11",
+          "chapter_reference": "3.2",
+          "official_title": "Robust and secure programming",
+          "paper": "Paper 1",
+          "source_pages": [
+            17
+          ],
+          "confidence": 0.8502,
+          "keyword_score": 1.0,
+          "semantic_score": 0.5898,
+          "salience_score": 0.7744,
+          "extraction_method": "keyword_embedding",
+          "matched_aliases": [
+            "syntax error",
+            "logic error",
+            "debugging"
+          ],
+          "total_alias_hits": 7,
+          "evidence_sentence_count": 6,
+          "single_word_alias_only": false,
+          "ambiguous_alias_only": false,
+          "matched_context_terms": [],
+          "matched_conflicting_context_terms": [],
+          "minimum_context_hits": 1,
+          "context_collision": false,
+          "teaching_depth_level": 1,
+          "teaching_depth_label": "definition",
+          "evidence_quality_score": 0.6066,
+          "shared_evidence_penalty": 0.0,
+          "evidence_quality_notes": [
+            "Teaching depth: definition (1)."
+          ],
+          "recap_evidence_only": false,
+          "recap_evidence_count": 0,
+          "substantive_evidence_count": 3,
+          "comparison_evidence_only": false,
+          "comparison_evidence_count": 0,
+          "independent_evidence_count": 4,
+          "evidence": [
+            "syntax error means code breaks language rules, logic error runs but gives wrong result, runtime error occurs during execution.",
+            "asks missing bracket syntax error, yes.",
+            "asks if wrong condition logic error, yes."
+          ],
+          "parent_concept_id": null,
+          "cs_relevance_score": 0.782,
+          "cs_relevant": true
+        },
+        {
+          "concept_id": "aqa_3_1_4_sorting_algorithms",
+          "topic": "Sorting algorithms",
+          "domain": "Fundamentals of algorithms",
+          "official_reference": "3.1.4",
+          "chapter_reference": "3.1",
+          "official_title": "Sorting algorithms",
+          "paper": "Paper 1",
+          "source_pages": [
+            11
+          ],
+          "confidence": 0.5736,
+          "keyword_score": 0.72,
+          "semantic_score": 0.3361,
+          "salience_score": 0.3682,
+          "extraction_method": "keyword_embedding",
+          "matched_aliases": [
+            "sorting algorithms"
+          ],
+          "total_alias_hits": 1,
+          "evidence_sentence_count": 1,
+          "single_word_alias_only": false,
+          "ambiguous_alias_only": false,
+          "matched_context_terms": [],
+          "matched_conflicting_context_terms": [],
+          "minimum_context_hits": 1,
+          "context_collision": false,
+          "teaching_depth_level": 1,
+          "teaching_depth_label": "definition",
+          "evidence_quality_score": 0.4543,
+          "shared_evidence_penalty": 0.0,
+          "evidence_quality_notes": [
+            "Teaching depth: definition (1)."
+          ],
+          "recap_evidence_only": false,
+          "recap_evidence_count": 0,
+          "substantive_evidence_count": 1,
+          "comparison_evidence_only": false,
+          "comparison_evidence_count": 0,
+          "independent_evidence_count": 1,
+          "evidence": [
+            "rough topics are search algorithms, sorting algorithms, trace tables and loops, subroutines, validation verification, Boolean logic, errors and debugging."
+          ],
+          "parent_concept_id": null,
+          "cs_relevance_score": 0.5402,
+          "cs_relevant": true
+        }
+      ],
+      "rejected_candidates": [],
+      "has_unmapped_cs_content": false,
+      "unmapped_cs_signals": [],
+      "continuation_of_chunk_id": null,
+      "requires_llm_fallback": false,
+      "notes": []
+    }
+  ],
+  "merged_topics": [
+    {
+      "concept_id": "aqa_3_2_6_arrays",
+      "topic": "One- and two-dimensional arrays",
+      "domain": "Programming",
+      "official_reference": "3.2.6",
+      "chapter_reference": "3.2",
+      "official_title": "Data structures",
+      "paper": "Paper 1",
+      "source_pages": [
+        15
+      ],
+      "confidence": 0.8405,
+      "ranking_score": 0.5481,
+      "topic_role": "primary",
+      "source_chunk_ids": [
+        3,
+        6,
+        7
+      ],
+      "support_span_count": 2,
+      "mean_semantic_score": 0.4516,
+      "mean_keyword_score": 0.9133,
+      "mean_salience_score": 0.6984,
+      "coverage_score": 0.375,
+      "evidence": [
+        "suppose total equals zero and array is 2 4 1 3.",
+        "for i from zero while i less than length, total total plus array i.",
+        "what is common array mistake?",
+        "array 3 8 2 9 4 9 1.",
+        "for i from zero to length minus one, if array i greater than five then total equals total plus array i and count equals count plus one."
+      ],
+      "supporting_candidate_count": 3
+    },
+    {
+      "concept_id": "aqa_3_1_3_binary_search",
+      "topic": "Binary search",
+      "domain": "Fundamentals of algorithms",
+      "official_reference": "3.1.3",
+      "chapter_reference": "3.1",
+      "official_title": "Searching algorithms",
+      "paper": "Paper 1",
+      "source_pages": [
+        11
+      ],
+      "confidence": 0.8371,
+      "ranking_score": 0.538,
+      "topic_role": "primary",
+      "source_chunk_ids": [
+        1,
+        5,
+        7
+      ],
+      "support_span_count": 3,
+      "mean_semantic_score": 0.5179,
+      "mean_keyword_score": 0.8167,
+      "mean_salience_score": 0.5849,
+      "coverage_score": 0.375,
+      "evidence": [
+        "now let's move on to binary search.",
+        "why is binary search generally efficient?",
+        "we look at the middle, compare target, discard half.",
+        "linear search, binary search, bubble sort, merge sort, trace tables, array bounds, while loops, subroutines, validation verification, Boolean logic.",
+        "binary search pseudocode uses low high mid."
+      ],
+      "supporting_candidate_count": 3
+    },
+    {
+      "concept_id": "aqa_3_1_3_linear_search",
+      "topic": "Linear search",
+      "domain": "Fundamentals of algorithms",
+      "official_reference": "3.1.3",
+      "chapter_reference": "3.1",
+      "official_title": "Searching algorithms",
+      "paper": "Paper 1",
+      "source_pages": [
+        11
+      ],
+      "confidence": 0.7705,
+      "ranking_score": 0.5246,
+      "topic_role": "primary",
+      "source_chunk_ids": [
+        1,
+        4,
+        5
+      ],
+      "support_span_count": 2,
+      "mean_semantic_score": 0.5392,
+      "mean_keyword_score": 0.82,
+      "mean_salience_score": 0.5632,
+      "coverage_score": 0.375,
+      "evidence": [
+        "first thing, linear search.",
+        "what does linear search do?",
+        "okay before we move on, what is worst case for linear search?",
+        "this is exactly how linear search can stop early.",
+        "so see how lesson loops back: linear search, Boolean logic, arrays, while loops."
+      ],
+      "supporting_candidate_count": 3
+    },
+    {
+      "concept_id": "aqa_3_2_11_validation",
+      "topic": "Data validation routines",
+      "domain": "Programming",
+      "official_reference": "3.2.11",
+      "chapter_reference": "3.2",
+      "official_title": "Robust and secure programming",
+      "paper": "Paper 1",
+      "source_pages": [
+        17
+      ],
+      "confidence": 0.7984,
+      "ranking_score": 0.5029,
+      "topic_role": "supporting",
+      "source_chunk_ids": [
+        4,
+        7
+      ],
+      "support_span_count": 2,
+      "mean_semantic_score": 0.4941,
+      "mean_keyword_score": 1.0,
+      "mean_salience_score": 0.7218,
+      "coverage_score": 0.25,
+      "evidence": [
+        "range check, type check, length check, presence check, format check.",
+        "student asks so if age must be between 0 and 120 that's range check?",
+        "password minimum eight characters length check.",
+        "input age 250, range check fails.",
+        "password abc, length check fails."
+      ],
+      "supporting_candidate_count": 2
+    },
+    {
+      "concept_id": "aqa_3_2_11_errors_debugging",
+      "topic": "Syntax errors, logic errors and debugging",
+      "domain": "Programming",
+      "official_reference": "3.2.11",
+      "chapter_reference": "3.2",
+      "official_title": "Robust and secure programming",
+      "paper": "Paper 1",
+      "source_pages": [
+        17
+      ],
+      "confidence": 0.782,
+      "ranking_score": 0.4792,
+      "topic_role": "supporting",
+      "source_chunk_ids": [
+        8
+      ],
+      "support_span_count": 1,
+      "mean_semantic_score": 0.5898,
+      "mean_keyword_score": 1.0,
+      "mean_salience_score": 0.7744,
+      "coverage_score": 0.125,
+      "evidence": [
+        "syntax error means code breaks language rules, logic error runs but gives wrong result, runtime error occurs during execution.",
+        "asks missing bracket syntax error, yes.",
+        "asks if wrong condition logic error, yes."
+      ],
+      "supporting_candidate_count": 1
+    },
+    {
+      "concept_id": "aqa_3_1_4_bubble_sort",
+      "topic": "Bubble sort",
+      "domain": "Fundamentals of algorithms",
+      "official_reference": "3.1.4",
+      "chapter_reference": "3.1",
+      "official_title": "Sorting algorithms",
+      "paper": "Paper 1",
+      "source_pages": [
+        11
+      ],
+      "confidence": 0.7969,
+      "ranking_score": 0.4779,
+      "topic_role": "supporting",
+      "source_chunk_ids": [
+        2,
+        5
+      ],
+      "support_span_count": 2,
+      "mean_semantic_score": 0.5005,
+      "mean_keyword_score": 0.86,
+      "mean_salience_score": 0.5919,
+      "coverage_score": 0.25,
+      "evidence": [
+        "bubble sort first.",
+        "bubble sort bubble sort okay.",
+        "yes conceptually more steps, but much more efficient for large datasets than bubble sort in general.",
+        "linear search, binary search, bubble sort, merge sort, trace tables, array bounds, while loops, subroutines, validation verification, Boolean logic."
+      ],
+      "supporting_candidate_count": 2
+    },
+    {
+      "concept_id": "aqa_3_2_10_parameters_returns",
+      "topic": "Parameters and return values",
+      "domain": "Programming",
+      "official_reference": "3.2.10",
+      "chapter_reference": "3.2",
+      "official_title": "Structured programming and subroutines (procedures and functions)",
+      "paper": "Paper 1",
+      "source_pages": [
+        16
+      ],
+      "confidence": 0.6959,
+      "ranking_score": 0.4698,
+      "topic_role": "supporting",
+      "source_chunk_ids": [
+        4,
+        7
+      ],
+      "support_span_count": 2,
+      "mean_semantic_score": 0.5072,
+      "mean_keyword_score": 0.815,
+      "mean_salience_score": 0.6457,
+      "coverage_score": 0.25,
+      "evidence": [
+        "function versus procedure, parameters, local variables.",
+        "parameters are variables in definition, arguments are actual values passed when calling.",
+        "a and b parameters.",
+        "parameter array, local max, return value maximum."
+      ],
+      "supporting_candidate_count": 2
+    },
+    {
+      "concept_id": "aqa_3_2_2_subroutine_statement",
+      "topic": "Subroutine statements",
+      "domain": "Programming",
+      "official_reference": "3.2.2",
+      "chapter_reference": "3.2",
+      "official_title": "Programming concepts",
+      "paper": "Paper 1",
+      "source_pages": [
+        12
+      ],
+      "confidence": 0.6611,
+      "ranking_score": 0.4647,
+      "topic_role": "supporting",
+      "source_chunk_ids": [
+        4
+      ],
+      "support_span_count": 1,
+      "mean_semantic_score": 0.6208,
+      "mean_keyword_score": 0.81,
+      "mean_salience_score": 0.7914,
+      "coverage_score": 0.125,
+      "evidence": [
+        "function versus procedure, parameters, local variables.",
+        "function returns value, procedure performs task.",
+        "local variable only exists within that function scope."
+      ],
+      "supporting_candidate_count": 1
+    },
+    {
+      "concept_id": "aqa_3_2_10_local_variables",
+      "topic": "Local variables",
+      "domain": "Programming",
+      "official_reference": "3.2.10",
+      "chapter_reference": "3.2",
+      "official_title": "Structured programming and subroutines (procedures and functions)",
+      "paper": "Paper 1",
+      "source_pages": [
+        16
+      ],
+      "confidence": 0.6343,
+      "ranking_score": 0.4525,
+      "topic_role": "supporting",
+      "source_chunk_ids": [
+        4,
+        7
+      ],
+      "support_span_count": 2,
+      "mean_semantic_score": 0.6096,
+      "mean_keyword_score": 0.72,
+      "mean_salience_score": 0.5185,
+      "coverage_score": 0.25,
+      "evidence": [
+        "local variable only exists within that function scope.",
+        "local variable inside function normally unavailable outside."
+      ],
+      "supporting_candidate_count": 2
+    },
+    {
+      "concept_id": "aqa_3_1_1_algorithm_purpose_trace",
+      "topic": "Algorithm tracing and program execution",
+      "domain": "Fundamentals of algorithms",
+      "official_reference": "3.1.1",
+      "chapter_reference": "3.1",
+      "official_title": "Representing algorithms",
+      "paper": "Paper 1",
+      "source_pages": [
+        10
+      ],
+      "confidence": 0.7369,
+      "ranking_score": 0.4277,
+      "topic_role": "supporting",
+      "source_chunk_ids": [
+        3,
+        6
+      ],
+      "support_span_count": 2,
+      "mean_semantic_score": 0.4044,
+      "mean_keyword_score": 0.795,
+      "mean_salience_score": 0.4974,
+      "coverage_score": 0.25,
+      "evidence": [
+        "trace table records variable values as algorithm executes.",
+        "homework is two search questions and one trace table.",
+        "actually I want one more dry run because this is where exam questions get messy."
+      ],
+      "supporting_candidate_count": 2
+    },
+    {
+      "concept_id": "aqa_3_2_2_selection",
+      "topic": "Selection",
+      "domain": "Programming",
+      "official_reference": "3.2.2",
+      "chapter_reference": "3.2",
+      "official_title": "Programming concepts",
+      "paper": "Paper 1",
+      "source_pages": [
+        12,
+        13
+      ],
+      "confidence": 0.6562,
+      "ranking_score": 0.3814,
+      "topic_role": "supporting",
+      "source_chunk_ids": [
+        3,
+        5
+      ],
+      "support_span_count": 2,
+      "mean_semantic_score": 0.3071,
+      "mean_keyword_score": 0.795,
+      "mean_salience_score": 0.4439,
+      "coverage_score": 0.25,
+      "evidence": [
+        "what if increment happens only inside an if statement?",
+        "if condition was greater than or equal, the second eleven would increment too.",
+        "if condition was greater than fifty instead of greater than or equal, then fifty would not count, so three."
+      ],
+      "supporting_candidate_count": 2
+    },
+    {
+      "concept_id": "aqa_3_1_4_merge_sort",
+      "topic": "Merge sort",
+      "domain": "Fundamentals of algorithms",
+      "official_reference": "3.1.4",
+      "chapter_reference": "3.1",
+      "official_title": "Sorting algorithms",
+      "paper": "Paper 1",
+      "source_pages": [
+        11
+      ],
+      "confidence": 0.5568,
+      "ranking_score": 0.3746,
+      "topic_role": "supporting",
+      "source_chunk_ids": [
+        5,
+        6
+      ],
+      "support_span_count": 1,
+      "mean_semantic_score": 0.4081,
+      "mean_keyword_score": 0.72,
+      "mean_salience_score": 0.4078,
+      "coverage_score": 0.25,
+      "evidence": [
+        "linear search, binary search, bubble sort, merge sort, trace tables, array bounds, while loops, subroutines, validation verification, Boolean logic.",
+        "don't do merge sort implementation, just trace it."
+      ],
+      "supporting_candidate_count": 2
+    },
+    {
+      "concept_id": "aqa_3_2_1_data_types",
+      "topic": "Data types",
+      "domain": "Programming",
+      "official_reference": "3.2.1",
+      "chapter_reference": "3.2",
+      "official_title": "Data types",
+      "paper": "Paper 1",
+      "source_pages": [
+        11,
+        12
+      ],
+      "confidence": 0.6665,
+      "ranking_score": 0.3695,
+      "topic_role": "supporting",
+      "source_chunk_ids": [
+        7
+      ],
+      "support_span_count": 1,
+      "mean_semantic_score": 0.364,
+      "mean_keyword_score": 0.87,
+      "mean_salience_score": 0.5669,
+      "coverage_score": 0.125,
+      "evidence": [
+        "type check makes sure value is expected data type.",
+        "okay trace table plus Boolean."
+      ],
+      "supporting_candidate_count": 1
+    },
+    {
+      "concept_id": "aqa_3_2_5_boolean_operations",
+      "topic": "Boolean operations in programming",
+      "domain": "Programming",
+      "official_reference": "3.2.5",
+      "chapter_reference": "3.2",
+      "official_title": "Boolean operations in a programming language",
+      "paper": "Paper 1",
+      "source_pages": [
+        14
+      ],
+      "confidence": 0.6062,
+      "ranking_score": 0.3603,
+      "topic_role": "supporting",
+      "source_chunk_ids": [
+        4
+      ],
+      "support_span_count": 1,
+      "mean_semantic_score": 0.4379,
+      "mean_keyword_score": 0.79,
+      "mean_salience_score": 0.5075,
+      "coverage_score": 0.125,
+      "evidence": [
+        "AND means both conditions true.",
+        "both conditions need true for loop to continue."
+      ],
+      "supporting_candidate_count": 1
+    },
+    {
+      "concept_id": "aqa_3_2_2_iteration",
+      "topic": "Iteration",
+      "domain": "Programming",
+      "official_reference": "3.2.2",
+      "chapter_reference": "3.2",
+      "official_title": "Programming concepts",
+      "paper": "Paper 1",
+      "source_pages": [
+        12,
+        13
+      ],
+      "confidence": 0.6137,
+      "ranking_score": 0.3532,
+      "topic_role": "supporting",
+      "source_chunk_ids": [
+        3
+      ],
+      "support_span_count": 1,
+      "mean_semantic_score": 0.4639,
+      "mean_keyword_score": 0.72,
+      "mean_salience_score": 0.4385,
+      "coverage_score": 0.125,
+      "evidence": [
+        "now I want to show while loop version because you said loops question was weird."
+      ],
+      "supporting_candidate_count": 1
+    },
+    {
+      "concept_id": "aqa_3_1_3_search_comparison",
+      "topic": "Comparing linear and binary search",
+      "domain": "Fundamentals of algorithms",
+      "official_reference": "3.1.3",
+      "chapter_reference": "3.1",
+      "official_title": "Searching algorithms",
+      "paper": "Paper 1",
+      "source_pages": [
+        11
+      ],
+      "confidence": 0.4924,
+      "ranking_score": 0.3507,
+      "topic_role": "supporting",
+      "source_chunk_ids": [
+        1
+      ],
+      "support_span_count": 1,
+      "mean_semantic_score": 0.6524,
+      "mean_keyword_score": 0.0,
+      "mean_salience_score": 0.3588,
+      "coverage_score": 0.125,
+      "evidence": [
+        "okay before we move on, what is worst case for linear search? target at end or not present, so you check everything. yes exactly. notice I said before we move on but we are still on linear search, so don't get confused by my wording. we're still same topic same topic. now let's move on to binary search. this is a different algorithm."
+      ],
+      "supporting_candidate_count": 1
+    },
+    {
+      "concept_id": "aqa_3_2_2_nested_structures",
+      "topic": "Nested selection and iteration",
+      "domain": "Programming",
+      "official_reference": "3.2.2",
+      "chapter_reference": "3.2",
+      "official_title": "Programming concepts",
+      "paper": "Paper 1",
+      "source_pages": [
+        13
+      ],
+      "confidence": 0.5443,
+      "ranking_score": 0.3094,
+      "topic_role": "supporting",
+      "source_chunk_ids": [
+        6
+      ],
+      "support_span_count": 1,
+      "mean_semantic_score": 0.3673,
+      "mean_keyword_score": 0.72,
+      "mean_salience_score": 0.3854,
+      "coverage_score": 0.125,
+      "evidence": [
+        "okay nested loop briefly."
+      ],
+      "supporting_candidate_count": 1
+    },
+    {
+      "concept_id": "aqa_3_1_4_sorting_algorithms",
+      "topic": "Sorting algorithms",
+      "domain": "Fundamentals of algorithms",
+      "official_reference": "3.1.4",
+      "chapter_reference": "3.1",
+      "official_title": "Sorting algorithms",
+      "paper": "Paper 1",
+      "source_pages": [
+        11
+      ],
+      "confidence": 0.5402,
+      "ranking_score": 0.2989,
+      "topic_role": "supporting",
+      "source_chunk_ids": [
+        8
+      ],
+      "support_span_count": 1,
+      "mean_semantic_score": 0.3361,
+      "mean_keyword_score": 0.72,
+      "mean_salience_score": 0.3682,
+      "coverage_score": 0.125,
+      "evidence": [
+        "rough topics are search algorithms, sorting algorithms, trace tables and loops, subroutines, validation verification, Boolean logic, errors and debugging."
+      ],
+      "supporting_candidate_count": 1
+    },
+    {
+      "concept_id": "aqa_3_2_3_arithmetic_operations",
+      "topic": "Arithmetic operations",
+      "domain": "Programming",
+      "official_reference": "3.2.3",
+      "chapter_reference": "3.2",
+      "official_title": "Arithmetic operations in a programming language",
+      "paper": "Paper 1",
+      "source_pages": [
+        14
+      ],
+      "confidence": 0.5416,
+      "ranking_score": 0.2828,
+      "topic_role": "supporting",
+      "source_chunk_ids": [
+        6
+      ],
+      "support_span_count": 1,
+      "mean_semantic_score": 0.2831,
+      "mean_keyword_score": 0.72,
+      "mean_salience_score": 0.3391,
+      "coverage_score": 0.125,
+      "evidence": [
+        "average of selected values if asked would be total divided count, but be careful integer division depending language."
+      ],
+      "supporting_candidate_count": 1
+    }
+  ],
+  "total_chunks": 8,
+  "cs_relevant_chunks": 8,
+  "non_cs_chunks": 0,
+  "official_topic_chunks": 6,
+  "mixed_official_unmapped_chunks": 2,
+  "unmapped_cs_chunks": 0,
+  "continuation_chunks": 0,
+  "no_topic_chunks": 0,
+  "llm_fallback_chunk_ids": [
+    5
+  ],
+  "embedding_model": "sentence-transformers/all-MiniLM-L6-v2",
+  "candidate_keep_threshold": 0.46
+}

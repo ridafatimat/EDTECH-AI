@@ -1,0 +1,90 @@
+hello? can you hear me
+I can now. your voice was robotic before.
+okay okay. before we start did you submit the science homework?
+yeah. I sent it this morning.
+Nice. I am going to share the screen.
+Today is mainly computer networks and then cyber security. We might go back and forth a little because the ideas connect.
+First, what is a computer network?
+Devices connected together so they can communicate.
+Good. The purpose can include sharing files, sharing printers, communication, and access to services.
+Now LAN and WAN. Tell me the difference.
+LAN is local, like one building, and WAN is over a bigger area.
+Yes. A LAN usually covers a small geographical area and is often owned or controlled by one organisation. A WAN covers a larger geographical area.
+The internet is a network of networks. Don't confuse the internet with the World Wide Web.
+Web is websites and internet is the network?
+Exactly.
+right, topology. Actually, no, before topology let's talk about network hardware.
+A router forwards data between networks. A switch connects devices on a LAN and forwards frames to the correct device.
+Is a hub the same as switch?
+Not exactly. A hub broadcasts to all connected devices; switches are more selective. For your course, understand the role of switches and routers clearly.
+A wireless access point allows wireless devices to connect to a wired network.
+NIC, network interface controller, allows a device to connect to a network.
+Okay.
+Let's move on to protocols. Protocol means an agreed set of rules.
+HTTP is used for transferring web pages and related resources. HTTPS is HTTP with encryption through secure communication.
+FTP is for file transfer. SMTP is used to send email. IMAP can be used to retrieve and manage email on a server.
+Do we need port numbers?
+For this lesson, focus on what each protocol does. We'll check exact specification detail later.
+TCP/IP is really important. IP handles addressing and routing; TCP helps reliable delivery by breaking data into packets and checking they arrive.
+packet is like a small part of the file?
+yes, data is divided into packets. Packets can travel through different routes and then be reassembled at the destination.
+packet switching is more efficient for shared networks than reserving one dedicated path for the entire communication.
+sorry say that again
+I said, do packets always arrive in order?
+Not necessarily, and protocols help deal with ordering and missing data.
+Okay. Now we can move on to cyber security, but remember networks and security overlap.
+Cyber security is about protecting systems, networks and data from attacks, damage or unauthorised access.
+Let's start with malware.
+Virus, worm, Trojan, spyware, ransomware. Don't just memorise names, understand the behaviour.
+virus needs a file to attach to?
+A computer virus typically attaches itself to files or programs and spreads when they are executed or shared. A worm can self-replicate across networks.
+A Trojan pretends to be legitimate software. Spyware secretly gathers information. Ransomware can encrypt files and demand payment.
+so antivirus stops everything?
+No. No security measure stops everything. Antivirus can detect known malicious patterns and suspicious behaviour, but security needs layers.
+phishing is different. Phishing attacks trick people into revealing credentials or clicking malicious links.
+social engineering targets people rather than only technical vulnerabilities.
+Like fake bank emails.
+Exactly.
+brute force attack means trying many password combinations until one works.
+weak passwords make brute force easier. Rate limiting, account lockouts and strong passwords can reduce risk.
+SQL injection is when malicious input is used to interfere with a database query. At GCSE level, know the idea and appropriate prevention such as input validation.
+Is that the same as hacking the database?
+It's a specific attack technique that can be used against poorly protected database-backed applications.
+Let's talk about prevention now.
+Firewalls monitor and control network traffic based on rules.
+Encryption makes data unreadable without the correct key. It is especially useful for data being transmitted or stored.
+authentication checks identity. Two-factor authentication asks for two different forms of evidence.
+Like password plus code from phone.
+Exactly.
+user access levels are also important. Not every user should have administrator permissions.
+software updates and patches fix known vulnerabilities.
+penetration testing is authorised testing where security weaknesses are deliberately searched for.
+so ethical hackers?
+yes, when authorised and within scope.
+Okay before we move on, let's go back to networks for one example because security sits on top of networks.
+Imagine a school LAN connected to the internet through a router. Where could we place controls?
+firewall at the router?
+Good. We could also use authentication on school accounts, access levels, filtering, device security, and encrypted connections.
+So notice, we temporarily returned to networks but we're still applying cyber security ideas.
+Now, final small topic: network performance.
+Bandwidth is the maximum amount of data that can be transmitted in a given time. Latency is delay.
+So high bandwidth automatically means low latency?
+No, they're different. You can have high bandwidth and still have noticeable latency.
+Factors affecting performance can include bandwidth, number of users, transmission media, interference and hardware.
+Wi-Fi can be affected by distance, walls and interference.
+My Wi-Fi definitely is.
+haha yes, and that explains the start of today's lesson.
+
+hello?
+I'm back. sorry.
+Quick recap. LAN versus WAN, hardware, protocols, packet switching, threats, and security measures.
+One question: if an attacker sends a fake email asking for your password, what attack is that?
+phishing.
+And if they try ten thousand password combinations?
+brute force.
+Good. And what device forwards packets between networks?
+router.
+Great.
+I think that's enough today. We ran slightly over time.
+okay thank you.
+Bye, see you Thursday.

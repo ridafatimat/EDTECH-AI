@@ -35,6 +35,8 @@ class UnmappedConceptFamily:
     domain: str
     description: str
     aliases: tuple[str, ...]
+    minimum_distinct_aliases: int = 1
+    minimum_total_hits: int = 1
 
 
 # Broad descriptions used only for residual semantic detection.
@@ -161,6 +163,97 @@ UNMAPPED_CONCEPT_FAMILIES: tuple[UnmappedConceptFamily, ...] = (
             "polymorphism",
         ),
     ),
+    UnmappedConceptFamily(
+        rough_topic="Higher-dimensional arrays",
+        domain="Programming and software development",
+        description=(
+            "Arrays with three or more dimensions, including 3D, 4D and "
+            "higher-dimensional indexing and visualisation."
+        ),
+        aliases=(
+            "three dimensional array",
+            "3d array",
+            "four dimensional array",
+            "4d array",
+            "five dimensional array",
+            "5d array",
+            "higher dimensional array",
+            "multidimensional array beyond two dimensions",
+        ),
+        minimum_distinct_aliases=1,
+        minimum_total_hits=1,
+    ),
+    UnmappedConceptFamily(
+        rough_topic="Time complexity",
+        domain="Algorithms and computational thinking",
+        description=(
+            "How an algorithm's running time grows as the input size grows, "
+            "including constant, linear, polynomial and exponential time."
+        ),
+        aliases=(
+            "time complexity",
+            "constant time",
+            "linear time",
+            "polynomial time",
+            "exponential time",
+            "running time grows",
+        ),
+        minimum_distinct_aliases=1,
+        minimum_total_hits=1,
+    ),
+    UnmappedConceptFamily(
+        rough_topic="Space complexity",
+        domain="Algorithms and computational thinking",
+        description=(
+            "How much memory or other storage an algorithm requires as its "
+            "input size changes."
+        ),
+        aliases=(
+            "space complexity",
+            "memory complexity",
+            "memory required",
+            "amount of memory",
+            "space efficient",
+        ),
+        minimum_distinct_aliases=1,
+        minimum_total_hits=1,
+    ),
+    UnmappedConceptFamily(
+        rough_topic="Big O notation",
+        domain="Algorithms and computational thinking",
+        description=(
+            "Big O notation classifies how computational cost grows with "
+            "input size."
+        ),
+        aliases=(
+            "big o notation",
+            "big o",
+            "o of n",
+            "o n",
+            "complexity notation",
+        ),
+        minimum_distinct_aliases=1,
+        minimum_total_hits=1,
+    ),
+    UnmappedConceptFamily(
+        rough_topic="Tractable and intractable problems",
+        domain="Algorithms and computational thinking",
+        description=(
+            "Problems classified by whether algorithms can solve them in a "
+            "practical amount of time, including polynomial and worse-than-"
+            "polynomial growth."
+        ),
+        aliases=(
+            "tractable problem",
+            "tractable problems",
+            "intractable problem",
+            "intractable problems",
+            "reasonable amount of time",
+            "polynomial time or better",
+        ),
+        minimum_distinct_aliases=1,
+        minimum_total_hits=1,
+    ),
 )
 
 
@@ -244,6 +337,7 @@ class CSUnmappedDetector:
         for family_index, family in enumerate(UNMAPPED_CONCEPT_FAMILIES):
             matched_aliases: list[str] = []
             evidence_sentences: list[str] = []
+            total_alias_hits = 0
 
             for sentence in sentences:
                 normalized_sentence = self._normalize(sentence)
@@ -260,12 +354,16 @@ class CSUnmappedDetector:
                     continue
 
                 matched_aliases.extend(sentence_aliases)
+                total_alias_hits += len(sentence_aliases)
                 evidence_sentences.append(sentence)
 
             matched_aliases = self._unique_strings(matched_aliases)
             evidence_sentences = self._unique_strings(evidence_sentences)
 
-            if not matched_aliases:
+            if (
+                len(matched_aliases) < family.minimum_distinct_aliases
+                or total_alias_hits < family.minimum_total_hits
+            ):
                 continue
 
             # Do not duplicate an official candidate that already uses the

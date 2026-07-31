@@ -1,0 +1,323 @@
+====================================================================================================
+AGENT 1 — MODULE 3 ROUGH TOPIC EXTRACTION
+====================================================================================================
+
+Embedding model: sentence-transformers/all-MiniLM-L6-v2
+Candidate keep threshold: 0.46
+Total chunks: 2
+CS-relevant chunks: 2
+Non-CS/no-new-topic chunks: 0
+Official-topic chunks: 0
+Mixed official + unmapped chunks: 2
+Unmapped-CS chunks: 0
+Continuation/no-new-topic chunks: 0
+No-topic chunks: 0
+LLM fallback chunks: [1, 2]
+
+====================================================================================================
+CHUNK 1
+====================================================================================================
+Source words: 438
+Classification: mixed_official_and_unmapped
+CS relevant: True
+Creates new topic: True
+Chunk relevance score: 0.8506
+Requires LLM fallback: True
+Notes:
+- Unmapped CS evidence is semantic-only, borderline or ambiguous, so later fallback should refine the rough topic without inventing an AQA label.
+
+RETAINED TOPICS
+----------------------------------------------------------------------------------------------------
+- Decimal, binary and hexadecimal number bases
+  concept_id: aqa_3_3_1_number_bases
+  domain: Fundamentals of data representation
+  official reference: 3.3.1
+  confidence: 0.852
+  salience score: 0.7876
+  keyword score: 1.0
+  semantic score: 0.6138
+  method: None
+  matched aliases: ['denary', 'binary', 'hexadecimal', 'base sixteen']
+  evidence:
+    • Last lesson we were doing binary and denary conversion, and I want to quickly check that before we move on.
+    • So if I give you denary thirteen, how would you represent thirteen in eight-bit binary?
+    • A bit is a single binary digit, either zero or one, and eight bits make one byte.
+- Bits and bytes
+  concept_id: aqa_3_3_3_bits_bytes
+  domain: Fundamentals of data representation
+  official reference: 3.3.3
+  confidence: 0.8415
+  salience score: 0.7085
+  keyword score: 1.0
+  semantic score: 0.47
+  method: None
+  matched aliases: ['byte', 'eight bits', 'binary digit']
+  evidence:
+    • A bit is a single binary digit, either zero or one, and eight bits make one byte.
+    • Byte, yeah.
+    • Because we need eight bits, and those places are not being used.
+- Converting between binary, decimal and hexadecimal
+  concept_id: aqa_3_3_2_base_conversion
+  domain: Fundamentals of data representation
+  official reference: 3.3.2
+  confidence: 0.4644
+  salience score: 0.3454
+  keyword score: 0.0
+  semantic score: 0.628
+  method: None
+  matched aliases: []
+  evidence:
+    • Perfect. So that's still the same topic, binary representation. We haven't changed topic yet. Now, let's move on to hexadecimal. This is the new bit. We did a little bit in school but I don't really get why we use it. Good question. Hexadecimal is base sixteen. It uses zero to nine and then A, B, C, D, E, F for values ten to fifteen.
+
+UNMAPPED CS SIGNALS
+----------------------------------------------------------------------------------------------------
+- Unmapped Computer Science content
+  domain: Data representation
+  score: 0.5692
+  method: semantic
+  matched aliases: []
+  evidence: For example binary 1111 is hexadecimal F.
+- Unmapped Computer Science content
+  domain: Data representation
+  score: 0.5484
+  method: semantic
+  matched aliases: []
+  evidence: The useful thing is that one hexadecimal digit maps neatly to four binary bits.
+- Unmapped Computer Science content
+  domain: Data representation
+  score: 0.5336
+  method: semantic
+  matched aliases: []
+  evidence: Binary 1010 is hexadecimal A.
+
+====================================================================================================
+CHUNK 2
+====================================================================================================
+Source words: 495
+Classification: mixed_official_and_unmapped
+CS relevant: True
+Creates new topic: True
+Chunk relevance score: 0.8322
+Requires LLM fallback: True
+Notes:
+- Unmapped CS evidence is semantic-only, borderline or ambiguous, so later fallback should refine the rough topic without inventing an AQA label.
+
+RETAINED TOPICS
+----------------------------------------------------------------------------------------------------
+- Digital sound sampling
+  concept_id: aqa_3_3_7_sound_sampling
+  domain: Fundamentals of data representation
+  official reference: 3.3.7
+  confidence: 0.8553
+  salience score: 0.8132
+  keyword score: 1.0
+  semantic score: 0.6604
+  method: None
+  matched aliases: ['digital sound', 'analogue sound', 'sample rate', 'sample resolution', 'sample depth']
+  evidence:
+    • So today we covered binary recap, hexadecimal, character encoding, bitmap images, and digital sound.
+    • Analogue sound is continuous, but computers store digital values, so the sound wave is sampled.
+    • Sample rate means how many samples are taken per second.
+- Bits and bytes
+  concept_id: aqa_3_3_3_bits_bytes
+  domain: Fundamentals of data representation
+  official reference: 3.3.3
+  confidence: 0.7993
+  salience score: 0.7749
+  keyword score: 0.94
+  semantic score: 0.5908
+  method: None
+  matched aliases: ['byte', '8 bits']
+  evidence:
+    • Suppose a text file stores one thousand characters and each character uses one byte in a simplified question.
+    • Let's do 100 by 100 image, colour depth 8 bits.
+    • 8,000 samples per second, 8 bits per sample, 10 seconds.
+- Bitmap images, pixels and colour depth
+  concept_id: aqa_3_3_6_bitmap_images
+  domain: Fundamentals of data representation
+  official reference: 3.3.6
+  confidence: 0.8571
+  salience score: 0.8267
+  keyword score: 1.0
+  semantic score: 0.685
+  method: None
+  matched aliases: ['bitmap image', 'pixel', 'colour depth']
+  evidence:
+    • A bitmap image can be thought of as a grid of pixels.
+    • Each pixel stores a colour value.
+    • Colour depth is the number of bits used to represent the colour of each pixel.
+- ASCII and Unicode character encoding
+  concept_id: aqa_3_3_5_character_encoding
+  domain: Fundamentals of data representation
+  official reference: 3.3.5
+  confidence: 0.8492
+  salience score: 0.7665
+  keyword score: 1.0
+  semantic score: 0.5755
+  method: None
+  matched aliases: ['character encoding', 'ascii', 'unicode']
+  evidence:
+    • Next topic: character encoding.
+    • Think of character encoding as assigning numeric codes to characters.
+    • So today we covered binary recap, hexadecimal, character encoding, bitmap images, and digital sound.
+- Decimal, binary and hexadecimal number bases
+  concept_id: aqa_3_3_1_number_bases
+  domain: Fundamentals of data representation
+  official reference: 3.3.1
+  confidence: 0.481
+  salience score: 0.5861
+  keyword score: 0.67
+  semantic score: 0.399
+  method: None
+  matched aliases: ['binary', 'hexadecimal']
+  evidence:
+    • Computers ultimately store binary, so letters need number representations too.
+    • So today we covered binary recap, hexadecimal, character encoding, bitmap images, and digital sound.
+
+UNMAPPED CS SIGNALS
+----------------------------------------------------------------------------------------------------
+- Unmapped Computer Science content
+  domain: Data representation
+  score: 0.6352
+  method: semantic
+  matched aliases: []
+  evidence: Roughly how many bytes?
+- Unmapped Computer Science content
+  domain: Data representation
+  score: 0.5795
+  method: semantic
+  matched aliases: []
+  evidence: So a rough uncompressed file size question can use number of pixels multiplied by colour depth, then convert bits to bytes.
+- Unmapped Computer Science content
+  domain: Data representation
+  score: 0.5419
+  method: semantic
+  matched aliases: []
+  evidence: Bits to bytes divide by eight.
+- Unmapped Computer Science content
+  domain: Data representation
+  score: 0.5224
+  method: semantic
+  matched aliases: []
+  evidence: Repeat that: bits to bytes, divide by eight.
+
+====================================================================================================
+MERGED LESSON TOPICS
+====================================================================================================
+
+PRIMARY TOPICS
+----------------------------------------------------------------------------------------------------
+- Bits and bytes
+- Decimal, binary and hexadecimal number bases
+
+SUPPORTING TOPICS
+----------------------------------------------------------------------------------------------------
+- Bitmap images, pixels and colour depth
+- Digital sound sampling
+- ASCII and Unicode character encoding
+- Converting between binary, decimal and hexadecimal
+
+UNMAPPED / EXTENDED TOPICS
+----------------------------------------------------------------------------------------------------
+- Unmapped Computer Science content
+
+DETAILED MERGED OFFICIAL TOPICS
+----------------------------------------------------------------------------------------------------
+- Bits and bytes
+  concept_id: aqa_3_3_3_bits_bytes
+  domain: Fundamentals of data representation
+  role: primary
+  confidence: 0.8211
+  ranking score: 0.8186
+  source chunks: [1, 2]
+  support spans: 1
+  mean semantic score: 0.5304
+  mean salience score: 0.7417
+  coverage score: 1.0
+  supporting candidates: 2
+  evidence:
+    • A bit is a single binary digit, either zero or one, and eight bits make one byte.
+    • Byte, yeah.
+    • Because we need eight bits, and those places are not being used.
+    • Suppose a text file stores one thousand characters and each character uses one byte in a simplified question.
+    • Let's do 100 by 100 image, colour depth 8 bits.
+- Decimal, binary and hexadecimal number bases
+  concept_id: aqa_3_3_1_number_bases
+  domain: Fundamentals of data representation
+  role: primary
+  confidence: 0.8506
+  ranking score: 0.8088
+  source chunks: [1, 2]
+  support spans: 1
+  mean semantic score: 0.5064
+  mean salience score: 0.6868
+  coverage score: 1.0
+  supporting candidates: 2
+  evidence:
+    • Last lesson we were doing binary and denary conversion, and I want to quickly check that before we move on.
+    • So if I give you denary thirteen, how would you represent thirteen in eight-bit binary?
+    • A bit is a single binary digit, either zero or one, and eight bits make one byte.
+    • Computers ultimately store binary, so letters need number representations too.
+    • So today we covered binary recap, hexadecimal, character encoding, bitmap images, and digital sound.
+- Bitmap images, pixels and colour depth
+  concept_id: aqa_3_3_6_bitmap_images
+  domain: Fundamentals of data representation
+  role: supporting
+  confidence: 0.7959
+  ranking score: 0.6615
+  source chunks: [2]
+  support spans: 1
+  mean semantic score: 0.685
+  mean salience score: 0.8267
+  coverage score: 0.5
+  supporting candidates: 1
+  evidence:
+    • A bitmap image can be thought of as a grid of pixels.
+    • Each pixel stores a colour value.
+    • Colour depth is the number of bits used to represent the colour of each pixel.
+- Digital sound sampling
+  concept_id: aqa_3_3_7_sound_sampling
+  domain: Fundamentals of data representation
+  role: supporting
+  confidence: 0.8322
+  ranking score: 0.6612
+  source chunks: [2]
+  support spans: 1
+  mean semantic score: 0.6604
+  mean salience score: 0.8132
+  coverage score: 0.5
+  supporting candidates: 1
+  evidence:
+    • So today we covered binary recap, hexadecimal, character encoding, bitmap images, and digital sound.
+    • Analogue sound is continuous, but computers store digital values, so the sound wave is sampled.
+    • Sample rate means how many samples are taken per second.
+- ASCII and Unicode character encoding
+  concept_id: aqa_3_3_5_character_encoding
+  domain: Fundamentals of data representation
+  role: supporting
+  confidence: 0.7631
+  ranking score: 0.621
+  source chunks: [2]
+  support spans: 1
+  mean semantic score: 0.5755
+  mean salience score: 0.7665
+  coverage score: 0.5
+  supporting candidates: 1
+  evidence:
+    • Next topic: character encoding.
+    • Think of character encoding as assigning numeric codes to characters.
+    • So today we covered binary recap, hexadecimal, character encoding, bitmap images, and digital sound.
+- Converting between binary, decimal and hexadecimal
+  concept_id: aqa_3_3_2_base_conversion
+  domain: Fundamentals of data representation
+  role: supporting
+  confidence: 0.533
+  ranking score: 0.5013
+  source chunks: [1]
+  support spans: 1
+  mean semantic score: 0.628
+  mean salience score: 0.3454
+  coverage score: 0.5
+  supporting candidates: 1
+  evidence:
+    • Perfect. So that's still the same topic, binary representation. We haven't changed topic yet. Now, let's move on to hexadecimal. This is the new bit. We did a little bit in school but I don't really get why we use it. Good question. Hexadecimal is base sixteen. It uses zero to nine and then A, B, C, D, E, F for values ten to fifteen.

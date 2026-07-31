@@ -1,0 +1,1118 @@
+{
+  "chunk_results": [
+    {
+      "chunk_id": 1,
+      "source_word_count": 500,
+      "classification": "no_topic",
+      "is_cs_relevant": false,
+      "creates_new_topic": false,
+      "cs_relevance_score": 0.0,
+      "topic_candidates": [],
+      "rejected_candidates": [],
+      "has_unmapped_cs_content": false,
+      "unmapped_cs_signals": [],
+      "continuation_of_chunk_id": null,
+      "requires_llm_fallback": false,
+      "notes": [
+        "No official AQA topic candidate was detected."
+      ]
+    },
+    {
+      "chunk_id": 2,
+      "source_word_count": 505,
+      "classification": "mixed_official_and_unmapped",
+      "is_cs_relevant": true,
+      "creates_new_topic": true,
+      "cs_relevance_score": 0.6515,
+      "topic_candidates": [
+        {
+          "concept_id": "aqa_3_2_6_arrays",
+          "topic": "One- and two-dimensional arrays",
+          "domain": "Programming",
+          "official_reference": "3.2.6",
+          "chapter_reference": "3.2",
+          "official_title": "Data structures",
+          "paper": "Paper 1",
+          "source_pages": [
+            15
+          ],
+          "confidence": 0.6024,
+          "keyword_score": 0.81,
+          "semantic_score": 0.4971,
+          "salience_score": 0.7234,
+          "extraction_method": "keyword_embedding",
+          "matched_aliases": [
+            "array",
+            "arrays"
+          ],
+          "total_alias_hits": 5,
+          "evidence_sentence_count": 5,
+          "single_word_alias_only": true,
+          "ambiguous_alias_only": false,
+          "matched_context_terms": [],
+          "matched_conflicting_context_terms": [],
+          "minimum_context_hits": 1,
+          "context_collision": false,
+          "teaching_depth_level": 4,
+          "teaching_depth_label": "sustained_teaching",
+          "evidence_quality_score": 0.7778,
+          "shared_evidence_penalty": 0.0,
+          "evidence_quality_notes": [
+            "Teaching depth: sustained_teaching (4)."
+          ],
+          "recap_evidence_only": false,
+          "recap_evidence_count": 0,
+          "substantive_evidence_count": 3,
+          "comparison_evidence_only": false,
+          "comparison_evidence_count": 0,
+          "independent_evidence_count": 0,
+          "evidence": [
+            "And then, you talked about that there could be different types of array questions that will be expected, you know, for example, these ones, let's say that we've talked about.",
+            "So, now the last thing that we were talking about, Salar, we've kind of completed the topic of arrays, even from the past as an onwards.",
+            "Now, just want to know, is there any particular question, anything specifically regarding arrays that you think that you want to talk about?"
+          ],
+          "parent_concept_id": "aqa_3_2_6_data_structures",
+          "cs_relevance_score": 0.6515,
+          "cs_relevant": true
+        }
+      ],
+      "rejected_candidates": [],
+      "has_unmapped_cs_content": true,
+      "unmapped_cs_signals": [
+        {
+          "rough_topic": "Dynamic arrays and list collections",
+          "domain": "Programming and software development",
+          "score": 0.735,
+          "evidence": "But I think what we can do is that for now, we can move on and we can start chapter number seven and that chapter number seven essentially talks about array lists.",
+          "matched_aliases": [
+            "array lists"
+          ],
+          "detection_method": "lexical"
+        }
+      ],
+      "continuation_of_chunk_id": null,
+      "requires_llm_fallback": false,
+      "notes": [
+        "Strong specific unmapped-CS evidence was retained directly; no LLM fallback is required."
+      ]
+    },
+    {
+      "chunk_id": 3,
+      "source_word_count": 519,
+      "classification": "official_aqa_topic",
+      "is_cs_relevant": true,
+      "creates_new_topic": true,
+      "cs_relevance_score": 0.8077,
+      "topic_candidates": [
+        {
+          "concept_id": "aqa_3_2_6_arrays",
+          "topic": "One- and two-dimensional arrays",
+          "domain": "Programming",
+          "official_reference": "3.2.6",
+          "chapter_reference": "3.2",
+          "official_title": "Data structures",
+          "paper": "Paper 1",
+          "source_pages": [
+            15
+          ],
+          "confidence": 0.8349,
+          "keyword_score": 1.0,
+          "semantic_score": 0.3783,
+          "salience_score": 0.6581,
+          "extraction_method": "keyword_embedding",
+          "matched_aliases": [
+            "array",
+            "array length"
+          ],
+          "total_alias_hits": 14,
+          "evidence_sentence_count": 10,
+          "single_word_alias_only": false,
+          "ambiguous_alias_only": false,
+          "matched_context_terms": [],
+          "matched_conflicting_context_terms": [],
+          "minimum_context_hits": 1,
+          "context_collision": false,
+          "teaching_depth_level": 4,
+          "teaching_depth_label": "sustained_teaching",
+          "evidence_quality_score": 0.7377,
+          "shared_evidence_penalty": 0.0,
+          "evidence_quality_notes": [
+            "Teaching depth: sustained_teaching (4)."
+          ],
+          "recap_evidence_only": false,
+          "recap_evidence_count": 0,
+          "substantive_evidence_count": 3,
+          "comparison_evidence_only": false,
+          "comparison_evidence_count": 0,
+          "independent_evidence_count": 2,
+          "evidence": [
+            "Why do some int array int limit?",
+            "So the input that's being given to the function is what it's an array.",
+            "So an array of integers and an integer called limit."
+          ],
+          "parent_concept_id": "aqa_3_2_6_data_structures",
+          "cs_relevance_score": 0.8077,
+          "cs_relevant": true
+        },
+        {
+          "concept_id": "aqa_3_1_1_algorithm_purpose_trace",
+          "topic": "Algorithm tracing and program execution",
+          "domain": "Fundamentals of algorithms",
+          "official_reference": "3.1.1",
+          "chapter_reference": "3.1",
+          "official_title": "Representing algorithms",
+          "paper": "Paper 1",
+          "source_pages": [
+            10
+          ],
+          "confidence": 0.6676,
+          "keyword_score": 0.84,
+          "semantic_score": 0.31,
+          "salience_score": 0.3538,
+          "extraction_method": "keyword_embedding",
+          "matched_aliases": [
+            "counting statement or loop executions"
+          ],
+          "total_alias_hits": 1,
+          "evidence_sentence_count": 1,
+          "single_word_alias_only": false,
+          "ambiguous_alias_only": false,
+          "matched_context_terms": [],
+          "matched_conflicting_context_terms": [],
+          "minimum_context_hits": 1,
+          "context_collision": false,
+          "teaching_depth_level": 1,
+          "teaching_depth_label": "definition",
+          "evidence_quality_score": 0.4455,
+          "shared_evidence_penalty": 0.0,
+          "evidence_quality_notes": [
+            "Teaching depth: definition (1)."
+          ],
+          "recap_evidence_only": false,
+          "recap_evidence_count": 0,
+          "substantive_evidence_count": 1,
+          "comparison_evidence_only": false,
+          "comparison_evidence_count": 0,
+          "independent_evidence_count": 0,
+          "evidence": [
+            "which of the, or combination to the value of them, the number of times statement s is executed and the numbers."
+          ],
+          "parent_concept_id": "aqa_3_1_1_algorithm",
+          "cs_relevance_score": 0.6054,
+          "cs_relevant": true
+        },
+        {
+          "concept_id": "aqa_3_2_2_iteration",
+          "topic": "Iteration",
+          "domain": "Programming",
+          "official_reference": "3.2.2",
+          "chapter_reference": "3.2",
+          "official_title": "Programming concepts",
+          "paper": "Paper 1",
+          "source_pages": [
+            12,
+            13
+          ],
+          "confidence": 0.5748,
+          "keyword_score": 0.72,
+          "semantic_score": 0.36,
+          "salience_score": 0.3813,
+          "extraction_method": "keyword_embedding",
+          "matched_aliases": [
+            "for loop"
+          ],
+          "total_alias_hits": 1,
+          "evidence_sentence_count": 1,
+          "single_word_alias_only": false,
+          "ambiguous_alias_only": false,
+          "matched_context_terms": [],
+          "matched_conflicting_context_terms": [],
+          "minimum_context_hits": 1,
+          "context_collision": false,
+          "teaching_depth_level": 1,
+          "teaching_depth_label": "definition",
+          "evidence_quality_score": 0.4623,
+          "shared_evidence_penalty": 0.0,
+          "evidence_quality_notes": [
+            "Teaching depth: definition (1)."
+          ],
+          "recap_evidence_only": false,
+          "recap_evidence_count": 0,
+          "substantive_evidence_count": 1,
+          "comparison_evidence_only": false,
+          "comparison_evidence_count": 0,
+          "independent_evidence_count": 1,
+          "evidence": [
+            "We can pretty much know that they're not remember we've already done that we can traverse and the rate for loop."
+          ],
+          "parent_concept_id": null,
+          "cs_relevance_score": 0.5433,
+          "cs_relevant": true
+        }
+      ],
+      "rejected_candidates": [],
+      "has_unmapped_cs_content": false,
+      "unmapped_cs_signals": [],
+      "continuation_of_chunk_id": null,
+      "requires_llm_fallback": false,
+      "notes": []
+    },
+    {
+      "chunk_id": 4,
+      "source_word_count": 546,
+      "classification": "continuation_no_new_topic",
+      "is_cs_relevant": false,
+      "creates_new_topic": false,
+      "cs_relevance_score": 0.7843,
+      "topic_candidates": [
+        {
+          "concept_id": "aqa_3_1_1_algorithm_purpose_trace",
+          "topic": "Algorithm tracing and program execution",
+          "domain": "Fundamentals of algorithms",
+          "official_reference": "3.1.1",
+          "chapter_reference": "3.1",
+          "official_title": "Representing algorithms",
+          "paper": "Paper 1",
+          "source_pages": [
+            10
+          ],
+          "confidence": 0.8233,
+          "keyword_score": 1.0,
+          "semantic_score": 0.2194,
+          "salience_score": 0.5707,
+          "extraction_method": "keyword_embedding",
+          "matched_aliases": [
+            "reported execution count",
+            "reasoning about possible execution behaviour"
+          ],
+          "total_alias_hits": 4,
+          "evidence_sentence_count": 3,
+          "single_word_alias_only": false,
+          "ambiguous_alias_only": false,
+          "matched_context_terms": [],
+          "matched_conflicting_context_terms": [],
+          "minimum_context_hits": 1,
+          "context_collision": false,
+          "teaching_depth_level": 4,
+          "teaching_depth_label": "sustained_teaching",
+          "evidence_quality_score": 0.6841,
+          "shared_evidence_penalty": 0.0,
+          "evidence_quality_notes": [
+            "Teaching depth: sustained_teaching (4)."
+          ],
+          "recap_evidence_only": false,
+          "recap_evidence_count": 0,
+          "substantive_evidence_count": 3,
+          "comparison_evidence_only": false,
+          "comparison_evidence_count": 0,
+          "independent_evidence_count": 0,
+          "evidence": [
+            "Then do you think it could be possible that statement s is executed zero times?",
+            "How many possible times it could run?",
+            "Then do you think it's possible that statement s is never executed?"
+          ],
+          "parent_concept_id": "aqa_3_1_1_algorithm",
+          "cs_relevance_score": 0.7843,
+          "cs_relevant": true
+        }
+      ],
+      "rejected_candidates": [],
+      "has_unmapped_cs_content": false,
+      "unmapped_cs_signals": [],
+      "continuation_of_chunk_id": 3,
+      "requires_llm_fallback": false,
+      "notes": [
+        "No new standalone topic was detected; the chunk continues the previous overlapped discussion. Matching evidence is preserved for lesson-level merging."
+      ]
+    },
+    {
+      "chunk_id": 5,
+      "source_word_count": 548,
+      "classification": "official_aqa_topic",
+      "is_cs_relevant": true,
+      "creates_new_topic": true,
+      "cs_relevance_score": 0.6354,
+      "topic_candidates": [
+        {
+          "concept_id": "aqa_3_1_1_algorithm_purpose_trace",
+          "topic": "Algorithm tracing and program execution",
+          "domain": "Fundamentals of algorithms",
+          "official_reference": "3.1.1",
+          "chapter_reference": "3.1",
+          "official_title": "Representing algorithms",
+          "paper": "Paper 1",
+          "source_pages": [
+            10
+          ],
+          "confidence": 0.7118,
+          "keyword_score": 0.89,
+          "semantic_score": 0.2287,
+          "salience_score": 0.3925,
+          "extraction_method": "keyword_embedding",
+          "matched_aliases": [
+            "reported execution count"
+          ],
+          "total_alias_hits": 2,
+          "evidence_sentence_count": 2,
+          "single_word_alias_only": false,
+          "ambiguous_alias_only": false,
+          "matched_context_terms": [],
+          "matched_conflicting_context_terms": [],
+          "minimum_context_hits": 1,
+          "context_collision": false,
+          "teaching_depth_level": 1,
+          "teaching_depth_label": "definition",
+          "evidence_quality_score": 0.4389,
+          "shared_evidence_penalty": 0.0,
+          "evidence_quality_notes": [
+            "Teaching depth: definition (1)."
+          ],
+          "recap_evidence_only": false,
+          "recap_evidence_count": 0,
+          "substantive_evidence_count": 2,
+          "comparison_evidence_only": false,
+          "comparison_evidence_count": 0,
+          "independent_evidence_count": 0,
+          "evidence": [
+            "That it means that they're asked the statement as should execute at least once.",
+            "Then this statement will at least execute once."
+          ],
+          "parent_concept_id": "aqa_3_1_1_algorithm",
+          "cs_relevance_score": 0.6354,
+          "cs_relevant": true
+        },
+        {
+          "concept_id": "aqa_3_2_6_arrays",
+          "topic": "One- and two-dimensional arrays",
+          "domain": "Programming",
+          "official_reference": "3.2.6",
+          "chapter_reference": "3.2",
+          "official_title": "Data structures",
+          "paper": "Paper 1",
+          "source_pages": [
+            15
+          ],
+          "confidence": 0.4735,
+          "keyword_score": 0.71,
+          "semantic_score": 0.2888,
+          "salience_score": 0.5089,
+          "extraction_method": "keyword_embedding",
+          "matched_aliases": [
+            "array"
+          ],
+          "total_alias_hits": 4,
+          "evidence_sentence_count": 4,
+          "single_word_alias_only": true,
+          "ambiguous_alias_only": false,
+          "matched_context_terms": [],
+          "matched_conflicting_context_terms": [],
+          "minimum_context_hits": 1,
+          "context_collision": false,
+          "teaching_depth_level": 1,
+          "teaching_depth_label": "definition",
+          "evidence_quality_score": 0.48,
+          "shared_evidence_penalty": 0.0,
+          "evidence_quality_notes": [
+            "Teaching depth: definition (1)."
+          ],
+          "recap_evidence_only": false,
+          "recap_evidence_count": 0,
+          "substantive_evidence_count": 3,
+          "comparison_evidence_only": false,
+          "comparison_evidence_count": 0,
+          "independent_evidence_count": 0,
+          "evidence": [
+            "Sorry, the value of V in the beginning is zero and the array contains positive values.",
+            "Let's go back to the array place and then.",
+            "I'm just talking about it's an array number one right now."
+          ],
+          "parent_concept_id": "aqa_3_2_6_data_structures",
+          "cs_relevance_score": 0.4753,
+          "cs_relevant": true
+        }
+      ],
+      "rejected_candidates": [],
+      "has_unmapped_cs_content": false,
+      "unmapped_cs_signals": [],
+      "continuation_of_chunk_id": null,
+      "requires_llm_fallback": false,
+      "notes": []
+    },
+    {
+      "chunk_id": 6,
+      "source_word_count": 539,
+      "classification": "official_aqa_topic",
+      "is_cs_relevant": true,
+      "creates_new_topic": true,
+      "cs_relevance_score": 0.7773,
+      "topic_candidates": [
+        {
+          "concept_id": "aqa_3_1_1_algorithm_purpose_trace",
+          "topic": "Algorithm tracing and program execution",
+          "domain": "Fundamentals of algorithms",
+          "official_reference": "3.1.1",
+          "chapter_reference": "3.1",
+          "official_title": "Representing algorithms",
+          "paper": "Paper 1",
+          "source_pages": [
+            10
+          ],
+          "confidence": 0.8148,
+          "keyword_score": 1.0,
+          "semantic_score": 0.284,
+          "salience_score": 0.5062,
+          "extraction_method": "keyword_embedding",
+          "matched_aliases": [
+            "reported execution count"
+          ],
+          "total_alias_hits": 4,
+          "evidence_sentence_count": 4,
+          "single_word_alias_only": false,
+          "ambiguous_alias_only": false,
+          "matched_context_terms": [],
+          "matched_conflicting_context_terms": [],
+          "minimum_context_hits": 1,
+          "context_collision": false,
+          "teaching_depth_level": 4,
+          "teaching_depth_label": "sustained_teaching",
+          "evidence_quality_score": 0.6808,
+          "shared_evidence_penalty": 0.0,
+          "evidence_quality_notes": [
+            "Teaching depth: sustained_teaching (4)."
+          ],
+          "recap_evidence_only": false,
+          "recap_evidence_count": 0,
+          "substantive_evidence_count": 3,
+          "comparison_evidence_only": false,
+          "comparison_evidence_count": 0,
+          "independent_evidence_count": 0,
+          "evidence": [
+            "Then is there a chance that statement s is executed four times and statement is executed like nine times.",
+            "So I believe and the statement runs how many times nine times.",
+            "So this statement is going to run once and we is updated to one."
+          ],
+          "parent_concept_id": "aqa_3_1_1_algorithm",
+          "cs_relevance_score": 0.7773,
+          "cs_relevant": true
+        },
+        {
+          "concept_id": "aqa_3_2_6_arrays",
+          "topic": "One- and two-dimensional arrays",
+          "domain": "Programming",
+          "official_reference": "3.2.6",
+          "chapter_reference": "3.2",
+          "official_title": "Data structures",
+          "paper": "Paper 1",
+          "source_pages": [
+            15
+          ],
+          "confidence": 0.4867,
+          "keyword_score": 0.73,
+          "semantic_score": 0.2845,
+          "salience_score": 0.5065,
+          "extraction_method": "keyword_embedding",
+          "matched_aliases": [
+            "array"
+          ],
+          "total_alias_hits": 6,
+          "evidence_sentence_count": 5,
+          "single_word_alias_only": true,
+          "ambiguous_alias_only": false,
+          "matched_context_terms": [],
+          "matched_conflicting_context_terms": [],
+          "minimum_context_hits": 1,
+          "context_collision": false,
+          "teaching_depth_level": 1,
+          "teaching_depth_label": "definition",
+          "evidence_quality_score": 0.4785,
+          "shared_evidence_penalty": 0.0,
+          "evidence_quality_notes": [
+            "Teaching depth: definition (1)."
+          ],
+          "recap_evidence_only": false,
+          "recap_evidence_count": 0,
+          "substantive_evidence_count": 3,
+          "comparison_evidence_only": false,
+          "comparison_evidence_count": 0,
+          "independent_evidence_count": 0,
+          "evidence": [
+            "So I can possibly do get some array in which I get such a situation.",
+            "So let's say if the array was this, let's say if my array was this.",
+            "So let's say if this was the array."
+          ],
+          "parent_concept_id": "aqa_3_2_6_data_structures",
+          "cs_relevance_score": 0.4844,
+          "cs_relevant": true
+        }
+      ],
+      "rejected_candidates": [],
+      "has_unmapped_cs_content": false,
+      "unmapped_cs_signals": [],
+      "continuation_of_chunk_id": null,
+      "requires_llm_fallback": false,
+      "notes": []
+    },
+    {
+      "chunk_id": 7,
+      "source_word_count": 519,
+      "classification": "continuation_no_new_topic",
+      "is_cs_relevant": false,
+      "creates_new_topic": false,
+      "cs_relevance_score": 0.7972,
+      "topic_candidates": [
+        {
+          "concept_id": "aqa_3_1_1_algorithm_purpose_trace",
+          "topic": "Algorithm tracing and program execution",
+          "domain": "Fundamentals of algorithms",
+          "official_reference": "3.1.1",
+          "chapter_reference": "3.1",
+          "official_title": "Representing algorithms",
+          "paper": "Paper 1",
+          "source_pages": [
+            10
+          ],
+          "confidence": 0.8297,
+          "keyword_score": 1.0,
+          "semantic_score": 0.3067,
+          "salience_score": 0.6187,
+          "extraction_method": "keyword_embedding",
+          "matched_aliases": [
+            "counting statement or loop executions",
+            "reported execution count"
+          ],
+          "total_alias_hits": 5,
+          "evidence_sentence_count": 5,
+          "single_word_alias_only": false,
+          "ambiguous_alias_only": false,
+          "matched_context_terms": [],
+          "matched_conflicting_context_terms": [],
+          "minimum_context_hits": 1,
+          "context_collision": false,
+          "teaching_depth_level": 4,
+          "teaching_depth_label": "sustained_teaching",
+          "evidence_quality_score": 0.7135,
+          "shared_evidence_penalty": 0.0,
+          "evidence_quality_notes": [
+            "Teaching depth: sustained_teaching (4)."
+          ],
+          "recap_evidence_only": false,
+          "recap_evidence_count": 0,
+          "substantive_evidence_count": 3,
+          "comparison_evidence_only": false,
+          "comparison_evidence_count": 0,
+          "independent_evidence_count": 0,
+          "evidence": [
+            "So basically statement T actually tells me how many times the loop is running.",
+            "So the statement T K equals K plus one is up is done nine times.",
+            "And statement has is only going to be done four times at which values respectively one two three and then four till hair."
+          ],
+          "parent_concept_id": "aqa_3_1_1_algorithm",
+          "cs_relevance_score": 0.7972,
+          "cs_relevant": true
+        }
+      ],
+      "rejected_candidates": [
+        {
+          "concept_id": "aqa_3_2_6_arrays",
+          "topic": "One- and two-dimensional arrays",
+          "domain": "Programming",
+          "official_reference": "3.2.6",
+          "chapter_reference": "3.2",
+          "official_title": "Data structures",
+          "paper": "Paper 1",
+          "source_pages": [
+            15
+          ],
+          "confidence": 0.4258,
+          "keyword_score": 0.64,
+          "semantic_score": 0.2624,
+          "salience_score": 0.4943,
+          "extraction_method": "keyword_embedding",
+          "matched_aliases": [
+            "array"
+          ],
+          "total_alias_hits": 3,
+          "evidence_sentence_count": 3,
+          "single_word_alias_only": true,
+          "ambiguous_alias_only": false,
+          "matched_context_terms": [],
+          "matched_conflicting_context_terms": [],
+          "minimum_context_hits": 1,
+          "context_collision": false,
+          "teaching_depth_level": 0,
+          "teaching_depth_label": "mention_only",
+          "evidence_quality_score": 0.0,
+          "shared_evidence_penalty": 0.0,
+          "evidence_quality_notes": [],
+          "recap_evidence_only": false,
+          "recap_evidence_count": 0,
+          "substantive_evidence_count": 0,
+          "comparison_evidence_only": false,
+          "comparison_evidence_count": 0,
+          "independent_evidence_count": 0,
+          "evidence": [
+            "You're not the little bit versus the array.",
+            "So for example, in this case, the array was nine.",
+            "In example that I gave, array was of nine length."
+          ],
+          "parent_concept_id": "aqa_3_2_6_data_structures",
+          "cs_relevance_score": 0.4258,
+          "cs_relevant": false
+        }
+      ],
+      "has_unmapped_cs_content": false,
+      "unmapped_cs_signals": [],
+      "continuation_of_chunk_id": 6,
+      "requires_llm_fallback": false,
+      "notes": [
+        "No new standalone topic was detected; the chunk continues the previous overlapped discussion. Matching evidence is preserved for lesson-level merging."
+      ]
+    },
+    {
+      "chunk_id": 8,
+      "source_word_count": 256,
+      "classification": "continuation_no_new_topic",
+      "is_cs_relevant": false,
+      "creates_new_topic": false,
+      "cs_relevance_score": 0.7732,
+      "topic_candidates": [
+        {
+          "concept_id": "aqa_3_1_1_algorithm_purpose_trace",
+          "topic": "Algorithm tracing and program execution",
+          "domain": "Fundamentals of algorithms",
+          "official_reference": "3.1.1",
+          "chapter_reference": "3.1",
+          "official_title": "Representing algorithms",
+          "paper": "Paper 1",
+          "source_pages": [
+            10
+          ],
+          "confidence": 0.8136,
+          "keyword_score": 1.0,
+          "semantic_score": 0.2372,
+          "salience_score": 0.4971,
+          "extraction_method": "keyword_embedding",
+          "matched_aliases": [
+            "reported execution count",
+            "reasoning about possible execution behaviour"
+          ],
+          "total_alias_hits": 4,
+          "evidence_sentence_count": 2,
+          "single_word_alias_only": false,
+          "ambiguous_alias_only": false,
+          "matched_context_terms": [],
+          "matched_conflicting_context_terms": [],
+          "minimum_context_hits": 1,
+          "context_collision": false,
+          "teaching_depth_level": 4,
+          "teaching_depth_label": "sustained_teaching",
+          "evidence_quality_score": 0.6692,
+          "shared_evidence_penalty": 0.0,
+          "evidence_quality_notes": [
+            "Teaching depth: sustained_teaching (4)."
+          ],
+          "recap_evidence_only": false,
+          "recap_evidence_count": 0,
+          "substantive_evidence_count": 2,
+          "comparison_evidence_only": false,
+          "comparison_evidence_count": 0,
+          "independent_evidence_count": 0,
+          "evidence": [
+            "It says that the loop is run only twice and statement has execute five times.",
+            "Because if the whole loop is only running two times, how is it possible that this statement will execute five times at maximum?"
+          ],
+          "parent_concept_id": "aqa_3_1_1_algorithm",
+          "cs_relevance_score": 0.7732,
+          "cs_relevant": true
+        }
+      ],
+      "rejected_candidates": [],
+      "has_unmapped_cs_content": false,
+      "unmapped_cs_signals": [],
+      "continuation_of_chunk_id": 6,
+      "requires_llm_fallback": false,
+      "notes": [
+        "No new standalone topic was detected; the chunk continues the previous overlapped discussion. Matching evidence is preserved for lesson-level merging."
+      ]
+    },
+    {
+      "chunk_id": 9,
+      "source_word_count": 486,
+      "classification": "mixed_official_and_unmapped",
+      "is_cs_relevant": true,
+      "creates_new_topic": true,
+      "cs_relevance_score": 0.5672,
+      "topic_candidates": [
+        {
+          "concept_id": "aqa_3_1_1_algorithm_purpose_trace",
+          "topic": "Algorithm tracing and program execution",
+          "domain": "Fundamentals of algorithms",
+          "official_reference": "3.1.1",
+          "chapter_reference": "3.1",
+          "official_title": "Representing algorithms",
+          "paper": "Paper 1",
+          "source_pages": [
+            10
+          ],
+          "confidence": 0.6183,
+          "keyword_score": 0.78,
+          "semantic_score": 0.2816,
+          "salience_score": 0.3382,
+          "extraction_method": "keyword_embedding",
+          "matched_aliases": [
+            "tracking changing program values"
+          ],
+          "total_alias_hits": 1,
+          "evidence_sentence_count": 1,
+          "single_word_alias_only": false,
+          "ambiguous_alias_only": false,
+          "matched_context_terms": [],
+          "matched_conflicting_context_terms": [],
+          "minimum_context_hits": 1,
+          "context_collision": false,
+          "teaching_depth_level": 1,
+          "teaching_depth_label": "definition",
+          "evidence_quality_score": 0.4359,
+          "shared_evidence_penalty": 0.0,
+          "evidence_quality_notes": [
+            "Teaching depth: definition (1)."
+          ],
+          "recap_evidence_only": false,
+          "recap_evidence_count": 0,
+          "substantive_evidence_count": 1,
+          "comparison_evidence_only": false,
+          "comparison_evidence_count": 0,
+          "independent_evidence_count": 0,
+          "evidence": [
+            "So the point is that we want to make sure that the Maya items and Milo index, these things they are not changed or they are not verified from outside the class."
+          ],
+          "parent_concept_id": "aqa_3_1_1_algorithm",
+          "cs_relevance_score": 0.5672,
+          "cs_relevant": true
+        },
+        {
+          "concept_id": "aqa_3_2_6_arrays",
+          "topic": "One- and two-dimensional arrays",
+          "domain": "Programming",
+          "official_reference": "3.2.6",
+          "chapter_reference": "3.2",
+          "official_title": "Data structures",
+          "paper": "Paper 1",
+          "source_pages": [
+            15
+          ],
+          "confidence": 0.4902,
+          "keyword_score": 0.73,
+          "semantic_score": 0.3652,
+          "salience_score": 0.5508,
+          "extraction_method": "keyword_embedding",
+          "matched_aliases": [
+            "array"
+          ],
+          "total_alias_hits": 5,
+          "evidence_sentence_count": 4,
+          "single_word_alias_only": true,
+          "ambiguous_alias_only": false,
+          "matched_context_terms": [],
+          "matched_conflicting_context_terms": [],
+          "minimum_context_hits": 1,
+          "context_collision": false,
+          "teaching_depth_level": 4,
+          "teaching_depth_label": "sustained_teaching",
+          "evidence_quality_score": 0.7082,
+          "shared_evidence_penalty": 0.0,
+          "evidence_quality_notes": [
+            "Teaching depth: sustained_teaching (4)."
+          ],
+          "recap_evidence_only": false,
+          "recap_evidence_count": 0,
+          "substantive_evidence_count": 3,
+          "comparison_evidence_only": false,
+          "comparison_evidence_count": 0,
+          "independent_evidence_count": 0,
+          "evidence": [
+            "So when we call the first one array one, it's calling the second constructor, which is giving the size, which is 100 and also telling you where to start from.",
+            "So because if you have a look at array two, array two starts from zero and goes to 99 because 100 values are beginning to come from zero till 99.",
+            "But array one is starting at five."
+          ],
+          "parent_concept_id": "aqa_3_2_6_data_structures",
+          "cs_relevance_score": 0.5513,
+          "cs_relevant": true
+        }
+      ],
+      "rejected_candidates": [],
+      "has_unmapped_cs_content": true,
+      "unmapped_cs_signals": [
+        {
+          "rough_topic": "Encapsulation and access modifiers",
+          "domain": "Programming and software development",
+          "score": 0.8003,
+          "evidence": "But remember, I did briefly talk about this in classes and I talked about remember the idea of private and public.",
+          "matched_aliases": [
+            "private and public",
+            "outside the class"
+          ],
+          "detection_method": "lexical_semantic"
+        },
+        {
+          "rough_topic": "Object construction and initialisation",
+          "domain": "Programming and software development",
+          "score": 0.7973,
+          "evidence": "So I remember it says that we actually have two constructors in this example.",
+          "matched_aliases": [
+            "constructors",
+            "constructor"
+          ],
+          "detection_method": "lexical_semantic"
+        }
+      ],
+      "continuation_of_chunk_id": null,
+      "requires_llm_fallback": false,
+      "notes": [
+        "Strong specific unmapped-CS evidence was retained directly; no LLM fallback is required."
+      ]
+    },
+    {
+      "chunk_id": 10,
+      "source_word_count": 205,
+      "classification": "no_topic",
+      "is_cs_relevant": false,
+      "creates_new_topic": false,
+      "cs_relevance_score": 0.0,
+      "topic_candidates": [],
+      "rejected_candidates": [
+        {
+          "concept_id": "aqa_3_2_6_arrays",
+          "topic": "One- and two-dimensional arrays",
+          "domain": "Programming",
+          "official_reference": "3.2.6",
+          "chapter_reference": "3.2",
+          "official_title": "Data structures",
+          "paper": "Paper 1",
+          "source_pages": [
+            15
+          ],
+          "confidence": 0.3885,
+          "keyword_score": 0.59,
+          "semantic_score": 0.2989,
+          "salience_score": 0.4311,
+          "extraction_method": "keyword_embedding",
+          "matched_aliases": [
+            "array"
+          ],
+          "total_alias_hits": 3,
+          "evidence_sentence_count": 2,
+          "single_word_alias_only": true,
+          "ambiguous_alias_only": false,
+          "matched_context_terms": [],
+          "matched_conflicting_context_terms": [],
+          "minimum_context_hits": 1,
+          "context_collision": false,
+          "teaching_depth_level": 0,
+          "teaching_depth_label": "mention_only",
+          "evidence_quality_score": 0.0,
+          "shared_evidence_penalty": 0.0,
+          "evidence_quality_notes": [],
+          "recap_evidence_only": false,
+          "recap_evidence_count": 0,
+          "substantive_evidence_count": 0,
+          "comparison_evidence_only": false,
+          "comparison_evidence_count": 0,
+          "independent_evidence_count": 0,
+          "evidence": [
+            "So I want to make sure that whatever was in array zero is noise and array five and so on and so forth.",
+            "For example, in part day, if you have a look at it says integer k equals arrows, integer k equals array zero."
+          ],
+          "parent_concept_id": "aqa_3_2_6_data_structures",
+          "cs_relevance_score": 0.3885,
+          "cs_relevant": false
+        },
+        {
+          "concept_id": "aqa_3_1_4_sorting_algorithms",
+          "topic": "Sorting algorithms",
+          "domain": "Fundamentals of algorithms",
+          "official_reference": "3.1.4",
+          "chapter_reference": "3.1",
+          "official_title": "Sorting algorithms",
+          "paper": "Paper 1",
+          "source_pages": [
+            11
+          ],
+          "confidence": 0.5846,
+          "keyword_score": 0.72,
+          "semantic_score": 0.5476,
+          "salience_score": 0.4845,
+          "extraction_method": "keyword_embedding",
+          "matched_aliases": [
+            "sorting algorithms"
+          ],
+          "total_alias_hits": 1,
+          "evidence_sentence_count": 1,
+          "single_word_alias_only": false,
+          "ambiguous_alias_only": false,
+          "matched_context_terms": [],
+          "matched_conflicting_context_terms": [],
+          "minimum_context_hits": 1,
+          "context_collision": false,
+          "teaching_depth_level": 0,
+          "teaching_depth_label": "mention_only",
+          "evidence_quality_score": 0.34,
+          "shared_evidence_penalty": 0.0,
+          "evidence_quality_notes": [
+            "Teaching depth: mention_only (0).",
+            "Rejected because the evidence is an isolated mention rather than definition, explanation, example or practice."
+          ],
+          "recap_evidence_only": false,
+          "recap_evidence_count": 0,
+          "substantive_evidence_count": 1,
+          "comparison_evidence_only": false,
+          "comparison_evidence_count": 0,
+          "independent_evidence_count": 1,
+          "evidence": [
+            "We have sorting algorithms and our syllabus is well by the way."
+          ],
+          "parent_concept_id": null,
+          "cs_relevance_score": 0.5161,
+          "cs_relevant": false
+        }
+      ],
+      "has_unmapped_cs_content": false,
+      "unmapped_cs_signals": [],
+      "continuation_of_chunk_id": null,
+      "requires_llm_fallback": false,
+      "notes": [
+        "Evidence-quality evaluation rejected 1 candidate(s)."
+      ]
+    },
+    {
+      "chunk_id": 11,
+      "source_word_count": 182,
+      "classification": "no_topic",
+      "is_cs_relevant": false,
+      "creates_new_topic": false,
+      "cs_relevance_score": 0.0,
+      "topic_candidates": [],
+      "rejected_candidates": [],
+      "has_unmapped_cs_content": false,
+      "unmapped_cs_signals": [],
+      "continuation_of_chunk_id": null,
+      "requires_llm_fallback": false,
+      "notes": [
+        "No official AQA topic candidate was detected."
+      ]
+    }
+  ],
+  "merged_topics": [
+    {
+      "concept_id": "aqa_3_1_1_algorithm_purpose_trace",
+      "topic": "Algorithm tracing and program execution",
+      "domain": "Fundamentals of algorithms",
+      "official_reference": "3.1.1",
+      "chapter_reference": "3.1",
+      "official_title": "Representing algorithms",
+      "paper": "Paper 1",
+      "source_pages": [
+        10
+      ],
+      "confidence": 0.7972,
+      "ranking_score": 0.6564,
+      "topic_role": "primary",
+      "source_chunk_ids": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "support_span_count": 1,
+      "mean_semantic_score": 0.2668,
+      "mean_keyword_score": 0.93,
+      "mean_salience_score": 0.4682,
+      "coverage_score": 0.875,
+      "evidence": [
+        "which of the, or combination to the value of them, the number of times statement s is executed and the numbers.",
+        "Then do you think it could be possible that statement s is executed zero times?",
+        "How many possible times it could run?",
+        "Then do you think it's possible that statement s is never executed?",
+        "That it means that they're asked the statement as should execute at least once."
+      ],
+      "supporting_candidate_count": 7
+    },
+    {
+      "concept_id": "aqa_3_2_6_arrays",
+      "topic": "One- and two-dimensional arrays",
+      "domain": "Programming",
+      "official_reference": "3.2.6",
+      "chapter_reference": "3.2",
+      "official_title": "Data structures",
+      "paper": "Paper 1",
+      "source_pages": [
+        15
+      ],
+      "confidence": 0.8477,
+      "ranking_score": 0.61,
+      "topic_role": "supporting",
+      "source_chunk_ids": [
+        2,
+        3,
+        5,
+        6,
+        9
+      ],
+      "support_span_count": 3,
+      "mean_semantic_score": 0.3628,
+      "mean_keyword_score": 0.796,
+      "mean_salience_score": 0.5895,
+      "coverage_score": 0.625,
+      "evidence": [
+        "And then, you talked about that there could be different types of array questions that will be expected, you know, for example, these ones, let's say that we've talked about.",
+        "So, now the last thing that we were talking about, Salar, we've kind of completed the topic of arrays, even from the past as an onwards.",
+        "Now, just want to know, is there any particular question, anything specifically regarding arrays that you think that you want to talk about?",
+        "Why do some int array int limit?",
+        "So the input that's being given to the function is what it's an array."
+      ],
+      "supporting_candidate_count": 5
+    },
+    {
+      "concept_id": "aqa_3_2_2_iteration",
+      "topic": "Iteration",
+      "domain": "Programming",
+      "official_reference": "3.2.2",
+      "chapter_reference": "3.2",
+      "official_title": "Programming concepts",
+      "paper": "Paper 1",
+      "source_pages": [
+        12,
+        13
+      ],
+      "confidence": 0.5433,
+      "ranking_score": 0.3069,
+      "topic_role": "supporting",
+      "source_chunk_ids": [
+        3
+      ],
+      "support_span_count": 1,
+      "mean_semantic_score": 0.36,
+      "mean_keyword_score": 0.72,
+      "mean_salience_score": 0.3813,
+      "coverage_score": 0.125,
+      "evidence": [
+        "We can pretty much know that they're not remember we've already done that we can traverse and the rate for loop."
+      ],
+      "supporting_candidate_count": 1
+    }
+  ],
+  "total_chunks": 11,
+  "cs_relevant_chunks": 5,
+  "non_cs_chunks": 6,
+  "official_topic_chunks": 3,
+  "mixed_official_unmapped_chunks": 2,
+  "unmapped_cs_chunks": 0,
+  "continuation_chunks": 3,
+  "no_topic_chunks": 3,
+  "llm_fallback_chunk_ids": [],
+  "embedding_model": "sentence-transformers/all-MiniLM-L6-v2",
+  "candidate_keep_threshold": 0.46
+}

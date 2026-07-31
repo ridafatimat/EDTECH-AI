@@ -1,0 +1,115 @@
+Transcript Test 3 - Algorithms and Programming Stress Test
+Synthetic raw lesson transcript for EDTech Module 1 + Module 2 testing
+Teacher - 16:00:01: Right, we're recording. Can you see the code on my screen?
+Student - 16:00:05: Yeah. It's a bit small but I can zoom in.
+Teacher - 16:00:09: Great. Today is algorithms and programming techniques. This one is intentionally more practice-heavy.
+Teacher - 16:00:18: Before we start, how did your basketball game go?
+Student - 16:00:22: We lost by two points.
+Teacher - 16:00:25: Ah unlucky. Okay, coding now.
+Teacher - 16:00:31: Let's begin with linear search. Suppose we have the list 14, 7, 23, 5, 19 and we want to find 5.
+Student - 16:00:42: We check from the first item until we find five.
+Teacher - 16:00:46: Exactly. Linear search checks items one by one. It does not require the data to be sorted.
+Teacher - 16:00:55: Worst case, if the target is at the end or missing, we may inspect every element.
+Student - 16:01:04: So it's simple but can be slow.
+Teacher - 16:01:07: Correct. Now write pseudocode. set index to zero, found false, while index is less than length and found is false...
+Student - 16:01:18: if array index equals target then found true, otherwise index plus one.
+Teacher - 16:01:24: Good. Good. Good. Notice the loop condition prevents us going beyond the end.
+Teacher - 16:01:32: Before we move on, what if the target appears twice?
+Student - 16:01:36: This version stops at the first one.
+Teacher - 16:01:40: Exactly. We are still discussing linear search; 'before we move on' here is not a topic change.
+Teacher - 16:01:49: Let's test it. target nineteen. index zero fourteen no, index one seven no, index two twenty-three no, index three five no, index four nineteen yes.
+Student - 16:02:01: found true.
+Teacher - 16:02:03: Great.
+Teacher - 16:02:06: Let's move on to binary search. This is a new algorithm.
+Teacher - 16:02:13: Binary search requires the list to be sorted.
+Teacher - 16:02:18: We repeatedly compare the target with the middle item and discard half of the remaining search area.
+Student - 16:02:29: So if the target is smaller than the middle, we only keep the left half.
+Teacher - 16:02:34: Correct. If greater, keep the right half.
+Teacher - 16:02:39: Example: 3, 8, 12, 17, 25, 31, 42. Search for 31.
+Student - 16:02:47: Middle is 17, 31 is bigger, so right side.
+Teacher - 16:02:53: Then middle of the remaining section is around 31, and we find it quickly.
+Teacher - 16:03:01: Binary search is generally more efficient on large sorted datasets because each comparison removes about half the remaining items.
+Teacher - 16:03:12: But remember the requirement: sorted data. sorted data. That's the catch.
+Student - 16:03:18: Could we sort first and then binary search?
+Teacher - 16:03:22: Sometimes, but sorting itself has a cost. The right choice depends on the situation.
+Teacher - 16:03:32: [unclear] ... if you're only searching one tiny list, linear search may be perfectly reasonable.
+Teacher - 16:03:39: Okay next question. Compare linear and binary search in words.
+Student - 16:03:45: Linear checks each item and works on unsorted data. Binary keeps halving the search area but needs sorted data.
+Teacher - 16:03:53: Excellent.
+Teacher - 16:03:56: Now, let's move on to sorting algorithms. Start with bubble sort.
+Teacher - 16:04:04: Bubble sort compares adjacent items and swaps them if they are in the wrong order.
+Teacher - 16:04:12: After a full pass, a large value can 'bubble' toward the end.
+Teacher - 16:04:18: Example: 5, 2, 4, 1.
+Teacher - 16:04:24: Compare 5 and 2, swap: 2, 5, 4, 1. Compare 5 and 4, swap: 2, 4, 5, 1. Compare 5 and 1, swap: 2, 4, 1, 5.
+Student - 16:04:39: Then we do another pass.
+Teacher - 16:04:41: Right. Compare 2 and 4 no swap. Compare 4 and 1 swap, giving 2, 1, 4, 5. Then another pass gives 1, 2, 4, 5.
+Teacher - 16:04:55: We may optimise by stopping if a full pass makes no swaps.
+Student - 16:05:02: So a flag variable?
+Teacher - 16:05:04: Exactly, maybe swapped equals false at the start of each pass.
+Teacher - 16:05:11: This is a good place to connect algorithms to programming constructs: loops, variables, Boolean flags, array indexing.
+Teacher - 16:05:22: um wait, did I say compare 2 and 4 twice? I did. Ignore the repeated sentence, the final order is correct.
+Teacher - 16:05:30: Let's move on to merge sort.
+Teacher - 16:05:35: Merge sort uses divide and conquer. Split the list into smaller lists until each contains one item, then merge them back in sorted order.
+Teacher - 16:05:47: Take 8, 3, 6, 2. Split into 8,3 and 6,2. Then into single elements. Merge 8 and 3 as 3,8. Merge 6 and 2 as 2,6. Finally merge 3,8 with 2,6 to get 2,3,6,8.
+Student - 16:06:08: It's more complicated than bubble sort.
+Teacher - 16:06:11: Conceptually, yes. But it can be much more efficient for large datasets.
+Teacher - 16:06:19: For GCSE, be able to describe how the algorithm works and trace examples.
+Teacher - 16:06:27: Okay, before we move on, let's compare bubble and merge sort.
+Teacher - 16:06:34: Bubble sort repeatedly compares adjacent values. Merge sort splits and merges.
+Student - 16:06:43: And both result in sorted data.
+Teacher - 16:06:46: Correct. We're still in sorting here, not a new topic.
+Teacher - 16:06:52: Now let's move on to trace tables and dry running code.
+Teacher - 16:06:58: A trace table records how variables change as an algorithm executes.
+Teacher - 16:07:05: Suppose total equals zero. For i from zero to three, total equals total plus array i. Array is 2, 4, 1, 3.
+Student - 16:07:17: So total is 2, then 6, then 7, then 10.
+Teacher - 16:07:22: Yes. A trace table might have columns for i and total.
+Teacher - 16:07:28: Now here's a common bug: using i less than or equal to array length. Why is that wrong?
+Student - 16:07:36: Because last valid index is length minus one.
+Teacher - 16:07:41: Exactly. For length four, indices are zero, one, two, three. Index four is outside the array.
+Teacher - 16:07:52: This is an off-by-one error.
+Teacher - 16:07:56: Let's do a longer dry run because I want you to practise keeping context over many lines.
+Teacher - 16:08:03: count equals zero, max equals array zero, then for i from one while i is less than array length. If array i is greater than max, set max to array i and increment count.
+Teacher - 16:08:17: Array values are 4, 9, 2, 11, 11, 5, 18, 7, 21, 3.
+Student - 16:08:28: At i one, 9 greater than 4, max becomes 9 and count one.
+Teacher - 16:08:34: Good. i two, 2 not greater. i three, 11 greater, max eleven and count two.
+Student - 16:08:43: i four is also eleven so not greater.
+Teacher - 16:08:47: Correct because condition is greater than, not greater than or equal.
+Teacher - 16:08:55: i five 5 no. i six 18 yes, max eighteen count three. i seven 7 no. i eight 21 yes, max twenty-one count four. i nine 3 no.
+Teacher - 16:09:09: So the final max is twenty-one and count is four.
+Student - 16:09:14: Count tells us how many times a new maximum was found.
+Teacher - 16:09:18: Exactly.
+Teacher - 16:09:20: Let's think about it again, again. If the condition had greater than or equal, the second eleven would also increment count.
+Teacher - 16:09:31: That's a subtle detail exam questions like.
+Teacher - 16:09:37: Okay, I know this is long, but we are intentionally staying on the same trace-table problem for a while.
+Teacher - 16:09:45: Now change the array to 10, 8, 6, 4, 2. What happens?
+Student - 16:09:50: Max starts ten, nothing is greater, so count stays zero.
+Teacher - 16:09:55: Exactly.
+Teacher - 16:10:00: [keyboard noise] sorry.
+Teacher - 16:10:02: Next, let's talk about subroutines and parameters.
+Teacher - 16:10:08: A procedure performs a task; a function returns a value. Depending on the language and specification wording, terminology can vary, so focus on the course definitions.
+Teacher - 16:10:19: Parameters are values passed into a subroutine. Arguments are the actual values used when calling it.
+Student - 16:10:28: Like function add a comma b, then add 3 comma 4?
+Teacher - 16:10:34: Yes. a and b are parameters; 3 and 4 are arguments in that call.
+Teacher - 16:10:42: Local variables exist within the subroutine's scope.
+Teacher - 16:10:49: Why use subroutines? Decomposition, reuse, easier testing, easier maintenance, clearer structure.
+Student - 16:11:01: So instead of copying the same code.
+Teacher - 16:11:04: Exactly.
+Teacher - 16:11:07: Now let's move on to validation and authentication—careful, they sound similar but they're not.
+Teacher - 16:11:15: Validation checks whether input is sensible or follows rules. It does not prove the data is true.
+Teacher - 16:11:25: Range check, length check, type check, presence check, format check.
+Student - 16:11:34: Verification is checking it was entered correctly?
+Teacher - 16:11:37: Right. Double entry or visual checks are examples of verification methods.
+Teacher - 16:11:47: Authentication is different again: checking identity, for example username and password or two-factor authentication.
+Teacher - 16:11:58: I'm mentioning authentication because students often confuse the words, but don't merge it with validation in your notes.
+Student - 16:12:05: Okay.
+Teacher - 16:12:07: Last coding point: Boolean logic in conditions.
+Teacher - 16:12:12: AND requires both conditions true. OR requires at least one true. NOT reverses a Boolean value.
+Teacher - 16:12:22: If age is greater than or equal to 13 AND consent is true, then access allowed. Both parts matter.
+Student - 16:12:31: With OR, either one can be true.
+Teacher - 16:12:34: Correct.
+Teacher - 16:12:36: Let's finish. What were the big areas today?
+Student - 16:12:41: linear search, binary search, bubble and merge sort, trace tables, subroutines, validation, and Boolean logic.
+Teacher - 16:12:51: Good. Authentication was mentioned as a contrast as well.
+Teacher - 16:12:56: Sorry I have another call now, so we'll stop there.
+Student - 16:13:00: okay bye.
+Teacher - 16:13:02: bye.

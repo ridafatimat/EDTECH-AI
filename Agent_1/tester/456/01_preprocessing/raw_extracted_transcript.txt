@@ -1,0 +1,402 @@
+Data structures and arrays
+0:00
+so in this video we take a look at the
+0:02
+concept of data structures and arrays so
+What is a data structure?
+0:12
+first of all what actually is a data
+0:14
+structure oh it's a specialized format
+0:17
+for organizing and storing data and
+0:20
+you've been using a number of them
+0:22
+already things like arrays lists files
+0:25
+records and tables you've actually been
+0:28
+using basic data structures ever since
+0:31
+you first started to program in the form
+0:34
+of characters strings integers reals and
+0:37
+billions you already know that a string
+0:41
+is a collection of alphanumeric
+0:43
+characters whereas a char or character
+0:46
+data type is a single character although
+0:50
+you use the string datatype behind the
+0:53
+scenes it's actually a data structure
+0:56
+made up of a series of separate
+0:59
+character data types
+1:03
+there are many much more complex or what
+1:06
+we call higher-level data types and
+1:08
+you'll start to be exposed to lots of
+1:11
+these at a level but they all work in
+1:13
+fundamentally the same way and that they
+1:15
+allow you to organize and store data in
+1:18
+a certain way following certain rules so
+What is an array?
+1:23
+an array can be thought of like a
+1:25
+variable which can contain more than one
+1:28
+data item for example we could be
+1:31
+storing a list of names and we can do
+1:37
+that by allocating a continuous part of
+1:40
+memory to storing that data so you can
+1:44
+see here we have a number of memory
+1:46
+locations in memory and starting at
+1:48
+memory address five we've then start is
+1:52
+doing contiguously a list of names which
+1:55
+will be part of our variable note that
+2:00
+lists which are probably what you might
+2:01
+be familiar with if you're programming
+2:03
+in Python are different to arrays
+2:05
+because they're not contiguous but for
+2:08
+the person who exam you can think of a
+2:10
+raise as storing contiguous data items
+2:16
+so our program will know where in memory
+2:20
+our array starts in this case address
+2:22
+five and we can therefore use an index
+2:25
+relative to the start point to allow us
+2:28
+to easily access the arrays contents
+2:30
+so notice arrays are typically zero
+2:34
+indexed which means Jane is that index
+2:37
+to not index three it is in the third
+2:40
+position in the array but because we
+2:42
+start at zero is it index to so we're
+One-dimensional arrays (Python)
+2:48
+going to use some code example here from
+2:50
+Python now just a quick note python does
+2:53
+actually use arrays but it has methods
+2:57
+that allow them to be used like lists by
+3:01
+a programmer and that's why most people
+3:04
+think Python only supports lists but
+3:06
+this little extra level of complication
+3:08
+is beyond the spec all intents and
+3:10
+purposes at GCSE you can effectively
+3:13
+think of lists and arrays as the same
+3:15
+things although that's not strictly true
+3:17
+so here in this a code example this line
+3:20
+sets up a one-dimensional array of
+3:23
+strings called countries it assigns it
+3:27
+some initial values and goal at index 0
+3:29
+austria index 1 and belgium at index 2
+3:32
+and again note how the index is
+3:35
+typically start at 0 and not 1 to output
+3:41
+austria from the array we would
+3:42
+therefore need to use index 1 as index 1
+3:46
+represents the second item in our
+3:48
+countries array arrays are a static data
+3:54
+structure and that means you can't
+3:56
+change the size of them once you've set
+3:58
+them up now this is a good example of
+4:00
+where python is allowing the array to
+4:03
+behave like a list although you can't
+4:06
+tell because this has been abstracted
+4:07
+from you
+4:08
+Python is actually moving the entire
+4:11
+data structure to a new part of the
+4:13
+memory to ensure it's contiguous so with
+4:18
+Python we can insert an item into the
+4:21
+new location at the end of the array
+4:23
+using its index
+4:25
+so here we
+4:27
+added Canada to the third index or the
+4:30
+fourth position in the countries away
+Two-dimensional arrays (Python)
+4:34
+you can also have two-dimensional arrays
+4:37
+and you can visualize in your head a
+4:39
+two-dimensional array as looking like a
+4:41
+table where we now need two sets of
+4:44
+indexes one to index the rows and
+4:47
+another to indexed columns so to access
+4:53
+Angola you'd be going to index 0 0 as
+4:58
+shown here countries 0 1 contains the
+5:06
+integer 1 2 4 6 7 0 0 and countries 1 1
+5:14
+contains the value 8 3 8 7 1 so let's
+Arrays summary
+5:21
+just recap what we've covered an array
+5:24
+is a static number of related data items
+5:27
+that are stored together in the same
+5:29
+memory space each data item has to have
+5:32
+the same data type and the particular
+5:35
+data item the element is found using the
+5:39
+index for the array indexes usually
+5:42
+start at 0 for the first data item known
+5:45
+as a 0 indexed array and raised may be
+5:48
+single or multi-dimensional you can
+5:53
+visualize dimensions as a column when
+5:55
+it's a single dimensional array or a
+5:57
+table where it's a two-dimensional array
+6:00
+now a quick note in something which is
+6:03
+often asked by students and teachers
+6:05
+that when we say index 1 0 we could be
+6:09
+accessing value 1 1 2 it depends how you
+6:13
+actually choose to store the data behind
+6:15
+the scenes there's not a fixed way of
+6:18
+referencing the data for an array you
+6:20
+don't go for example always down the
+6:22
+x-axis and then the y-axis it doesn't
+6:25
+matter when you visualize rows or
+6:27
+columns first as long as you're
+6:29
+consistent in your program so read the
+6:32
+questions carefully in an exam so you
+6:35
+assure which way round the data is being
+6:37
+stored
+AQA exam pseudocode
+6:46
+you
+7:34
+now that's where the specification stops
+Going beyond the GCSE specification
+7:37
+because in the exam you only need to
+7:39
+know about one dimensional and two
+7:41
+dimensional rays if you're interested to
+7:44
+know about three dimensional or higher
+7:46
+dimensional arrays then you can watch
+7:48
+the rest of this video but there's no
+7:49
+need to take notes and high dimensional
+7:52
+arrays is something you'll probably
+7:53
+cover at a level so you already know
+Going beyond a two-dimensional array
+7:57
+that you can visualize as an abstraction
+8:01
+a one-dimensional array as a simple
+8:03
+column and a two-dimensional array as a
+8:06
+table well it doesn't take much for
+8:12
+stretch then for you to realize that a
+8:14
+three dimensional array in your head
+8:16
+could be visualized as a cube you could
+8:21
+reference any item in a three
+8:23
+dimensional array by giving three index
+8:26
+values one for the height one for the
+8:29
+length and one for the depth so here
+8:33
+we're accessing two to two we're going
+8:35
+down to across two and two rows deep
+8:38
+into our cube now at that point people
+8:42
+think well surely we can't go higher
+8:44
+than a three dimensional array how could
+8:47
+we represent a four dimensional array
+8:49
+and although that can be a difficult
+8:51
+concept for us to wrap our heads around
+8:53
+because we live in a three-dimensional
+8:55
+world the computer doesn't care about
+8:58
+that it can easily have a fourth
+9:00
+dimensional or fifth dimension or higher
+9:02
+dimensional array and actually it's not
+9:06
+that hard for us to visualize even
+9:08
+though we only live in a three
+9:10
+dimensional world so this is how you
+9:14
+could potentially visualize a four
+9:17
+dimensional array we just take a set of
+9:20
+cubes
+9:20
+we'd have to supply for indexes to this
+9:24
+array to access any one of the elements
+9:26
+the first index specifies which cube we
+9:30
+look at and then the next three specify
+9:32
+the width the depth and the height in a
+9:37
+similar manner we could carry on
+9:39
+visualizing fifth sixth seventh and high
+9:42
+dimensional arrays although this does
+9:44
+get a little confusing so here we have a
+9:47
+fifth dimension
+9:47
+or a with one suggestion of how you
+9:49
+could visualize it you'd have to supply
+9:51
+five index values to access any
+9:54
+particular element in a five dimensional
+9:56
+array the first two here could be
+10:00
+telling us the row and the column of the
+10:04
+cube to access and the final three the
+10:06
+row column and depth of that cube now
+10:10
+it's unlikely you're ever gonna be
+10:11
+dealing with five dimensional arrays
+10:12
+even at a level but it just shows how
+10:14
+computers are not really limited and we
+10:16
+can often take concepts to the next
+10:18
+level quite easily once we understand
+10:21
+some of the basics
+Outro
+10:25
+[Music]
