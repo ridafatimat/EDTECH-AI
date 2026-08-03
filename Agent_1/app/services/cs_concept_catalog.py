@@ -64,6 +64,25 @@ class CSConcept:
     # shorter term from consuming a longer compound term.
     excluded_phrases: tuple[str, ...] = ()
 
+    # One-word aliases that are technically valid but contextually ambiguous.
+    # These aliases cannot independently create a topic unless supporting
+    # contextual terms are also present.
+    ambiguous_aliases: tuple[str, ...] = ()
+
+    # Context terms that confirm the intended meaning of an ambiguous alias.
+    # For example, "binary" is supported as a number-base term by phrases
+    # such as "base two", "hexadecimal", "place value" or "conversion".
+    supporting_context_terms: tuple[str, ...] = ()
+
+    # Terms that indicate the same aliases are being used in a different
+    # conceptual domain. These do not hardcode transcript names; they provide
+    # reusable catalogue-level disambiguation metadata.
+    conflicting_context_terms: tuple[str, ...] = ()
+
+    # Minimum number of supporting context terms required when a candidate is
+    # driven only by ambiguous aliases.
+    minimum_context_hits: int = 1
+
     # Flexible regex patterns for concepts whose classroom wording can vary.
     # Patterns are evaluated against normalised sentence text.
     match_patterns: tuple[FlexiblePattern, ...] = ()
@@ -100,6 +119,10 @@ def _concept(
     source_pages: tuple[int, ...],
     parent_concept_id: str | None = None,
     excluded_phrases: tuple[str, ...] = (),
+    ambiguous_aliases: tuple[str, ...] = (),
+    supporting_context_terms: tuple[str, ...] = (),
+    conflicting_context_terms: tuple[str, ...] = (),
+    minimum_context_hits: int = 1,
     match_patterns: tuple[FlexiblePattern, ...] = (),
 ) -> CSConcept:
     """
@@ -121,6 +144,10 @@ def _concept(
         source_pages=source_pages,
         parent_concept_id=parent_concept_id,
         excluded_phrases=excluded_phrases,
+        ambiguous_aliases=ambiguous_aliases,
+        supporting_context_terms=supporting_context_terms,
+        conflicting_context_terms=conflicting_context_terms,
+        minimum_context_hits=minimum_context_hits,
         match_patterns=match_patterns,
     )
 
@@ -170,6 +197,18 @@ CS_CONCEPTS: tuple[CSConcept, ...] = (
             "sequence of steps",
             "solve a task",
             "computer program implementation",
+        ),
+        ambiguous_aliases=(
+            "algorithm",
+        ),
+        supporting_context_terms=(
+            "sequence of steps",
+            "solve a problem",
+            "solve a task",
+            "input processing output",
+            "pseudocode",
+            "flowchart",
+            "algorithm design",
         ),
         paper="Paper 1",
         source_pages=(10,),
@@ -515,6 +554,29 @@ CS_CONCEPTS: tuple[CSConcept, ...] = (
             "character",
             "string",
         ),
+        ambiguous_aliases=(
+            "integer",
+            "float",
+            "boolean",
+            "character",
+            "string",
+        ),
+        supporting_context_terms=(
+            "data type",
+            "declare",
+            "declaration",
+            "variable",
+            "store a value",
+            "type conversion",
+            "programming language",
+        ),
+        excluded_phrases=(
+            "character encoding",
+            "character set",
+            "string handling",
+            "string length",
+            "integer division",
+        ),
         paper="Paper 1",
         source_pages=(11, 12),
     ),
@@ -677,6 +739,23 @@ CS_CONCEPTS: tuple[CSConcept, ...] = (
             "remainder",
             "modulo",
         ),
+        ambiguous_aliases=(
+            "addition",
+            "subtraction",
+            "multiplication",
+            "remainder",
+            "modulo",
+        ),
+        supporting_context_terms=(
+            "arithmetic operation",
+            "operator",
+            "expression",
+            "integer division",
+            "real division",
+            "div operator",
+            "mod operator",
+            "calculate",
+        ),
         paper="Paper 1",
         source_pages=(14,),
     ),
@@ -700,6 +779,23 @@ CS_CONCEPTS: tuple[CSConcept, ...] = (
             "less than or equal",
             "greater than or equal",
             "comparison operator",
+        ),
+        ambiguous_aliases=(
+            "equal to",
+            "not equal to",
+            "less than",
+            "greater than",
+            "less than or equal",
+            "greater than or equal",
+        ),
+        supporting_context_terms=(
+            "relational operator",
+            "comparison operator",
+            "operator symbol",
+            "compare values",
+            "comparison expression",
+            "boolean expression",
+            "condition evaluates",
         ),
         paper="Paper 1",
         source_pages=(14,),
@@ -995,6 +1091,20 @@ CS_CONCEPTS: tuple[CSConcept, ...] = (
             "empty string check",
             "valid input",
         ),
+        ambiguous_aliases=(
+            "valid input",
+        ),
+        supporting_context_terms=(
+            "data validation",
+            "input validation",
+            "user input",
+            "input field",
+            "range check",
+            "length check",
+            "presence check",
+            "validation routine",
+            "reject invalid data",
+        ),
         paper="Paper 1",
         source_pages=(17,),
     ),
@@ -1091,6 +1201,28 @@ CS_CONCEPTS: tuple[CSConcept, ...] = (
             "base two",
             "hexadecimal",
             "base sixteen",
+        ),
+        excluded_phrases=(
+            "binary search",
+            "binary tree",
+            "binary search tree",
+        ),
+        ambiguous_aliases=(
+            "binary",
+        ),
+        supporting_context_terms=(
+            "number base",
+            "decimal",
+            "denary",
+            "base ten",
+            "base two",
+            "hexadecimal",
+            "base sixteen",
+            "place value",
+            "convert",
+            "conversion",
+            "binary digit",
+            "bit pattern",
         ),
         paper="Paper 2",
         source_pages=(18,),
@@ -2194,6 +2326,29 @@ CS_CONCEPTS: tuple[CSConcept, ...] = (
             "row",
             "database data type",
         ),
+        ambiguous_aliases=(
+            "column",
+            "row",
+        ),
+        supporting_context_terms=(
+            "database",
+            "relational database",
+            "record",
+            "field",
+            "primary key",
+            "foreign key",
+            "sql",
+        ),
+        conflicting_context_terms=(
+            "array",
+            "array index",
+            "one dimensional array",
+            "two dimensional array",
+            "dimension",
+            "matrix",
+            "spreadsheet",
+        ),
+        minimum_context_hits=1,
         paper="Paper 2",
         source_pages=(32,),
         parent_concept_id="aqa_3_7_1_database_fundamentals",
@@ -2521,6 +2676,38 @@ def validate_catalog() -> None:
         if not concept.aliases:
             raise ValueError(
                 f"No aliases defined for {concept.concept_id}"
+            )
+
+        normalized_aliases = {
+            re.sub(r"\s+", " ", alias.strip().lower())
+            for alias in concept.aliases
+        }
+
+        unknown_ambiguous_aliases = {
+            re.sub(r"\s+", " ", alias.strip().lower())
+            for alias in concept.ambiguous_aliases
+        } - normalized_aliases
+
+        if unknown_ambiguous_aliases:
+            raise ValueError(
+                "Ambiguous aliases must also appear in aliases for "
+                f"{concept.concept_id}: "
+                + ", ".join(sorted(unknown_ambiguous_aliases))
+            )
+
+        if concept.minimum_context_hits < 1:
+            raise ValueError(
+                "minimum_context_hits must be at least 1 for "
+                f"{concept.concept_id}"
+            )
+
+        if (
+            concept.ambiguous_aliases
+            and not concept.supporting_context_terms
+        ):
+            raise ValueError(
+                "Ambiguous aliases require supporting context terms for "
+                f"{concept.concept_id}"
             )
 
         for pattern in concept.match_patterns:

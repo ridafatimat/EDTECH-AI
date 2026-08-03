@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import re
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
@@ -9,9 +10,10 @@ import numpy as np
 from app.schemas.topic import RawTopicCandidate
 from app.services.cs_concept_catalog import CS_CONCEPTS, CSConcept
 from app.services.embedding_service import (
-    CHUNKING_EMBEDDING_MODEL,
+    TOPIC_EMBEDDING_MODEL,
     embed_texts,
 )
+from app.services.qdrant_syllabus_store import QdrantSyllabusStore
 
 
 EmbeddingFunction = Callable[[Sequence[str], str, int], np.ndarray]
@@ -38,6 +40,12 @@ class TopicExtractionConfig:
     single_word_min_evidence_sentences: int = 2
     single_word_min_distinct_aliases: int = 2
 
+    # Ambiguous aliases require contextual confirmation. This prevents a
+    # valid but overloaded word such as "binary" from mapping to number
+    # bases when the phrase actually refers to binary search.
+    ambiguous_alias_semantic_floor: float = 0.50
+    ambiguous_alias_min_context_terms: int = 1
+
     max_raw_candidates: int = 12
     max_final_candidates: int = 6
     max_evidence_per_candidate: int = 3
@@ -50,7 +58,16 @@ class TopicExtractionConfig:
     duplicate_evidence_overlap: float = 0.80
     duplicate_alias_token_overlap: float = 0.50
 
-    embedding_model: str = CHUNKING_EMBEDDING_MODEL
+    # Module 3 uses the same MiniLM model used when indexing Qdrant.
+    embedding_model: str = TOPIC_EMBEDDING_MODEL
+
+
+    qdrant_top_k_per_unit: int = int(
+        os.getenv(
+            "QDRANT_TOP_K_PER_UNIT",
+            "20",
+        )
+    )
 
     def __post_init__(self) -> None:
         if self.semantic_unit_words <= 0:
@@ -60,6 +77,7 @@ class TopicExtractionConfig:
             "raw_candidate_floor",
             "semantic_only_threshold",
             "single_word_semantic_floor",
+            "ambiguous_alias_semantic_floor",
             "parent_suppression_margin",
             "duplicate_evidence_overlap",
             "duplicate_alias_token_overlap",
@@ -71,6 +89,17 @@ class TopicExtractionConfig:
         if self.max_raw_candidates < 1 or self.max_final_candidates < 1:
             raise ValueError("Candidate limits must be at least 1.")
 
+        if self.ambiguous_alias_min_context_terms < 1:
+            raise ValueError(
+                "ambiguous_alias_min_context_terms must be at least 1."
+            )
+
+
+        if self.qdrant_top_k_per_unit < 1:
+            raise ValueError(
+                "qdrant_top_k_per_unit must be at least 1."
+            )
+
 
 @dataclass(frozen=True)
 class KeywordEvidence:
@@ -80,6 +109,10 @@ class KeywordEvidence:
     total_hits: int
     excluded_hits: int
     single_word_alias_only: bool
+    ambiguous_alias_only: bool
+    matched_context_terms: list[str]
+    matched_conflicting_context_terms: list[str]
+    minimum_context_hits: int
 
 
 class TopicCandidateExtractor:
@@ -88,7 +121,7 @@ class TopicCandidateExtractor:
 
     Evidence sources:
     - exact transcript-friendly catalogue aliases
-    - MiniLM semantic similarity
+    - Qdrant semantic retrieval using MiniLM embeddings
     - evidence repetition/diversity (topic salience)
     """
 
@@ -96,10 +129,15 @@ class TopicCandidateExtractor:
         self,
         config: TopicExtractionConfig | None = None,
         embedding_function: EmbeddingFunction = embed_texts,
+        qdrant_store: QdrantSyllabusStore | None = None,
     ) -> None:
         self.config = config or TopicExtractionConfig()
         self._embedding_function = embedding_function
-        self._concept_embeddings: np.ndarray | None = None
+        self._qdrant_store = (
+            qdrant_store
+            if qdrant_store is not None
+            else QdrantSyllabusStore()
+        )
 
     def extract(
         self,
@@ -124,18 +162,26 @@ class TopicCandidateExtractor:
             self.config.embedding_model,
             32,
         )
-        concept_embeddings = self._get_concept_embeddings()
 
-        if unit_embeddings.size == 0 or concept_embeddings.size == 0:
+        if unit_embeddings.size == 0:
             return []
 
-        similarity_matrix = unit_embeddings @ concept_embeddings.T
+        semantic_scores = self._semantic_scores(
+            unit_embeddings=unit_embeddings,
+            sentences=sentences,
+            full_text=text,
+        )
+
         raw_candidates: list[RawTopicCandidate] = []
 
-        for concept_index, concept in enumerate(CS_CONCEPTS):
-            similarities = similarity_matrix[:, concept_index]
-            best_unit_index = int(np.argmax(similarities))
-            semantic_score = float(similarities[best_unit_index])
+        for concept in CS_CONCEPTS:
+            semantic_result = semantic_scores.get(concept.concept_id)
+
+            if semantic_result is None:
+                semantic_score = 0.0
+                best_unit_index = 0
+            else:
+                semantic_score, best_unit_index = semantic_result
 
             keyword = self._keyword_evidence(
                 concept=concept,
@@ -213,6 +259,12 @@ class TopicCandidateExtractor:
                     total_alias_hits=keyword.total_hits,
                     evidence_sentence_count=len(keyword.evidence_sentences),
                     single_word_alias_only=keyword.single_word_alias_only,
+                    ambiguous_alias_only=keyword.ambiguous_alias_only,
+                    matched_context_terms=keyword.matched_context_terms,
+                    matched_conflicting_context_terms=(
+                        keyword.matched_conflicting_context_terms
+                    ),
+                    minimum_context_hits=keyword.minimum_context_hits,
                     evidence=evidence,
                     parent_concept_id=concept.parent_concept_id,
                 )
@@ -237,17 +289,72 @@ class TopicCandidateExtractor:
 
         return raw_candidates[: self.config.max_final_candidates]
 
-    def _get_concept_embeddings(self) -> np.ndarray:
-        if self._concept_embeddings is not None:
-            return self._concept_embeddings
+    def _semantic_scores(
+        self,
+        unit_embeddings: np.ndarray,
+        sentences: list[str],
+        full_text: str,
+    ) -> dict[str, tuple[float, int]]:
+        """
+        Retrieve the strongest semantic score and semantic-unit index for each
+        candidate concept using Qdrant.
 
-        concept_texts = [concept.embedding_text for concept in CS_CONCEPTS]
-        self._concept_embeddings = self._embedding_function(
-            concept_texts,
-            self.config.embedding_model,
-            32,
+        Qdrant performs server-side nearest-neighbour search for every
+        semantic unit. Exact lexical candidates that fall outside the semantic
+        top-k are still scored by retrieving only their stored vectors from
+        Qdrant. The full syllabus vector matrix is never loaded into memory.
+        """
+
+        result_sets = self._qdrant_store.search_by_vectors(
+            unit_embeddings,
+            top_k=self.config.qdrant_top_k_per_unit,
         )
-        return self._concept_embeddings
+
+        scores: dict[str, tuple[float, int]] = {}
+
+        for unit_index, matches in enumerate(result_sets):
+            for match in matches:
+                previous = scores.get(match.concept_id)
+
+                if previous is None or match.score > previous[0]:
+                    scores[match.concept_id] = (
+                        float(match.score),
+                        unit_index,
+                    )
+
+        # Lexical matching still scans catalogue metadata, not catalogue
+        # vectors. When a lexical candidate is outside Qdrant's top-k, fetch
+        # only that concept's stored vector so the existing confidence formula
+        # receives a semantic score.
+        lexical_concept_ids: list[str] = []
+
+        for concept in CS_CONCEPTS:
+            if concept.concept_id in scores:
+                continue
+
+            keyword = self._keyword_evidence(
+                concept=concept,
+                sentences=sentences,
+                full_text=full_text,
+            )
+
+            if keyword.score > 0.0:
+                lexical_concept_ids.append(concept.concept_id)
+
+        stored_vectors = self._qdrant_store.retrieve_concept_vectors(
+            lexical_concept_ids
+        )
+
+        for concept_id, concept_vector in stored_vectors.items():
+            similarities = unit_embeddings @ concept_vector
+            best_unit_index = int(np.argmax(similarities))
+
+            scores[concept_id] = (
+                float(similarities[best_unit_index]),
+                best_unit_index,
+            )
+
+        return scores
 
     @staticmethod
     def _split_sentences(text: str) -> list[str]:
@@ -388,10 +495,44 @@ class TopicCandidateExtractor:
                 total_hits=0,
                 excluded_hits=excluded_hits,
                 single_word_alias_only=False,
+                ambiguous_alias_only=False,
+                matched_context_terms=[],
+                matched_conflicting_context_terms=[],
+                minimum_context_hits=concept.minimum_context_hits,
             )
 
         evidence = self._unique_strings(evidence)
         matched_aliases = self._unique_strings(matched_aliases)
+
+        normalized_ambiguous_aliases = {
+            self._normalize_for_match(alias)
+            for alias in concept.ambiguous_aliases
+            if self._normalize_for_match(alias)
+        }
+
+        normalized_matched_aliases = {
+            self._normalize_for_match(alias)
+            for alias in matched_aliases
+            if self._normalize_for_match(alias)
+        }
+
+        ambiguous_alias_only = bool(
+            normalized_matched_aliases
+            and normalized_matched_aliases.issubset(
+                normalized_ambiguous_aliases
+            )
+        )
+
+        matched_context_terms = self._matched_context_terms(
+            full_text=full_text,
+            context_terms=concept.supporting_context_terms,
+            excluded_phrases=concept.excluded_phrases,
+        )
+        matched_conflicting_context_terms = self._matched_context_terms(
+            full_text=full_text,
+            context_terms=concept.conflicting_context_terms,
+            excluded_phrases=concept.excluded_phrases,
+        )
 
         strongest_alias = max(alias_weights)
         distinct_bonus = 0.08 * max(0, len(matched_aliases) - 1)
@@ -415,7 +556,55 @@ class TopicCandidateExtractor:
             single_word_alias_only=all(
                 word_count == 1 for word_count in matched_word_counts
             ),
+            ambiguous_alias_only=ambiguous_alias_only,
+            matched_context_terms=matched_context_terms,
+            matched_conflicting_context_terms=(
+                matched_conflicting_context_terms
+            ),
+            minimum_context_hits=concept.minimum_context_hits,
         )
+
+    @classmethod
+    def _matched_context_terms(
+        cls,
+        full_text: str,
+        context_terms: tuple[str, ...],
+        excluded_phrases: tuple[str, ...],
+    ) -> list[str]:
+        """
+        Return catalogue-provided context terms found outside blocked phrases.
+
+        A context term cannot confirm an ambiguous alias when its occurrence
+        exists only inside a known confusable compound phrase.
+        """
+
+        normalized_text = cls._normalize_for_match(full_text)
+        blocked_ranges = cls._excluded_ranges(
+            text=normalized_text,
+            excluded_phrases=excluded_phrases,
+        )
+
+        matched: list[str] = []
+
+        for term in context_terms:
+            normalized_term = cls._normalize_for_match(term)
+            if not normalized_term:
+                continue
+
+            pattern = re.compile(
+                r"(?<!\w)"
+                + re.escape(normalized_term).replace(r"\ ", r"\s+")
+                + r"(?!\w)",
+                re.IGNORECASE,
+            )
+
+            if any(
+                not cls._overlaps_any(match.span(), blocked_ranges)
+                for match in pattern.finditer(normalized_text)
+            ):
+                matched.append(term)
+
+        return cls._unique_strings(matched)
 
     @classmethod
     def _excluded_ranges(
@@ -469,6 +658,17 @@ class TopicCandidateExtractor:
         keyword: KeywordEvidence,
         semantic_score: float,
     ) -> bool:
+        # Ambiguous aliases are stricter than ordinary single-word aliases.
+        # They must be confirmed by catalogue-provided contextual language.
+        # This is generic and applies to any future ambiguous catalogue term.
+        if keyword.ambiguous_alias_only:
+            return (
+                semantic_score
+                >= self.config.ambiguous_alias_semantic_floor
+                and len(keyword.matched_context_terms)
+                >= self.config.ambiguous_alias_min_context_terms
+            )
+
         if not keyword.single_word_alias_only:
             return True
 

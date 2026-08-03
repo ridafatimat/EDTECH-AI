@@ -13,6 +13,7 @@ from app.schemas.topic import (
 from app.services.cs_relevance_filter import CSRelevanceFilter
 from app.services.cs_unmapped_detector import CSUnmappedDetector
 from app.services.topic_candidate_extractor import TopicCandidateExtractor
+from app.services.evidence_quality_evaluator import EvidenceQualityEvaluator
 from app.services.topic_merger import TopicMerger
 
 
@@ -29,11 +30,17 @@ class Module3PipelineConfig:
     strong_unmapped_semantic_score: float = 0.82
     ambiguous_signal_margin: float = 0.04
 
+    # Rejected candidates may still provide continuation evidence for a
+    # concept already established in the immediately preceding discussion.
+    # They are never allowed to create a new topic instance.
+    continuation_support_floor: float = 0.50
+
     def __post_init__(self) -> None:
         for field_name in (
             "strong_unmapped_lexical_score",
             "strong_unmapped_semantic_score",
             "ambiguous_signal_margin",
+            "continuation_support_floor",
         ):
             value = getattr(self, field_name)
             if not 0.0 <= value <= 1.0:
@@ -49,9 +56,10 @@ class Module3TopicPipeline:
     Module 2 chunks
         → official AQA candidate extraction
         → salience-aware filtering
+        → evidence-quality and recap evaluation
         → continuation/no-new-topic handling
         → unmapped CS detection
-        → official topic merging
+        → official topic merging and lesson-relative role assignment
     """
 
     def __init__(
@@ -59,12 +67,17 @@ class Module3TopicPipeline:
         extractor: TopicCandidateExtractor | None = None,
         relevance_filter: CSRelevanceFilter | None = None,
         unmapped_detector: CSUnmappedDetector | None = None,
+        evidence_evaluator: EvidenceQualityEvaluator | None = None,
         merger: TopicMerger | None = None,
         config: Module3PipelineConfig | None = None,
     ) -> None:
         self.extractor = extractor or TopicCandidateExtractor()
         self.relevance_filter = relevance_filter or CSRelevanceFilter()
         self.unmapped_detector = unmapped_detector or CSUnmappedDetector()
+        self.evidence_evaluator = (
+            evidence_evaluator
+            or EvidenceQualityEvaluator()
+        )
         self.merger = merger or TopicMerger()
         self.config = config or Module3PipelineConfig()
 
@@ -104,6 +117,45 @@ class Module3TopicPipeline:
                 candidates=raw_candidates,
             )
 
+            quality_result = self.evidence_evaluator.evaluate(
+                text=text,
+                candidates=base_result.topic_candidates,
+            )
+
+            combined_rejected = (
+                list(base_result.rejected_candidates)
+                + quality_result.rejected
+            )
+
+            retained = quality_result.retained
+
+            adjusted_score = (
+                max(
+                    candidate.cs_relevance_score
+                    for candidate in retained
+                )
+                if retained
+                else 0.0
+            )
+
+            quality_notes = list(base_result.notes)
+            if quality_result.rejected:
+                quality_notes.append(
+                    f"Evidence-quality evaluation rejected "
+                    f"{len(quality_result.rejected)} candidate(s)."
+                )
+
+            base_result = base_result.model_copy(
+                update={
+                    "topic_candidates": retained,
+                    "rejected_candidates": combined_rejected,
+                    "is_cs_relevant": bool(retained),
+                    "creates_new_topic": bool(retained),
+                    "cs_relevance_score": round(adjusted_score, 4),
+                    "notes": quality_notes,
+                }
+            )
+
             previous_result = chunk_results[-1] if chunk_results else None
 
             # A chunk created with overlap immediately after a retained CS
@@ -129,13 +181,54 @@ class Module3TopicPipeline:
             )
 
             if continuation_only:
+                continuation_candidates = list(
+                    base_result.topic_candidates
+                )
+
+                if not continuation_candidates:
+                    continuation_candidates = [
+                        candidate.model_copy(
+                            update={
+                                "cs_relevant": True,
+                                "evidence_quality_notes": [
+                                    *candidate.evidence_quality_notes,
+                                    (
+                                        "Retained only as continuation "
+                                        "evidence for an already established "
+                                        "topic; it cannot create a new topic."
+                                    ),
+                                ],
+                            }
+                        )
+                        for candidate in combined_rejected
+                        if (
+                            candidate.concept_id in previous_topic_ids
+                            and candidate.cs_relevance_score
+                            >= self.config.continuation_support_floor
+                            and not candidate.recap_evidence_only
+                            and not candidate.comparison_evidence_only
+                            and not candidate.context_collision
+                        )
+                    ]
+
+                continuation_score = (
+                    max(
+                        candidate.cs_relevance_score
+                        for candidate in continuation_candidates
+                    )
+                    if continuation_candidates
+                    else 0.0
+                )
+
                 final_result = base_result.model_copy(
                     update={
                         "classification": "continuation_no_new_topic",
                         "is_cs_relevant": False,
                         "creates_new_topic": False,
-                        "cs_relevance_score": 0.0,
-                        "topic_candidates": [],
+                        "cs_relevance_score": round(
+                            continuation_score, 4
+                        ),
+                        "topic_candidates": continuation_candidates,
                         "has_unmapped_cs_content": False,
                         "unmapped_cs_signals": [],
                         "continuation_of_chunk_id": (
@@ -144,8 +237,12 @@ class Module3TopicPipeline:
                         ),
                         "requires_llm_fallback": False,
                         "notes": [
-                            "No new standalone topic was detected; the chunk "
-                            "continues the previous overlapped discussion."
+                            (
+                                "No new standalone topic was detected; the "
+                                "chunk continues the previous overlapped "
+                                "discussion. Matching evidence is preserved "
+                                "for lesson-level merging."
+                            )
                         ],
                     }
                 )

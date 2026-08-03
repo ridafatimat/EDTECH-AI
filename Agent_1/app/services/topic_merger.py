@@ -10,8 +10,22 @@ from app.schemas.topic import ChunkTopicResult, MergedTopic, TopicCandidate
 @dataclass(frozen=True)
 class TopicMergeConfig:
     """
-    Merge repeated official topics and rank lesson topics without allowing
-    repeated low-semantic keyword matches to dominate the final order.
+    Merge repeated official topics and rank their importance in the lesson.
+
+    Score responsibilities are deliberately separate:
+
+    confidence:
+        certainty that a topic exists;
+
+    coverage:
+        breadth of the lesson containing the topic;
+
+    ranking:
+        estimated lesson importance;
+
+    topic role:
+        relative primary/supporting classification based mainly on coverage
+        and ranking, never confidence alone.
     """
 
     max_evidence_per_topic: int = 5
@@ -21,17 +35,48 @@ class TopicMergeConfig:
     maximum_support_bonus: float = 0.06
     maximum_merged_confidence: float = 0.95
 
-    # Ranking combines independent signals. These weights do not change the
-    # candidate acceptance threshold; they only order already-retained topics.
-    ranking_confidence_weight: float = 0.30
-    ranking_semantic_weight: float = 0.30
-    ranking_salience_weight: float = 0.25
-    ranking_coverage_weight: float = 0.15
+    # Coverage is weighted most strongly because primary/supporting is about
+    # lesson importance, not merely certainty that a topic was mentioned.
+    ranking_confidence_weight: float = 0.20
+    ranking_semantic_weight: float = 0.20
+    ranking_salience_weight: float = 0.20
+    ranking_coverage_weight: float = 0.40
 
-    primary_min_semantic_score: float = 0.32
-    primary_min_salience_score: float = 0.45
-    primary_min_ranking_score: float = 0.48
-    primary_min_coverage_score: float = 0.25
+    # Relative promotion rules.
+    minimum_primary_coverage: float = 0.35
+    dominant_coverage_ratio: float = 0.75
+    primary_ranking_margin: float = 0.12
+    minimum_primary_ranking_score: float = 0.42
+
+    def __post_init__(self) -> None:
+        weights = (
+            self.ranking_confidence_weight,
+            self.ranking_semantic_weight,
+            self.ranking_salience_weight,
+            self.ranking_coverage_weight,
+        )
+
+        if abs(sum(weights) - 1.0) > 1e-9:
+            raise ValueError(
+                "Ranking weights must sum to 1.0."
+            )
+
+        probability_fields = (
+            "non_adjacent_span_bonus",
+            "maximum_support_bonus",
+            "maximum_merged_confidence",
+            "minimum_primary_coverage",
+            "dominant_coverage_ratio",
+            "primary_ranking_margin",
+            "minimum_primary_ranking_score",
+        )
+
+        for field_name in probability_fields:
+            value = getattr(self, field_name)
+            if not 0.0 <= value <= 1.0:
+                raise ValueError(
+                    f"{field_name} must be between 0 and 1."
+                )
 
 
 class TopicMerger:
@@ -40,6 +85,10 @@ class TopicMerger:
 
     Consecutive chunk IDs are one support span because they may come from one
     long discussion split by Module 2's size guardrail.
+
+    Roles are assigned only after every merged topic has been scored, allowing
+    primary/supporting decisions to be lesson-relative rather than based on
+    independent absolute thresholds.
     """
 
     def __init__(self, config: TopicMergeConfig | None = None) -> None:
@@ -69,7 +118,7 @@ class TopicMerger:
                     (chunk_result.chunk_id, candidate)
                 )
 
-        merged_topics: list[MergedTopic] = []
+        provisional_topics: list[MergedTopic] = []
 
         for concept_id, occurrences in grouped.items():
             first_candidate = occurrences[0][1]
@@ -122,20 +171,11 @@ class TopicMerger:
                 coverage_score=coverage_score,
             )
 
-            topic_role = self._topic_role(
-                ranking_score=ranking_score,
-                mean_semantic_score=mean_semantic_score,
-                mean_salience_score=mean_salience_score,
-                coverage_score=coverage_score,
-                support_span_count=support_span_count,
-                supporting_candidate_count=len(occurrences),
-            )
-
             evidence: list[str] = []
             for _, candidate in occurrences:
                 evidence.extend(candidate.evidence)
 
-            merged_topics.append(
+            provisional_topics.append(
                 MergedTopic(
                     concept_id=concept_id,
                     topic=first_candidate.topic,
@@ -147,7 +187,7 @@ class TopicMerger:
                     source_pages=first_candidate.source_pages,
                     confidence=round(confidence, 4),
                     ranking_score=round(ranking_score, 4),
-                    topic_role=topic_role,
+                    topic_role="supporting",
                     source_chunk_ids=source_chunk_ids,
                     support_span_count=support_span_count,
                     mean_semantic_score=round(mean_semantic_score, 4),
@@ -161,6 +201,10 @@ class TopicMerger:
                 )
             )
 
+        merged_topics = self._assign_relative_roles(
+            provisional_topics
+        )
+
         role_priority = {
             "primary": 1,
             "supporting": 0,
@@ -170,6 +214,7 @@ class TopicMerger:
             key=lambda topic: (
                 role_priority[topic.topic_role],
                 topic.ranking_score,
+                topic.coverage_score,
                 topic.mean_semantic_score,
                 topic.confidence,
             ),
@@ -199,32 +244,87 @@ class TopicMerger:
 
         return max(0.0, min(1.0, score))
 
-    def _topic_role(
+    def _assign_relative_roles(
         self,
-        ranking_score: float,
-        mean_semantic_score: float,
-        mean_salience_score: float,
-        coverage_score: float,
-        support_span_count: int,
-        supporting_candidate_count: int,
-    ) -> str:
-        has_broad_lesson_support = any(
-            (
-                coverage_score >= self.config.primary_min_coverage_score,
-                support_span_count >= 2,
-                supporting_candidate_count >= 3,
-            )
+        topics: list[MergedTopic],
+    ) -> list[MergedTopic]:
+        if not topics:
+            return []
+
+        max_ranking = max(
+            topic.ranking_score
+            for topic in topics
+        )
+        max_coverage = max(
+            topic.coverage_score
+            for topic in topics
         )
 
-        if (
-            ranking_score >= self.config.primary_min_ranking_score
-            and mean_semantic_score >= self.config.primary_min_semantic_score
-            and mean_salience_score >= self.config.primary_min_salience_score
-            and has_broad_lesson_support
-        ):
-            return "primary"
+        dominant_coverage_threshold = max(
+            self.config.minimum_primary_coverage,
+            max_coverage
+            * self.config.dominant_coverage_ratio,
+        )
 
-        return "supporting"
+        ranking_threshold = max(
+            self.config.minimum_primary_ranking_score,
+            max_ranking
+            - self.config.primary_ranking_margin,
+        )
+
+        promoted: list[MergedTopic] = []
+
+        for topic in topics:
+            is_primary = (
+                topic.coverage_score
+                >= dominant_coverage_threshold
+                and topic.ranking_score
+                >= ranking_threshold
+            )
+
+            promoted.append(
+                topic.model_copy(
+                    update={
+                        "topic_role": (
+                            "primary"
+                            if is_primary
+                            else "supporting"
+                        )
+                    }
+                )
+            )
+
+        # A lesson with valid official topics should always have at least one
+        # primary topic. This fallback chooses the strongest lesson-relative
+        # topic, preferring ranking and coverage over raw confidence.
+        if not any(
+            topic.topic_role == "primary"
+            for topic in promoted
+        ):
+            best_topic = max(
+                promoted,
+                key=lambda topic: (
+                    topic.ranking_score,
+                    topic.coverage_score,
+                    topic.mean_salience_score,
+                    topic.mean_semantic_score,
+                ),
+            )
+
+            promoted = [
+                (
+                    topic.model_copy(
+                        update={
+                            "topic_role": "primary"
+                        }
+                    )
+                    if topic.concept_id == best_topic.concept_id
+                    else topic
+                )
+                for topic in promoted
+            ]
+
+        return promoted
 
     @staticmethod
     def _count_contiguous_spans(chunk_ids: list[int]) -> int:

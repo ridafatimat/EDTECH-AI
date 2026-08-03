@@ -177,6 +177,256 @@ LONG_TOKEN_PATTERN = re.compile(
 )
 
 
+
+
+# =========================================================
+# DOCUMENT METADATA
+# =========================================================
+
+# Metadata removal is deliberately conservative. A line is removed only when
+# it has strong document-level signals. Ordinary lesson introductions such as
+# "Today we are learning linear search" do not match these patterns.
+PAGE_METADATA_PATTERN = re.compile(
+    r"""
+    ^\s*(?:
+        page\s+\d+(?:\s+of\s+\d+)?
+        | \d+\s*/\s*\d+
+    )\s*$
+    """,
+    re.IGNORECASE | re.VERBOSE,
+)
+
+DOCUMENT_FIELD_PATTERN = re.compile(
+    r"""
+    ^\s*(?:
+        title
+        | document(?:\s+title)?
+        | file(?:\s*name)?
+        | source(?:\s+file)?
+        | recording(?:\s+title)?
+        | session(?:\s+title)?
+        | lesson\s+title
+    )\s*[:\-]\s*.+$
+    """,
+    re.IGNORECASE | re.VERBOSE,
+)
+
+TRANSCRIPT_HEADING_PATTERN = re.compile(
+    r"""
+    ^\s*(?:
+        transcript
+        | lesson\s+transcript
+        | class\s+transcript
+        | meeting\s+transcript
+        | raw\s+transcript
+        | cleaned\s+transcript
+    )
+    (?:\s+(?:test|sample|recording|number|no\.?|\#)?\s*\d*)?
+    (?:\s*[-:–—].*)?
+    \s*$
+    """,
+    re.IGNORECASE | re.VERBOSE,
+)
+
+SYNTHETIC_TEST_METADATA_PATTERN = re.compile(
+    r"""
+    ^\s*.*\b(?:
+        synthetic\s+(?:raw\s+)?(?:lesson\s+)?transcript
+        | test\s+transcript
+        | sample\s+transcript
+    )\b.*\b(?:
+        test(?:ing)?
+        | module\s*\d+
+        | edtech
+        | benchmark
+        | regression
+    )\b.*$
+    """,
+    re.IGNORECASE | re.VERBOSE,
+)
+
+DECORATIVE_METADATA_PATTERN = re.compile(
+    r"^\s*[-=_*]{3,}\s*$"
+)
+
+
+def _normalise_metadata_text(text: str) -> str:
+    """Normalize a heading or filename for conservative comparison."""
+
+    text = re.sub(
+        r"\.(?:docx?|pdf|txt|rtf)$",
+        "",
+        text.strip(),
+        flags=re.IGNORECASE,
+    )
+    text = re.sub(
+        r"[^a-z0-9]+",
+        " ",
+        text.lower(),
+    )
+    return re.sub(
+        r"\s+",
+        " ",
+        text,
+    ).strip()
+
+
+def _source_name_matches_line(
+    line: str,
+    source_name: str | None,
+) -> bool:
+    """
+    Return True only when a short line strongly matches the source filename.
+
+    This prevents a filename such as
+    ``Transcript_Test_3_Algorithms_Programming_Stress.docx`` from becoming
+    lesson evidence while avoiding broad topic-word deletion.
+    """
+
+    if not source_name:
+        return False
+
+    line_normalized = _normalise_metadata_text(line)
+    source_normalized = _normalise_metadata_text(source_name)
+
+    if not line_normalized or not source_normalized:
+        return False
+
+    if len(line_normalized) > 180:
+        return False
+
+    if line_normalized == source_normalized:
+        return True
+
+    line_tokens = set(line_normalized.split())
+    source_tokens = set(source_normalized.split())
+
+    if not line_tokens or not source_tokens:
+        return False
+
+    overlap = len(line_tokens & source_tokens)
+    coverage_of_line = overlap / len(line_tokens)
+    coverage_of_source = overlap / len(source_tokens)
+
+    return (
+        overlap >= 3
+        and coverage_of_line >= 0.85
+        and coverage_of_source >= 0.75
+    )
+
+
+def _is_strong_metadata_line(
+    line: str,
+    source_name: str | None,
+) -> bool:
+    """Classify only high-confidence document metadata."""
+
+    stripped = line.strip()
+
+    if not stripped:
+        return False
+
+    return any(
+        (
+            _source_name_matches_line(
+                stripped,
+                source_name,
+            ),
+            PAGE_METADATA_PATTERN.fullmatch(stripped) is not None,
+            DOCUMENT_FIELD_PATTERN.fullmatch(stripped) is not None,
+            TRANSCRIPT_HEADING_PATTERN.fullmatch(stripped) is not None,
+            SYNTHETIC_TEST_METADATA_PATTERN.fullmatch(stripped) is not None,
+            DECORATIVE_METADATA_PATTERN.fullmatch(stripped) is not None,
+        )
+    )
+
+
+def remove_document_metadata(
+    text: str,
+    source_name: str | None = None,
+    leading_non_empty_limit: int = 12,
+) -> tuple[str, list[str]]:
+    """
+    Remove high-confidence document metadata before transcript cleaning.
+
+    Rules:
+        * filename/title-like lines are removed near the document start;
+        * page markers and exact source-name headers are removed anywhere;
+        * repeated strong document headers are removed anywhere;
+        * normal lesson sentences are preserved.
+
+    The removed lines are returned for the preprocessing audit.
+    """
+
+    lines = text.splitlines()
+    normalized_counts: dict[str, int] = {}
+
+    for line in lines:
+        normalized = _normalise_metadata_text(line)
+        if normalized:
+            normalized_counts[normalized] = (
+                normalized_counts.get(normalized, 0) + 1
+            )
+
+    kept_lines: list[str] = []
+    removed_lines: list[str] = []
+    non_empty_seen = 0
+
+    for line in lines:
+        stripped = line.strip()
+
+        if stripped:
+            non_empty_seen += 1
+
+        normalized = _normalise_metadata_text(stripped)
+        is_leading = (
+            non_empty_seen <= leading_non_empty_limit
+        )
+
+        source_match = _source_name_matches_line(
+            stripped,
+            source_name,
+        )
+        page_marker = (
+            PAGE_METADATA_PATTERN.fullmatch(stripped)
+            is not None
+        )
+        repeated_strong_header = (
+            bool(normalized)
+            and normalized_counts.get(normalized, 0) >= 2
+            and _is_strong_metadata_line(
+                stripped,
+                source_name,
+            )
+        )
+
+        should_remove = (
+            (is_leading and _is_strong_metadata_line(
+                stripped,
+                source_name,
+            ))
+            or source_match
+            or page_marker
+            or repeated_strong_header
+        )
+
+        if should_remove:
+            if stripped:
+                removed_lines.append(stripped)
+            continue
+
+        kept_lines.append(line)
+
+    # Remove blank lines left only because a leading metadata block vanished.
+    while kept_lines and not kept_lines[0].strip():
+        kept_lines.pop(0)
+
+    return (
+        "\n".join(kept_lines),
+        removed_lines,
+    )
+
+
 # =========================================================
 # BASIC CLEANING
 # =========================================================
@@ -530,6 +780,7 @@ def collect_warnings(
 
 def preprocess_transcript(
     raw_text: str,
+    source_name: str | None = None,
 ) -> PreprocessingResult:
     """
     Lightweight deterministic transcript preprocessing.
@@ -538,16 +789,17 @@ def preprocess_transcript(
 
     Steps:
         1. Validate input
-        2. Remove combined speaker + timestamp prefixes
-        3. Remove standalone timestamps
-        4. Remove standalone speaker labels
-        5. Remove obvious non-verbal artefacts
-        6. Remove uncertainty markers
-        7. Remove safe fillers
-        8. Compress repeated words
-        9. Compress repeated sentences
-        10. Normalize whitespace
-        11. Return cleaned transcript for semantic chunking
+        2. Remove high-confidence document metadata
+        3. Remove combined speaker + timestamp prefixes
+        4. Remove standalone timestamps
+        5. Remove standalone speaker labels
+        6. Remove obvious non-verbal artefacts
+        7. Remove uncertainty markers
+        8. Remove safe fillers
+        9. Compress repeated words
+        10. Compress repeated sentences
+        11. Normalize whitespace
+        12. Return cleaned transcript for semantic chunking
     """
 
     if not raw_text or not raw_text.strip():
@@ -560,6 +812,18 @@ def preprocess_transcript(
         raw_text
     )
 
+    # Metadata must be removed before speaker/timestamp processing so that
+    # document titles can never become lesson evidence downstream.
+    text, removed_metadata_lines = remove_document_metadata(
+        raw_text,
+        source_name=source_name,
+    )
+
+    metadata_characters_removed = sum(
+        len(line)
+        for line in removed_metadata_lines
+    )
+
     timestamps_removed = 0
     speaker_labels_removed = 0
 
@@ -569,7 +833,7 @@ def preprocess_transcript(
     # LINE-LEVEL CLEANING
     # =====================================================
 
-    for line in raw_text.splitlines():
+    for line in text.splitlines():
 
         # First handle formats such as:
         # Teacher - 16:00:01:
@@ -667,38 +931,20 @@ def preprocess_transcript(
     stats = PreprocessingStats(
         original_characters=original_characters,
         cleaned_characters=len(text),
-
-        timestamps_removed=(
-            timestamps_removed
-        ),
-
-        speaker_labels_removed=(
-            speaker_labels_removed
-        ),
-
-        fillers_removed=(
-            fillers_removed
-        ),
-
-        artefacts_removed=(
-            artefacts_removed
-        ),
-
-        uncertainty_markers_removed=(
-            uncertainty_markers_removed
-        ),
-
-        repeated_words_removed=(
-            repeated_words_removed
-        ),
-
-        repeated_sentences_removed=(
-            repeated_sentences_removed
-        ),
+        timestamps_removed=timestamps_removed,
+        speaker_labels_removed=speaker_labels_removed,
+        fillers_removed=fillers_removed,
+        artefacts_removed=artefacts_removed,
+        uncertainty_markers_removed=uncertainty_markers_removed,
+        repeated_words_removed=repeated_words_removed,
+        repeated_sentences_removed=repeated_sentences_removed,
+        metadata_lines_removed=len(removed_metadata_lines),
+        metadata_characters_removed=metadata_characters_removed,
     )
 
     return PreprocessingResult(
         cleaned_text=text,
         warnings=warnings,
+        removed_metadata_lines=removed_metadata_lines,
         stats=stats,
     )

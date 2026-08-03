@@ -42,6 +42,12 @@ class SemanticChunkingConfig:
     strong_transition_min_words: int = 80
     semantic_unit_words: int = 60
 
+    # Raw YouTube/ASR captions often contain almost no punctuation.
+    # Any punctuation-delimited span longer than this limit is split using
+    # conservative discourse/clause boundaries, then by a hard word window.
+    max_sentence_words: int = 42
+    sentence_split_search_window: int = 12
+
     boundary_percentile: float = 15.0
     threshold_floor: float = 0.10
     threshold_ceiling: float = 0.45
@@ -74,6 +80,21 @@ class SemanticChunkingConfig:
         if self.semantic_unit_words <= 0:
             raise ValueError(
                 "semantic_unit_words must be positive."
+            )
+
+        if self.max_sentence_words < 15:
+            raise ValueError(
+                "max_sentence_words must be at least 15."
+            )
+
+        if not (
+            1
+            <= self.sentence_split_search_window
+            < self.max_sentence_words
+        ):
+            raise ValueError(
+                "sentence_split_search_window must be positive and smaller "
+                "than max_sentence_words."
             )
 
         if not 0 <= self.boundary_percentile <= 100:
@@ -383,44 +404,160 @@ class SemanticChunker:
     # Sentence preparation
     # -----------------------------------------------------------------
 
-    @staticmethod
     def _split_sentences(
+        self,
         text: str,
     ) -> list[str]:
         """
-        Lightweight sentence segmentation.
+        Segment ordinary prose and punctuation-poor ASR/YouTube captions.
 
-        A period inside `array.length` is not split because there is no
+        Normal punctuated sentences are preserved. Newlines are treated as
+        weak boundaries before they are collapsed. Any remaining span that
+        is too long is split near a conservative discourse/clause marker.
+        When no suitable marker exists, a hard word-window split guarantees
+        that one malformed caption block cannot become a 1,000-word
+        sentence or semantic unit.
+
+        A period inside ``array.length`` is not split because there is no
         whitespace after that period.
         """
 
-        text = text.replace(
-            "\r",
-            "\n",
-        )
+        text = text.replace("\r\n", "\n").replace("\r", "\n")
+        text = re.sub(r"[ \t]+", " ", text)
 
-        text = re.sub(
-            r"[ \t]+",
-            " ",
-            text,
-        )
+        # Preserve meaningful line boundaries from transcripts while
+        # ignoring blank-line noise. A line can still contain several
+        # ordinary punctuated sentences.
+        lines = [
+            line.strip()
+            for line in re.split(r"\n+", text)
+            if line.strip()
+        ]
 
-        text = re.sub(
-            r"\s*\n+\s*",
-            " ",
-            text,
-        )
+        initial_parts: list[str] = []
 
-        parts = re.split(
-            r"(?<=[.!?])\s+",
-            text.strip(),
-        )
+        for line in lines or [text.strip()]:
+            initial_parts.extend(
+                part.strip()
+                for part in re.split(
+                    r"(?<=[.!?])\s+",
+                    line,
+                )
+                if part.strip()
+            )
+
+        sentences: list[str] = []
+
+        for part in initial_parts:
+            sentences.extend(
+                self._split_overlong_sentence(part)
+            )
 
         return [
-            part.strip()
-            for part in parts
-            if part.strip()
+            sentence
+            for sentence in sentences
+            if sentence
         ]
+
+    def _split_overlong_sentence(
+        self,
+        sentence: str,
+    ) -> list[str]:
+        """Split a punctuation-poor span into bounded sentence-like units."""
+
+        words = sentence.split()
+
+        if len(words) <= self.config.max_sentence_words:
+            return [sentence.strip()]
+
+        result: list[str] = []
+        start = 0
+
+        while start < len(words):
+            remaining = len(words) - start
+
+            if remaining <= self.config.max_sentence_words:
+                result.append(" ".join(words[start:]).strip())
+                break
+
+            target_end = start + self.config.max_sentence_words
+            search_start = max(
+                start + 12,
+                target_end - self.config.sentence_split_search_window,
+            )
+            # Never search beyond target_end. Otherwise choosing a
+            # discourse marker after the hard limit can create a sentence
+            # longer than max_sentence_words.
+            search_end = min(
+                len(words) - 1,
+                target_end,
+            )
+
+            split_at: int | None = None
+
+            # Prefer boundaries before common spoken-discourse markers.
+            # Search backwards so the resulting unit stays near the target.
+            for index in range(search_end, search_start - 1, -1):
+                token = re.sub(
+                    r"^[^a-z0-9]+|[^a-z0-9]+$",
+                    "",
+                    words[index].lower(),
+                )
+
+                previous = (
+                    re.sub(
+                        r"^[^a-z0-9]+|[^a-z0-9]+$",
+                        "",
+                        words[index - 1].lower(),
+                    )
+                    if index > start
+                    else ""
+                )
+
+                two_word_marker = f"{previous} {token}".strip()
+
+                if (
+                    token in {
+                        "but",
+                        "however",
+                        "whereas",
+                        "therefore",
+                        "because",
+                        "although",
+                        "though",
+                        "meanwhile",
+                        "finally",
+                        "next",
+                        "now",
+                        "so",
+                        "if",
+                        "when",
+                        "while",
+                        "then",
+                    }
+                    or two_word_marker in {
+                        "for example",
+                        "for instance",
+                        "on the",
+                        "in this",
+                        "we can",
+                        "we have",
+                        "we now",
+                        "let us",
+                    }
+                ):
+                    split_at = index
+                    break
+
+            if split_at is None or split_at <= start:
+                split_at = target_end
+
+            result.append(
+                " ".join(words[start:split_at]).strip()
+            )
+            start = split_at
+
+        return result
 
     # -----------------------------------------------------------------
     # Transition detection

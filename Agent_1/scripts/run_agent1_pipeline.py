@@ -332,6 +332,75 @@ def save_topics_readable(
     topic_payload: dict[str, Any],
     output_path: Path,
 ) -> None:
+    """
+    Save the complete human-readable Module 3 report.
+
+    The final lesson-level result is grouped into primary, supporting,
+    and unmapped/extended topics. Chunk-level evidence is retained for
+    debugging and evaluation.
+    """
+
+    chunk_results = topic_payload.get(
+        "chunk_results",
+        [],
+    )
+
+    merged_topics = topic_payload.get(
+        "merged_topics",
+        [],
+    )
+
+    primary_topics = [
+        topic
+        for topic in merged_topics
+        if topic.get("topic_role") == "primary"
+    ]
+
+    supporting_topics = [
+        topic
+        for topic in merged_topics
+        if topic.get("topic_role") == "supporting"
+    ]
+
+    # Preserve first-seen order while removing duplicate rough topics.
+    unmapped_topics: list[dict[str, Any]] = []
+    seen_unmapped: set[str] = set()
+
+    for chunk_result in chunk_results:
+        for signal in chunk_result.get(
+            "unmapped_cs_signals",
+            [],
+        ):
+            rough_topic = str(
+                signal.get(
+                    "rough_topic",
+                    signal.get("domain", "Unmapped CS topic"),
+                )
+            ).strip()
+
+            key = rough_topic.casefold()
+
+            if not rough_topic or key in seen_unmapped:
+                continue
+
+            seen_unmapped.add(key)
+            unmapped_topics.append(signal)
+
+    classification_counts: dict[str, int] = {}
+
+    for chunk_result in chunk_results:
+        classification = str(
+            chunk_result.get(
+                "classification",
+                "unknown",
+            )
+        )
+
+        classification_counts[classification] = (
+            classification_counts.get(classification, 0)
+            + 1
+        )
+
     lines: list[str] = [
         "=" * 100,
         "AGENT 1 — MODULE 3 ROUGH TOPIC EXTRACTION",
@@ -340,6 +409,10 @@ def save_topics_readable(
         (
             "Embedding model: "
             f"{topic_payload.get('embedding_model')}"
+        ),
+        (
+            "Candidate keep threshold: "
+            f"{topic_payload.get('candidate_keep_threshold')}"
         ),
         (
             "Total chunks: "
@@ -353,26 +426,292 @@ def save_topics_readable(
             "Non-CS/no-new-topic chunks: "
             f"{topic_payload.get('non_cs_chunks')}"
         ),
+        (
+            "Official-topic chunks: "
+            f"{classification_counts.get('official_aqa_topic', 0)}"
+        ),
+        (
+            "Mixed official + unmapped chunks: "
+            f"{classification_counts.get('mixed_official_and_unmapped', 0)}"
+        ),
+        (
+            "Unmapped-CS chunks: "
+            f"{classification_counts.get('cs_related_unmapped', 0)}"
+        ),
+        (
+            "Continuation/no-new-topic chunks: "
+            f"{classification_counts.get('continuation_no_new_topic', 0)}"
+        ),
+        (
+            "No-topic chunks: "
+            f"{classification_counts.get('no_topic', 0)}"
+        ),
+        (
+            "LLM fallback chunks: "
+            f"{topic_payload.get('llm_fallback_chunk_ids', [])}"
+        ),
         "",
-        "=" * 100,
-        "MERGED LESSON TOPICS",
-        "=" * 100,
     ]
 
-    merged_topics = topic_payload.get(
-        "merged_topics",
-        [],
+    for chunk_result in chunk_results:
+        lines.extend(
+            [
+                "=" * 100,
+                (
+                    "CHUNK "
+                    f"{chunk_result.get('chunk_id')}"
+                ),
+                "=" * 100,
+                (
+                    "Source words: "
+                    f"{chunk_result.get('source_word_count')}"
+                ),
+                (
+                    "Classification: "
+                    f"{chunk_result.get('classification')}"
+                ),
+                (
+                    "CS relevant: "
+                    f"{chunk_result.get('is_cs_relevant')}"
+                ),
+                (
+                    "Creates new topic: "
+                    f"{chunk_result.get('creates_new_topic')}"
+                ),
+                (
+                    "Chunk relevance score: "
+                    f"{chunk_result.get('cs_relevance_score')}"
+                ),
+                (
+                    "Requires LLM fallback: "
+                    f"{chunk_result.get('requires_llm_fallback')}"
+                ),
+            ]
+        )
+
+        notes = chunk_result.get(
+            "notes",
+            [],
+        )
+
+        if notes:
+            lines.append("Notes:")
+
+            for note in notes:
+                lines.append(
+                    f"- {note}"
+                )
+
+        lines.extend(
+            [
+                "",
+                "RETAINED TOPICS",
+                "-" * 100,
+            ]
+        )
+
+        candidates = chunk_result.get(
+            "topic_candidates",
+            [],
+        )
+
+        if not candidates:
+            lines.append("None")
+
+        for candidate in candidates:
+            lines.extend(
+                [
+                    (
+                        "- "
+                        f"{candidate.get('topic')}"
+                    ),
+                    (
+                        "  concept_id: "
+                        f"{candidate.get('concept_id')}"
+                    ),
+                    (
+                        "  domain: "
+                        f"{candidate.get('domain')}"
+                    ),
+                    (
+                        "  official reference: "
+                        f"{candidate.get('official_reference')}"
+                    ),
+                    (
+                        "  confidence: "
+                        f"{candidate.get('confidence')}"
+                    ),
+                    (
+                        "  salience score: "
+                        f"{candidate.get('salience_score')}"
+                    ),
+                    (
+                        "  keyword score: "
+                        f"{candidate.get('keyword_score')}"
+                    ),
+                    (
+                        "  semantic score: "
+                        f"{candidate.get('semantic_score')}"
+                    ),
+                    (
+                        "  method: "
+                        f"{candidate.get('match_method')}"
+                    ),
+                    (
+                        "  matched aliases: "
+                        f"{candidate.get('matched_aliases', [])}"
+                    ),
+                ]
+            )
+
+            evidence = candidate.get(
+                "evidence",
+                [],
+            )
+
+            if evidence:
+                lines.append("  evidence:")
+
+                for item in evidence:
+                    lines.append(
+                        f"    • {item}"
+                    )
+
+        chunk_unmapped = chunk_result.get(
+            "unmapped_cs_signals",
+            [],
+        )
+
+        if chunk_unmapped:
+            lines.extend(
+                [
+                    "",
+                    "UNMAPPED CS SIGNALS",
+                    "-" * 100,
+                ]
+            )
+
+            for signal in chunk_unmapped:
+                lines.extend(
+                    [
+                        (
+                            "- "
+                            f"{signal.get('rough_topic', signal.get('domain'))}"
+                        ),
+                        (
+                            "  domain: "
+                            f"{signal.get('domain')}"
+                        ),
+                        (
+                            "  score: "
+                            f"{signal.get('score')}"
+                        ),
+                        (
+                            "  method: "
+                            f"{signal.get('detection_method')}"
+                        ),
+                        (
+                            "  matched aliases: "
+                            f"{signal.get('matched_aliases', [])}"
+                        ),
+                        (
+                            "  evidence: "
+                            f"{signal.get('evidence')}"
+                        ),
+                    ]
+                )
+
+        rejected = chunk_result.get(
+            "rejected_candidates",
+            [],
+        )
+
+        if rejected:
+            lines.extend(
+                [
+                    "",
+                    "REJECTED / LOW-CONFIDENCE CANDIDATES",
+                    "-" * 100,
+                ]
+            )
+
+            for candidate in rejected:
+                lines.append(
+                    "- "
+                    f"{candidate.get('topic')}: "
+                    f"{candidate.get('cs_relevance_score')}"
+                )
+
+        lines.append("")
+
+    lines.extend(
+        [
+            "=" * 100,
+            "MERGED LESSON TOPICS",
+            "=" * 100,
+            "",
+            "PRIMARY TOPICS",
+            "-" * 100,
+        ]
+    )
+
+    if not primary_topics:
+        lines.append("None")
+    else:
+        for topic in primary_topics:
+            lines.append(
+                f"- {topic.get('topic')}"
+            )
+
+    lines.extend(
+        [
+            "",
+            "SUPPORTING TOPICS",
+            "-" * 100,
+        ]
+    )
+
+    if not supporting_topics:
+        lines.append("None")
+    else:
+        for topic in supporting_topics:
+            lines.append(
+                f"- {topic.get('topic')}"
+            )
+
+    lines.extend(
+        [
+            "",
+            "UNMAPPED / EXTENDED TOPICS",
+            "-" * 100,
+        ]
+    )
+
+    if not unmapped_topics:
+        lines.append("None")
+    else:
+        for signal in unmapped_topics:
+            lines.append(
+                "- "
+                f"{signal.get('rough_topic', signal.get('domain'))}"
+            )
+
+    lines.extend(
+        [
+            "",
+            "DETAILED MERGED OFFICIAL TOPICS",
+            "-" * 100,
+        ]
     )
 
     if not merged_topics:
         lines.append(
-            "No retained topics."
+            "No merged official AQA topics."
         )
 
     for topic in merged_topics:
         lines.extend(
             [
-                "",
                 (
                     "- "
                     f"{topic.get('topic')}"
@@ -401,76 +740,46 @@ def save_topics_readable(
                     "  source chunks: "
                     f"{topic.get('source_chunk_ids')}"
                 ),
-            ]
-        )
-
-    lines.extend(
-        [
-            "",
-            "=" * 100,
-            "CHUNK-BY-CHUNK RESULTS",
-            "=" * 100,
-        ]
-    )
-
-    for chunk_result in topic_payload.get(
-        "chunk_results",
-        [],
-    ):
-        lines.extend(
-            [
-                "",
-                "-" * 100,
                 (
-                    "CHUNK "
-                    f"{chunk_result.get('chunk_id')}"
+                    "  support spans: "
+                    f"{topic.get('support_span_count')}"
                 ),
                 (
-                    "Classification: "
-                    f"{chunk_result.get('classification')}"
+                    "  mean semantic score: "
+                    f"{topic.get('mean_semantic_score')}"
                 ),
                 (
-                    "CS relevant: "
-                    f"{chunk_result.get('is_cs_relevant')}"
+                    "  mean salience score: "
+                    f"{topic.get('mean_salience_score')}"
                 ),
                 (
-                    "Creates new topic: "
-                    f"{chunk_result.get('creates_new_topic')}"
+                    "  coverage score: "
+                    f"{topic.get('coverage_score')}"
                 ),
                 (
-                    "Requires LLM fallback: "
-                    f"{chunk_result.get('requires_llm_fallback')}"
+                    "  supporting candidates: "
+                    f"{topic.get('supporting_candidate_count')}"
                 ),
             ]
         )
 
-        candidates = chunk_result.get(
-            "topic_candidates",
+        evidence = topic.get(
+            "evidence",
             [],
         )
 
-        if not candidates:
-            lines.append(
-                "Retained topics: none"
-            )
-        else:
-            lines.append(
-                "Retained topics:"
-            )
+        if evidence:
+            lines.append("  evidence:")
 
-            for candidate in candidates:
+            for item in evidence:
                 lines.append(
-                    "  - "
-                    f"{candidate.get('topic')} "
-                    f"(confidence="
-                    f"{candidate.get('confidence')})"
+                    f"    • {item}"
                 )
 
     write_text(
         output_path,
         "\n".join(lines),
     )
-
 
 # ------------------------------------------------------------------
 # Manifest helpers
@@ -663,7 +972,8 @@ def run_pipeline(
 
         preprocessing_result = (
             preprocess_transcript(
-                raw_text=raw_text
+                raw_text=raw_text,
+                source_name=source_file.name,
             )
         )
 
