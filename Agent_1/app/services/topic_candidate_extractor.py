@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import re
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
@@ -9,9 +10,10 @@ import numpy as np
 from app.schemas.topic import RawTopicCandidate
 from app.services.cs_concept_catalog import CS_CONCEPTS, CSConcept
 from app.services.embedding_service import (
-    CHUNKING_EMBEDDING_MODEL,
+    TOPIC_EMBEDDING_MODEL,
     embed_texts,
 )
+from app.services.qdrant_syllabus_store import QdrantSyllabusStore
 
 
 EmbeddingFunction = Callable[[Sequence[str], str, int], np.ndarray]
@@ -56,7 +58,16 @@ class TopicExtractionConfig:
     duplicate_evidence_overlap: float = 0.80
     duplicate_alias_token_overlap: float = 0.50
 
-    embedding_model: str = CHUNKING_EMBEDDING_MODEL
+    # Module 3 uses the same MiniLM model used when indexing Qdrant.
+    embedding_model: str = TOPIC_EMBEDDING_MODEL
+
+
+    qdrant_top_k_per_unit: int = int(
+        os.getenv(
+            "QDRANT_TOP_K_PER_UNIT",
+            "20",
+        )
+    )
 
     def __post_init__(self) -> None:
         if self.semantic_unit_words <= 0:
@@ -84,6 +95,12 @@ class TopicExtractionConfig:
             )
 
 
+        if self.qdrant_top_k_per_unit < 1:
+            raise ValueError(
+                "qdrant_top_k_per_unit must be at least 1."
+            )
+
+
 @dataclass(frozen=True)
 class KeywordEvidence:
     score: float
@@ -104,7 +121,7 @@ class TopicCandidateExtractor:
 
     Evidence sources:
     - exact transcript-friendly catalogue aliases
-    - MiniLM semantic similarity
+    - Qdrant semantic retrieval using MiniLM embeddings
     - evidence repetition/diversity (topic salience)
     """
 
@@ -112,10 +129,15 @@ class TopicCandidateExtractor:
         self,
         config: TopicExtractionConfig | None = None,
         embedding_function: EmbeddingFunction = embed_texts,
+        qdrant_store: QdrantSyllabusStore | None = None,
     ) -> None:
         self.config = config or TopicExtractionConfig()
         self._embedding_function = embedding_function
-        self._concept_embeddings: np.ndarray | None = None
+        self._qdrant_store = (
+            qdrant_store
+            if qdrant_store is not None
+            else QdrantSyllabusStore()
+        )
 
     def extract(
         self,
@@ -140,18 +162,26 @@ class TopicCandidateExtractor:
             self.config.embedding_model,
             32,
         )
-        concept_embeddings = self._get_concept_embeddings()
 
-        if unit_embeddings.size == 0 or concept_embeddings.size == 0:
+        if unit_embeddings.size == 0:
             return []
 
-        similarity_matrix = unit_embeddings @ concept_embeddings.T
+        semantic_scores = self._semantic_scores(
+            unit_embeddings=unit_embeddings,
+            sentences=sentences,
+            full_text=text,
+        )
+
         raw_candidates: list[RawTopicCandidate] = []
 
-        for concept_index, concept in enumerate(CS_CONCEPTS):
-            similarities = similarity_matrix[:, concept_index]
-            best_unit_index = int(np.argmax(similarities))
-            semantic_score = float(similarities[best_unit_index])
+        for concept in CS_CONCEPTS:
+            semantic_result = semantic_scores.get(concept.concept_id)
+
+            if semantic_result is None:
+                semantic_score = 0.0
+                best_unit_index = 0
+            else:
+                semantic_score, best_unit_index = semantic_result
 
             keyword = self._keyword_evidence(
                 concept=concept,
@@ -259,17 +289,72 @@ class TopicCandidateExtractor:
 
         return raw_candidates[: self.config.max_final_candidates]
 
-    def _get_concept_embeddings(self) -> np.ndarray:
-        if self._concept_embeddings is not None:
-            return self._concept_embeddings
+    def _semantic_scores(
+        self,
+        unit_embeddings: np.ndarray,
+        sentences: list[str],
+        full_text: str,
+    ) -> dict[str, tuple[float, int]]:
+        """
+        Retrieve the strongest semantic score and semantic-unit index for each
+        candidate concept using Qdrant.
 
-        concept_texts = [concept.embedding_text for concept in CS_CONCEPTS]
-        self._concept_embeddings = self._embedding_function(
-            concept_texts,
-            self.config.embedding_model,
-            32,
+        Qdrant performs server-side nearest-neighbour search for every
+        semantic unit. Exact lexical candidates that fall outside the semantic
+        top-k are still scored by retrieving only their stored vectors from
+        Qdrant. The full syllabus vector matrix is never loaded into memory.
+        """
+
+        result_sets = self._qdrant_store.search_by_vectors(
+            unit_embeddings,
+            top_k=self.config.qdrant_top_k_per_unit,
         )
-        return self._concept_embeddings
+
+        scores: dict[str, tuple[float, int]] = {}
+
+        for unit_index, matches in enumerate(result_sets):
+            for match in matches:
+                previous = scores.get(match.concept_id)
+
+                if previous is None or match.score > previous[0]:
+                    scores[match.concept_id] = (
+                        float(match.score),
+                        unit_index,
+                    )
+
+        # Lexical matching still scans catalogue metadata, not catalogue
+        # vectors. When a lexical candidate is outside Qdrant's top-k, fetch
+        # only that concept's stored vector so the existing confidence formula
+        # receives a semantic score.
+        lexical_concept_ids: list[str] = []
+
+        for concept in CS_CONCEPTS:
+            if concept.concept_id in scores:
+                continue
+
+            keyword = self._keyword_evidence(
+                concept=concept,
+                sentences=sentences,
+                full_text=full_text,
+            )
+
+            if keyword.score > 0.0:
+                lexical_concept_ids.append(concept.concept_id)
+
+        stored_vectors = self._qdrant_store.retrieve_concept_vectors(
+            lexical_concept_ids
+        )
+
+        for concept_id, concept_vector in stored_vectors.items():
+            similarities = unit_embeddings @ concept_vector
+            best_unit_index = int(np.argmax(similarities))
+
+            scores[concept_id] = (
+                float(similarities[best_unit_index]),
+                best_unit_index,
+            )
+
+        return scores
 
     @staticmethod
     def _split_sentences(text: str) -> list[str]:
