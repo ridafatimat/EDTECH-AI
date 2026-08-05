@@ -102,3 +102,6 @@ cache/
 
 # Qdrant storage
 qdrant_storage/
+# Agent 2 ignored files
+Agent2/OUTPUT/
+Agent2/.env
