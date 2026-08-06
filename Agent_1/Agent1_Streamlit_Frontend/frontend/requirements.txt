@@ -14,3 +14,4 @@ groq>=0.11
 numpy>=1.26
 SQLAlchemy>=2.0
 psycopg[binary]>=3.0
+nbformat>=5.10
