@@ -1,10 +1,8 @@
 from __future__ import annotations
 
-import importlib
 import re
 from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import Any
 
 
 _CORE_TERMS = {
@@ -302,15 +300,16 @@ def build_technical_vocabulary(
     """
     Build the controlled vocabulary from:
     1. core Computer Science terms;
-    2. the existing AQA concept catalogue, when importable;
+    2. PostgreSQL syllabus concepts through SyllabusStore;
     3. caller-provided terms.
 
-    No production correction mapping is stored here. The vocabulary only
+    PostgreSQL is now the authoritative syllabus source. The old static catalogue module is intentionally not imported here.
+    No production correction mapping is stored in this vocabulary; it only
     supplies canonical terminology and precision safeguards.
     """
 
     terms = set(_CORE_TERMS)
-    terms.update(_load_terms_from_catalogue())
+    terms.update(_load_terms_from_syllabus_store())
     terms.update(
         term.strip()
         for term in extra_terms
@@ -357,102 +356,20 @@ def build_technical_vocabulary(
     )
 
 
-def _load_terms_from_catalogue() -> set[str]:
-    try:
-        module = importlib.import_module(
-            "app.services.cs_concept_catalog"
-        )
-    except (ImportError, ModuleNotFoundError):
-        return set()
+def _load_terms_from_syllabus_store() -> set[str]:
+    """
+    Load canonical syllabus terminology from PostgreSQL via SyllabusStore.
 
-    catalogue = _find_catalogue(module)
+    The import is deliberately local so importing ``technical_vocabulary``
+    itself does not create a syllabus-store dependency until the vocabulary
+    is actually built. Qdrant is not queried by this function.
 
-    if catalogue is None:
-        return set()
+    A database/storage error is allowed to propagate. Silently falling back
+    to only ``_CORE_TERMS`` would hide an incomplete syllabus lookup after
+    removal of the static catalogue.
+    """
 
-    terms: set[str] = set()
+    from app.services.syllabus_store import SyllabusStore
 
-    for concept in catalogue:
-        terms.update(_extract_concept_terms(concept))
-
-    return terms
-
-
-def _find_catalogue(module: Any) -> Iterable[Any] | None:
-    for name in (
-        "CS_CONCEPTS",
-        "CS_CONCEPT_CATALOG",
-        "AQA_CS_CONCEPTS",
-        "CONCEPTS",
-        "CATALOG",
-    ):
-        value = getattr(module, name, None)
-
-        if _is_non_string_iterable(value):
-            return value
-
-    for name in (
-        "build_cs_concept_catalog",
-        "get_cs_concept_catalog",
-        "get_cs_concepts",
-    ):
-        factory = getattr(module, name, None)
-
-        if not callable(factory):
-            continue
-
-        try:
-            value = factory()
-        except TypeError:
-            continue
-
-        if _is_non_string_iterable(value):
-            return value
-
-    return None
-
-
-def _extract_concept_terms(concept: Any) -> set[str]:
-    terms: set[str] = set()
-
-    # Descriptions are deliberately excluded because complete prose is not
-    # suitable controlled replacement vocabulary.
-    for field_name in (
-        "label",
-        "official_title",
-        "topic",
-        "title",
-        "name",
-        "search_label",
-    ):
-        value = _read_value(concept, field_name)
-
-        if isinstance(value, str) and value.strip():
-            terms.add(value.strip())
-
-    aliases = _read_value(concept, "aliases")
-
-    if isinstance(aliases, str):
-        if aliases.strip():
-            terms.add(aliases.strip())
-    elif _is_non_string_iterable(aliases):
-        for alias in aliases:
-            if isinstance(alias, str) and alias.strip():
-                terms.add(alias.strip())
-
-    return terms
-
-
-def _read_value(concept: Any, field_name: str) -> Any:
-    if isinstance(concept, dict):
-        return concept.get(field_name)
-
-    return getattr(concept, field_name, None)
-
-
-def _is_non_string_iterable(value: Any) -> bool:
-    return (
-        value is not None
-        and not isinstance(value, (str, bytes, dict))
-        and isinstance(value, Iterable)
-    )
+    store = SyllabusStore()
+    return set(store.get_technical_terms())

@@ -5,6 +5,7 @@ from typing import Any, Literal
 
 from sqlalchemy import (
     BigInteger,
+    Boolean,
     CheckConstraint,
     DateTime,
     Float,
@@ -35,15 +36,14 @@ TopicMappingValidationStatus = Literal[
 
 class TopicMappingMemory(Base):
     """
-    Stores reusable, validated topic-mapping decisions.
+    Reusable, reviewer-approved topic-mapping memory.
 
-    Qdrant remains responsible for semantic syllabus retrieval.
+    Important safety rule:
+    a row is reusable only when it was reviewer approved, belongs to the
+    active specification version, and is not disabled.
 
-    This table provides deterministic PostgreSQL memory for decisions that
-    have already been validated by Python, the LLM, or a human reviewer.
-
-    Unsafe outcomes such as API errors and unresolved needs-review cases
-    should not be stored as reusable memory.
+    Qdrant remains the source for official syllabus candidate retrieval.
+    This table only stores decisions that have already passed human review.
     """
 
     __tablename__ = "topic_mapping_memory"
@@ -79,11 +79,15 @@ class TopicMappingMemory(Base):
         ),
         CheckConstraint(
             """
+            reviewer_approved = FALSE
+            OR validation_status IN ('validated', 'human_corrected')
+            """,
+            name="ck_topic_mapping_memory_reviewer_approved",
+        ),
+        CheckConstraint(
+            """
             (
-                decision IN (
-                    'mapped',
-                    'resolved_by_module3'
-                )
+                decision IN ('mapped', 'resolved_by_module3')
                 AND mapped_concept_id IS NOT NULL
             )
             OR
@@ -129,6 +133,13 @@ class TopicMappingMemory(Base):
             "last_used_at",
         ),
         Index(
+            "ix_topic_mapping_memory_safe_lookup",
+            "normalized_topic",
+            "spec_version",
+            "reviewer_approved",
+            "validation_status",
+        ),
+        Index(
             "ix_topic_mapping_memory_candidates_gin",
             "candidate_concept_ids",
             postgresql_using="gin",
@@ -152,25 +163,11 @@ class TopicMappingMemory(Base):
         unique=True,
     )
 
-    normalized_topic: Mapped[str] = mapped_column(
-        Text,
-        nullable=False,
-    )
+    normalized_topic: Mapped[str] = mapped_column(Text, nullable=False)
+    original_topic: Mapped[str] = mapped_column(Text, nullable=False)
 
-    original_topic: Mapped[str] = mapped_column(
-        Text,
-        nullable=False,
-    )
-
-    evidence_hash: Mapped[str] = mapped_column(
-        String(64),
-        nullable=False,
-    )
-
-    evidence_text: Mapped[str] = mapped_column(
-        Text,
-        nullable=False,
-    )
+    evidence_hash: Mapped[str] = mapped_column(String(64), nullable=False)
+    evidence_text: Mapped[str] = mapped_column(Text, nullable=False)
 
     candidate_concept_ids: Mapped[list[str]] = mapped_column(
         JSONB,
@@ -186,35 +183,13 @@ class TopicMappingMemory(Base):
         server_default="[]",
     )
 
-    decision: Mapped[str] = mapped_column(
-        String(40),
-        nullable=False,
-    )
+    decision: Mapped[str] = mapped_column(String(40), nullable=False)
+    mapped_concept_id: Mapped[str | None] = mapped_column(Text, nullable=True)
+    confidence: Mapped[float] = mapped_column(Float, nullable=False)
+    reason: Mapped[str] = mapped_column(Text, nullable=False)
 
-    mapped_concept_id: Mapped[str | None] = mapped_column(
-        Text,
-        nullable=True,
-    )
-
-    confidence: Mapped[float] = mapped_column(
-        Float,
-        nullable=False,
-    )
-
-    reason: Mapped[str] = mapped_column(
-        Text,
-        nullable=False,
-    )
-
-    model_name: Mapped[str] = mapped_column(
-        String(150),
-        nullable=False,
-    )
-
-    prompt_version: Mapped[str] = mapped_column(
-        String(50),
-        nullable=False,
-    )
+    model_name: Mapped[str] = mapped_column(String(150), nullable=False)
+    prompt_version: Mapped[str] = mapped_column(String(50), nullable=False)
 
     validation_status: Mapped[str] = mapped_column(
         String(30),
@@ -223,16 +198,29 @@ class TopicMappingMemory(Base):
         server_default="validated",
     )
 
-    source_transcript: Mapped[str | None] = mapped_column(
-        Text,
-        nullable=True,
-    )
-
+    source_transcript: Mapped[str | None] = mapped_column(Text, nullable=True)
     source_chunk_ids: Mapped[list[int]] = mapped_column(
         JSONB,
         nullable=False,
         default=list,
         server_default="[]",
+    )
+
+    # New memory-safety fields used by the updated architecture.
+    spec_version: Mapped[str] = mapped_column(String(80), nullable=False)
+
+    reviewer_approved: Mapped[bool] = mapped_column(
+        Boolean,
+        nullable=False,
+        default=False,
+        server_default="false",
+    )
+
+    reviewer_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
+    reviewed_by: Mapped[str | None] = mapped_column(Text, nullable=True)
+    reviewed_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
+        nullable=True,
     )
 
     hit_count: Mapped[int] = mapped_column(
@@ -260,20 +248,17 @@ class TopicMappingMemory(Base):
         nullable=True,
     )
 
-    def is_reusable(self) -> bool:
-        """
-        Return whether the record may safely be reused by Module 4.
-        """
+    def is_reusable(self, current_spec_version: str) -> bool:
+        """Return True only for a safe memory row for this specification."""
 
-        return self.validation_status in {
-            "validated",
-            "human_corrected",
-        }
+        return (
+            self.reviewer_approved
+            and self.spec_version == current_spec_version
+            and self.validation_status in {"validated", "human_corrected"}
+        )
 
     def to_dict(self) -> dict[str, Any]:
-        """
-        Return a serializable representation for notebook/report usage.
-        """
+        """Return a serializable representation for notebooks/UI."""
 
         return {
             "id": self.id,
@@ -282,12 +267,8 @@ class TopicMappingMemory(Base):
             "original_topic": self.original_topic,
             "evidence_hash": self.evidence_hash,
             "evidence_text": self.evidence_text,
-            "candidate_concept_ids": list(
-                self.candidate_concept_ids
-            ),
-            "module3_concept_ids": list(
-                self.module3_concept_ids
-            ),
+            "candidate_concept_ids": list(self.candidate_concept_ids),
+            "module3_concept_ids": list(self.module3_concept_ids),
             "decision": self.decision,
             "mapped_concept_id": self.mapped_concept_id,
             "confidence": self.confidence,
@@ -296,23 +277,18 @@ class TopicMappingMemory(Base):
             "prompt_version": self.prompt_version,
             "validation_status": self.validation_status,
             "source_transcript": self.source_transcript,
-            "source_chunk_ids": list(
-                self.source_chunk_ids
+            "source_chunk_ids": list(self.source_chunk_ids),
+            "spec_version": self.spec_version,
+            "reviewer_approved": self.reviewer_approved,
+            "reviewer_reason": self.reviewer_reason,
+            "reviewed_by": self.reviewed_by,
+            "reviewed_at": (
+                self.reviewed_at.isoformat() if self.reviewed_at else None
             ),
             "hit_count": self.hit_count,
-            "created_at": (
-                self.created_at.isoformat()
-                if self.created_at
-                else None
-            ),
-            "updated_at": (
-                self.updated_at.isoformat()
-                if self.updated_at
-                else None
-            ),
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "updated_at": self.updated_at.isoformat() if self.updated_at else None,
             "last_used_at": (
-                self.last_used_at.isoformat()
-                if self.last_used_at
-                else None
+                self.last_used_at.isoformat() if self.last_used_at else None
             ),
         }
