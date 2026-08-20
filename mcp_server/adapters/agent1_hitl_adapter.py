@@ -624,7 +624,7 @@ class Agent1HitlAdapter:
 
     def _catalogue_by_id(self) -> dict[str, dict[str, Any]]:
         self._prepare_agent1_imports()
-        from app.services.cs_concept_catalog import CS_CONCEPTS
+        from app.services.syllabus_store import get_syllabus_store
 
         return {
             str(concept.concept_id): {
@@ -637,7 +637,7 @@ class Agent1HitlAdapter:
                 "paper": concept.paper,
                 "source_pages": list(concept.source_pages),
             }
-            for concept in CS_CONCEPTS
+            for concept in get_syllabus_store().get_all_concepts()
         }
 
     def _evidence_from_chunks(
