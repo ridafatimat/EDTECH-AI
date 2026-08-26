@@ -1024,23 +1024,6 @@ def build_quiz_questions_marking_scheme_pdf(
                 question_count
             ),
         ],
-        [
-            "Release ready",
-            (
-                "Yes"
-                if manifest_payload.get(
-                    "release_ready"
-                )
-                else "No"
-            ),
-            "Generation status",
-            _pdf_clean_text(
-                manifest_payload.get(
-                    "generation_status",
-                    "",
-                )
-            ),
-        ],
     ]
 
     summary_table = Table(
@@ -1912,6 +1895,473 @@ def _attach_runtime_roots(
     return rows
 
 
+
+def _mcp_export_styles() -> Any:
+    """Styles used by the final MCP question-only and mark-scheme-only sections."""
+    styles = getSampleStyleSheet()
+    styles.add(
+        ParagraphStyle(
+            name="MCPQuestionHeading",
+            parent=styles["Heading2"],
+            fontName="Helvetica-Bold",
+            fontSize=14,
+            leading=17,
+            spaceAfter=7,
+            textColor=colors.HexColor("#1f2937"),
+        )
+    )
+    styles.add(
+        ParagraphStyle(
+            name="MCPSection",
+            parent=styles["Heading3"],
+            fontName="Helvetica-Bold",
+            fontSize=11.5,
+            leading=14,
+            spaceBefore=8,
+            spaceAfter=6,
+        )
+    )
+    styles.add(
+        ParagraphStyle(
+            name="MCPBody",
+            parent=styles["BodyText"],
+            fontName="Helvetica",
+            fontSize=9.6,
+            leading=13.2,
+            spaceAfter=6,
+        )
+    )
+    styles.add(
+        ParagraphStyle(
+            name="MCPCode",
+            parent=styles["BodyText"],
+            fontName="Courier",
+            fontSize=8.7,
+            leading=11.5,
+            leftIndent=8,
+            rightIndent=8,
+            borderColor=colors.HexColor("#d1d5db"),
+            borderWidth=0.5,
+            borderPadding=6,
+            backColor=colors.HexColor("#f8fafc"),
+            spaceBefore=5,
+            spaceAfter=7,
+        )
+    )
+    styles.add(
+        ParagraphStyle(
+            name="MCPMarkScheme",
+            parent=styles["BodyText"],
+            fontName="Helvetica",
+            fontSize=8.8,
+            leading=11.5,
+        )
+    )
+    return styles
+
+
+def _mcp_metadata_table(question: dict[str, Any], *, styles: Any) -> Table:
+    topic = _pdf_question_topic(question)
+    reference = _pdf_question_reference(question)
+    paper_label = _pdf_question_paper(question)
+    role = str(
+        question.get("role", question.get("topic_role", "")) or ""
+    ).strip()
+
+    rows = [
+        ["Topic", topic, "AQA ref", reference],
+        ["Paper", paper_label, "Role", role],
+    ]
+    table = Table(
+        rows,
+        colWidths=[18 * mm, 62 * mm, 18 * mm, 62 * mm],
+    )
+    table.setStyle(
+        TableStyle(
+            [
+                ("GRID", (0, 0), (-1, -1), 0.4, colors.HexColor("#d1d5db")),
+                ("BACKGROUND", (0, 0), (0, -1), colors.HexColor("#f8fafc")),
+                ("BACKGROUND", (2, 0), (2, -1), colors.HexColor("#f8fafc")),
+                ("FONTNAME", (0, 0), (0, -1), "Helvetica-Bold"),
+                ("FONTNAME", (2, 0), (2, -1), "Helvetica-Bold"),
+                ("FONTSIZE", (0, 0), (-1, -1), 8.3),
+                ("VALIGN", (0, 0), (-1, -1), "TOP"),
+                ("LEFTPADDING", (0, 0), (-1, -1), 4),
+                ("RIGHTPADDING", (0, 0), (-1, -1), 4),
+                ("TOPPADDING", (0, 0), (-1, -1), 3),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
+            ]
+        )
+    )
+    return table
+
+
+def _mcp_add_question_text(
+    story: list[Any],
+    text_value: str,
+    *,
+    styles: Any,
+) -> None:
+    """Question renderer equivalent to the existing Notebook 06 PDF renderer."""
+    parts = re.split(r"```", _pdf_clean_text(text_value))
+    for index, part in enumerate(parts):
+        part = part.strip()
+        if not part:
+            continue
+        if index % 2 == 1:
+            code_part = _pdf_strip_fence_language(part)
+            if not code_part:
+                continue
+            escaped = html.escape(code_part).replace("\n", "<br/>")
+            story.append(Paragraph(escaped, styles["MCPCode"]))
+        else:
+            formatted = _pdf_format_prose_markup(part)
+            formatted = formatted.replace("<br/>* ", "<br/>&bull; ").replace(
+                "<br/>- ", "<br/>&bull; "
+            )
+            story.append(Paragraph(formatted, styles["MCPBody"]))
+
+
+def _mcp_footer(label: str):
+    def footer(canvas: Any, document: Any) -> None:
+        canvas.saveState()
+        canvas.setFont("Helvetica", 8)
+        canvas.setFillColor(colors.HexColor("#6b7280"))
+        canvas.drawString(16 * mm, 9 * mm, label)
+        canvas.drawRightString(
+            A4[0] - 16 * mm,
+            9 * mm,
+            "Page " + str(document.page),
+        )
+        canvas.restoreState()
+    return footer
+
+
+def build_mcp_questions_only_pdf(
+    *,
+    questions: list[dict[str, Any]],
+    output_path: Path,
+    start_position: int = 1,
+) -> Path:
+    """Render learner-facing questions only. No answers or marking guidance."""
+    valid_questions = [q for q in questions if isinstance(q, dict)]
+    if not valid_questions:
+        raise RuntimeError("No questions were available for the question-only PDF section.")
+
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    styles = _mcp_export_styles()
+    _pdf_visual_integrity_preflight(valid_questions, styles=styles)
+
+    document = SimpleDocTemplate(
+        str(output_path),
+        pagesize=A4,
+        rightMargin=16 * mm,
+        leftMargin=16 * mm,
+        topMargin=16 * mm,
+        bottomMargin=16 * mm,
+        title="Agent 2 Questions",
+        author="EDTech Agent 2",
+    )
+
+    story: list[Any] = []
+    for offset, question in enumerate(valid_questions):
+        position = start_position + offset
+        marks = _pdf_question_marks(question)
+        story.append(
+            Paragraph(
+                f"Question {position} ({marks} mark{'s' if marks != 1 else ''})",
+                styles["MCPQuestionHeading"],
+            )
+        )
+        story.extend([_mcp_metadata_table(question, styles=styles), Spacer(1, 7)])
+        story.append(Paragraph("Question", styles["MCPSection"]))
+        _mcp_add_question_text(
+            story,
+            _pdf_question_text(question),
+            styles=styles,
+        )
+        _pdf_add_visual(story, question, styles=styles)
+        if offset != len(valid_questions) - 1:
+            story.append(PageBreak())
+
+    footer = _mcp_footer("EDTech Agent 2 - Questions")
+    document.build(story, onFirstPage=footer, onLaterPages=footer)
+    return output_path
+
+
+def _mcp_clean_marking_rows(question: dict[str, Any]) -> list[dict[str, Any]]:
+    """Prefer clean structured official MS fields; keep AI guidance unchanged."""
+    top_level_guidance = question.get("marking_guidance")
+    if isinstance(top_level_guidance, list) and top_level_guidance:
+        return _pdf_marking_rows(question)
+
+    mark_scheme = question.get("mark_scheme")
+    if not isinstance(mark_scheme, dict):
+        return _pdf_marking_rows(question)
+
+    structured = mark_scheme.get("phase3_structured")
+    rows: list[dict[str, Any]] = []
+
+    if isinstance(structured, dict):
+        def add_section(key: str, label: str, *, preserve_marks: bool = False) -> None:
+            values = structured.get(key) or []
+            if not isinstance(values, list):
+                values = [values] if values else []
+            for value in values:
+                if isinstance(value, dict):
+                    criterion = str(
+                        value.get("criterion")
+                        or value.get("text")
+                        or value.get("point")
+                        or value.get("answer")
+                        or ""
+                    ).strip()
+                    marks = value.get("marks", "") if preserve_marks else ""
+                else:
+                    criterion = str(value or "").strip()
+                    marks = ""
+                if criterion:
+                    prefix = "" if key == "marking_points" else f"{label}: "
+                    rows.append({"marks": marks, "criterion": prefix + criterion})
+
+        add_section("marking_points", "Marking point", preserve_marks=True)
+        add_section("acceptable_answers", "Accept")
+        add_section("rejected_answers", "Reject")
+        add_section("additional_guidance", "Additional guidance")
+        add_section("worked_examples", "Worked example")
+        add_section("assessment_objectives", "Assessment objective")
+
+    if rows:
+        return rows
+
+    raw = str(
+        mark_scheme.get("raw_marking_guidance")
+        or mark_scheme.get("marking_guidance")
+        or ""
+    ).strip()
+    if raw:
+        return [
+            {"marks": "", "criterion": line.strip()}
+            for line in raw.splitlines()
+            if line.strip()
+        ]
+
+    return _pdf_marking_rows(question)
+
+
+def build_mcp_marking_schemes_only_pdf(
+    *,
+    questions: list[dict[str, Any]],
+    output_path: Path,
+    start_position: int = 1,
+) -> Path:
+    """Render only mark schemes, with no repeated question text or visuals."""
+    valid_questions = [q for q in questions if isinstance(q, dict)]
+    if not valid_questions:
+        raise RuntimeError("No questions were available for the marking-scheme PDF section.")
+
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    styles = _mcp_export_styles()
+    document = SimpleDocTemplate(
+        str(output_path),
+        pagesize=A4,
+        rightMargin=16 * mm,
+        leftMargin=16 * mm,
+        topMargin=16 * mm,
+        bottomMargin=16 * mm,
+        title="Agent 2 Marking Schemes",
+        author="EDTech Agent 2",
+    )
+
+    story: list[Any] = []
+    for offset, question in enumerate(valid_questions):
+        position = start_position + offset
+        marks = _pdf_question_marks(question)
+        is_generated = _is_generated_question(question)
+        source_label = "AI-generated" if is_generated else "Official AQA"
+
+        story.append(
+            Paragraph(
+                f"Question {position} Mark Scheme ({marks} mark{'s' if marks != 1 else ''})",
+                styles["MCPQuestionHeading"],
+            )
+        )
+        story.append(
+            Paragraph(
+                source_label + " marking guidance",
+                styles["MCPSection"],
+            )
+        )
+        story.extend([_mcp_metadata_table(question, styles=styles), Spacer(1, 8)])
+
+        marking_rows = [
+            [
+                Paragraph("<b>Mark(s)</b>", styles["MCPMarkScheme"]),
+                Paragraph("<b>Criterion</b>", styles["MCPMarkScheme"]),
+            ]
+        ]
+        for item in _mcp_clean_marking_rows(question):
+            marking_rows.append(
+                [
+                    Paragraph(
+                        _pdf_escape(item.get("marks", "")),
+                        styles["MCPMarkScheme"],
+                    ),
+                    Paragraph(
+                        _pdf_escape(item.get("criterion", "")).replace("\n", "<br/>"),
+                        styles["MCPMarkScheme"],
+                    ),
+                ]
+            )
+
+        table = Table(
+            marking_rows,
+            colWidths=[19 * mm, 142 * mm],
+            repeatRows=1,
+        )
+        table.setStyle(
+            TableStyle(
+                [
+                    ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#cbd5e1")),
+                    ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#e5e7eb")),
+                    ("ALIGN", (0, 1), (0, -1), "CENTER"),
+                    ("VALIGN", (0, 0), (-1, -1), "TOP"),
+                    ("TOPPADDING", (0, 0), (-1, -1), 5),
+                    ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
+                    ("LEFTPADDING", (0, 0), (-1, -1), 5),
+                    ("RIGHTPADDING", (0, 0), (-1, -1), 5),
+                ]
+            )
+        )
+        story.append(table)
+
+        if offset != len(valid_questions) - 1:
+            story.append(PageBreak())
+
+    footer = _mcp_footer("EDTech Agent 2 - Marking Schemes")
+    document.build(story, onFirstPage=footer, onLaterPages=footer)
+    return output_path
+
+
+def _official_package_questions(
+    manifest: dict[str, Any],
+    *,
+    quiz_output_dir: Path,
+) -> list[dict[str, Any]]:
+    """Load and flatten Notebook 05 official questions for clean MS rendering."""
+    source = manifest.get("source_artifacts") or {}
+    if not isinstance(source, dict):
+        source = {}
+
+    package_path = _resolve_existing_path(
+        source.get("notebook05_package"),
+        [quiz_output_dir],
+    )
+    if package_path is None:
+        return []
+
+    try:
+        package = json.loads(package_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return []
+    if not isinstance(package, dict):
+        return []
+
+    rows: list[dict[str, Any]] = []
+    for item in safe_list(package.get("questions")):
+        if not isinstance(item, dict):
+            continue
+        question = item.get("question") or {}
+        topic = item.get("topic") or {}
+        mark_scheme = item.get("mark_scheme") or {}
+        if not isinstance(question, dict):
+            question = {}
+        if not isinstance(topic, dict):
+            topic = {}
+        if not isinstance(mark_scheme, dict):
+            mark_scheme = {}
+
+        rows.append(
+            {
+                "source_type": "official_aqa",
+                "question_id": str(
+                    item.get("question_id")
+                    or question.get("question_id")
+                    or question.get("id")
+                    or ""
+                ),
+                "topic": str(
+                    topic.get("detected_topic")
+                    or topic.get("topic")
+                    or "Topic"
+                ).strip(),
+                "official_reference": str(
+                    topic.get("official_reference") or ""
+                ).strip(),
+                "role": str(
+                    topic.get("role") or topic.get("topic_role") or ""
+                ).strip(),
+                "marks": safe_int(
+                    question.get("marks", mark_scheme.get("maximum_marks", 0))
+                ),
+                "paper_code": str(
+                    question.get("paper_code")
+                    or question.get("paper_label")
+                    or ""
+                ).strip(),
+                "question_number": str(
+                    question.get("number")
+                    or question.get("question_number")
+                    or ""
+                ).strip(),
+                "mark_scheme": mark_scheme,
+            }
+        )
+    return rows
+
+
+def _official_teacher_mark_scheme_pdf(
+    manifest: dict[str, Any],
+    *,
+    quiz_output_dir: Path,
+) -> Path | None:
+    """Backward-compatible fallback if structured Notebook 05 package data is unavailable."""
+    source = manifest.get("source_artifacts") or {}
+    if not isinstance(source, dict):
+        source = {}
+
+    for key in (
+        "notebook05_teacher_mark_scheme_pdf",
+        "official_retrieval_teacher_mark_scheme_pdf",
+        "teacher_mark_scheme_pdf",
+    ):
+        path = _resolve_existing_path(source.get(key), [quiz_output_dir])
+        if path is not None:
+            return path
+
+    package_path = _resolve_existing_path(
+        source.get("notebook05_package"),
+        [quiz_output_dir],
+    )
+    if package_path is None:
+        return None
+
+    try:
+        package = json.loads(package_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+    if not isinstance(package, dict):
+        return None
+
+    output_files = package.get("output_files") or {}
+    if not isinstance(output_files, dict):
+        return None
+
+    return _resolve_existing_path(
+        output_files.get("teacher_mark_scheme_pdf"),
+        [package_path.parent, quiz_output_dir],
+    )
+
 def _official_source_pdf(
     manifest: dict[str, Any],
     *,
@@ -1999,6 +2449,15 @@ def finalize_mcp_quiz_pdf(
                 visual_output_dir=visual_output_dir,
             )
 
+        official_questions = _official_package_questions(
+            manifest,
+            quiz_output_dir=quiz_output_dir,
+        )
+        official_teacher_pdf = _official_teacher_mark_scheme_pdf(
+            manifest,
+            quiz_output_dir=quiz_output_dir,
+        )
+
         official_marks = safe_int(manifest.get("official_total_marks", 0))
         official_count = safe_int(manifest.get("official_question_count", 0))
         ai_marks = sum(_pdf_question_marks(q) for q in ai_questions)
@@ -2009,7 +2468,10 @@ def finalize_mcp_quiz_pdf(
         cover = visual_output_dir / "__mcp_hybrid_summary.pdf"
         official_heading = visual_output_dir / "__mcp_official_heading.pdf"
         ai_heading = visual_output_dir / "__mcp_ai_heading.pdf"
-        ai_extension = visual_output_dir / "__mcp_ai_extension.pdf"
+        ai_questions_pdf = visual_output_dir / "__mcp_ai_questions_only.pdf"
+        marking_heading = visual_output_dir / "__mcp_marking_schemes_heading.pdf"
+        official_marking_pdf = visual_output_dir / "__mcp_official_marking_schemes_only.pdf"
+        ai_marking_pdf = visual_output_dir / "__mcp_ai_marking_schemes_only.pdf"
 
         _build_hybrid_heading_pdf(
             output_path=cover,
@@ -2023,7 +2485,6 @@ def finalize_mcp_quiz_pdf(
                 f"Combined after approval: {official_marks + ai_marks}/{target_marks} marks | "
                 f"{official_count + ai_count} questions",
                 "Visual source: LangGraph -> MCP -> Notebook 08",
-                f"Human review state: {manifest.get('generated_human_review_state') or 'N/A'}",
             ],
         )
         _build_hybrid_heading_pdf(
@@ -2041,12 +2502,13 @@ def finalize_mcp_quiz_pdf(
             cover_markers=["Student Question Paper", "AQA GCSE Computer Science"],
         )
 
-        segments = [
+        segments: list[tuple[Path, int | None, int | None]] = [
             (cover, 0, None),
             (official_heading, 0, None),
             (official_pdf, official_start, None),
         ]
 
+        # AI questions are rendered without answers/marking guidance.
         if ai_questions:
             _build_hybrid_heading_pdf(
                 output_path=ai_heading,
@@ -2058,23 +2520,67 @@ def finalize_mcp_quiz_pdf(
                     "Required visuals are MCP-routed Notebook 08 assets.",
                 ],
             )
-            build_quiz_questions_marking_scheme_pdf(
+            build_mcp_questions_only_pdf(
                 questions=ai_questions,
-                output_path=ai_extension,
-                manifest_payload=manifest,
+                output_path=ai_questions_pdf,
+                start_position=official_count + 1,
             )
-            ai_start = _pdf_content_start_page(
-                ai_extension,
-                cover_markers=["AI Quiz Generation Output", "Generated content"],
+            segments.extend(
+                [
+                    (ai_heading, 0, None),
+                    (ai_questions_pdf, 0, None),
+                ]
             )
-            segments.extend([
-                (ai_heading, 0, None),
-                (ai_extension, ai_start, None),
-            ])
+
+        # One common marking-scheme section comes after every question.
+        has_official_ms = bool(official_questions) or official_teacher_pdf is not None
+        has_ai_ms = bool(ai_questions)
+        if has_official_ms or has_ai_ms:
+            _build_hybrid_heading_pdf(
+                output_path=marking_heading,
+                title="Marking Schemes",
+                subtitle="Official AQA mark schemes followed by AI-generated marking guidance",
+                lines=[
+                    f"Official mark schemes: {official_count}",
+                    f"AI-generated mark schemes: {ai_count}",
+                ],
+            )
+            segments.append((marking_heading, 0, None))
+
+            if official_questions:
+                build_mcp_marking_schemes_only_pdf(
+                    questions=official_questions,
+                    output_path=official_marking_pdf,
+                    start_position=1,
+                )
+                segments.append((official_marking_pdf, 0, None))
+            elif official_teacher_pdf is not None:
+                # Fallback only for older manifests without structured Notebook 05 package rows.
+                official_ms_start = _pdf_content_start_page(
+                    official_teacher_pdf,
+                    cover_markers=["Teacher Mark Scheme", "AQA GCSE Computer Science"],
+                )
+                segments.append((official_teacher_pdf, official_ms_start, None))
+
+            if ai_questions:
+                build_mcp_marking_schemes_only_pdf(
+                    questions=ai_questions,
+                    output_path=ai_marking_pdf,
+                    start_position=official_count + 1,
+                )
+                segments.append((ai_marking_pdf, 0, None))
 
         _merge_pdf_segments(segments, final_pdf)
 
-        for temp in (cover, official_heading, ai_heading, ai_extension):
+        for temp in (
+            cover,
+            official_heading,
+            ai_heading,
+            ai_questions_pdf,
+            marking_heading,
+            official_marking_pdf,
+            ai_marking_pdf,
+        ):
             if temp.is_file():
                 try:
                     temp.unlink()
@@ -2084,11 +2590,64 @@ def finalize_mcp_quiz_pdf(
     else:
         if not display_questions:
             raise RuntimeError("No quiz questions are available for MCP PDF assembly.")
-        build_quiz_questions_marking_scheme_pdf(
-            questions=display_questions,
-            output_path=final_pdf,
-            manifest_payload=manifest,
+
+        # Complete generated quiz: questions first, then one marking-scheme section.
+        cover = visual_output_dir / "__mcp_complete_quiz_summary.pdf"
+        questions_pdf = visual_output_dir / "__mcp_complete_questions_only.pdf"
+        marking_heading = visual_output_dir / "__mcp_complete_marking_heading.pdf"
+        marking_pdf = visual_output_dir / "__mcp_complete_marking_only.pdf"
+
+        total_marks = sum(_pdf_question_marks(q) for q in display_questions)
+        target_marks = safe_int(manifest.get("target_marks", 0))
+        target_questions = safe_int(manifest.get("target_question_count", 0))
+        generated_model = str(
+            manifest.get("generation_model", GENERATION_MODEL) or GENERATION_MODEL
+        ).strip()
+
+        _build_hybrid_heading_pdf(
+            output_path=cover,
+            title="Agent 2 - AI Quiz Generation Output",
+            subtitle=(
+                f"Model: {generated_model} | Quiz mode: {quiz_mode}"
+                if generated_model
+                else f"Quiz mode: {quiz_mode}"
+            ),
+            lines=[
+                f"Target marks: {target_marks} | PDF marks: {total_marks}",
+                f"Target questions: {target_questions} | PDF questions: {len(display_questions)}",
+            ],
         )
+        build_mcp_questions_only_pdf(
+            questions=display_questions,
+            output_path=questions_pdf,
+            start_position=1,
+        )
+        _build_hybrid_heading_pdf(
+            output_path=marking_heading,
+            title="Marking Schemes",
+            subtitle="AI-generated marking guidance",
+            lines=[f"Marking schemes: {len(display_questions)}"],
+        )
+        build_mcp_marking_schemes_only_pdf(
+            questions=display_questions,
+            output_path=marking_pdf,
+            start_position=1,
+        )
+        _merge_pdf_segments(
+            [
+                (cover, 0, None),
+                (questions_pdf, 0, None),
+                (marking_heading, 0, None),
+                (marking_pdf, 0, None),
+            ],
+            final_pdf,
+        )
+        for temp in (cover, questions_pdf, marking_heading, marking_pdf):
+            if temp.is_file():
+                try:
+                    temp.unlink()
+                except OSError:
+                    pass
 
     if not final_pdf.is_file() or final_pdf.stat().st_size <= 0:
         raise RuntimeError("MCP final PDF was not created correctly.")
@@ -2106,7 +2665,7 @@ def finalize_mcp_quiz_pdf(
         "visual_source": "mcp_notebook08",
         "visual_results_path": str(visual_results_path),
         "uses_notebook08_assets": True,
-        "pdf_format_source": "current_notebook06_pdf_builder",
+        "pdf_format_source": "mcp_questions_then_marking_schemes",
     }
 
     patched_manifest_path.write_text(
