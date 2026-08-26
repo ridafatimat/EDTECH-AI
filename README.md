@@ -1,86 +1,54 @@
 EDTech AI — AI-Assisted Lesson Analysis & Assessment
 
-EDTech AI is an end-to-end assessment pipeline for AQA GCSE Computer Science (8525). It converts lesson transcripts into syllabus-aligned topics and then uses those approved topics to retrieve official-style assessment material or generate new AQA-aligned questions when coverage is missing.
+EDTech AI is an end-to-end assessment pipeline for AQA GCSE Computer Science (8525). It converts lesson transcripts into syllabus-aligned topics and then uses those approved topics to retrieve official-style assessment material — or generate new AQA-aligned questions when coverage is missing.
 
-The current application uses a Next.js / pnpm frontend, a FastAPI backend, LangGraph for workflow orchestration, Model Context Protocol (MCP) for tool execution, PostgreSQL for persistent state and human-review memory, and Qdrant for semantic syllabus and assessment retrieval.
-
+Tech Stack
+Layer	Technology
+Frontend	Next.js · React · TypeScript · pnpm
+Backend	FastAPI
+Orchestration	LangGraph (+ PostgreSQL checkpoints)
+Tooling	Model Context Protocol (MCP)
+Persistence	PostgreSQL (state + human-review memory)
+Retrieval	Qdrant (semantic syllabus & assessment search)
 End-to-End Flow
-
 Lesson transcript
-        ↓
 Agent 1
-        ↓
-Preprocessing and cleaning
-        ↓
-Technical terminology normalisation
-        ↓
+Preprocessing & cleaning
+Technical terminologynormalisation
 Semantic chunking
-        ↓
 Topic extraction
-        ↓
 AQA syllabus mapping
-        ↓
 Human review / HITL
-        ↓
 Approved topics
-        ↓
 Agent 2
-        ↓
 Official question retrieval
-        ↓
-Coverage / mark shortfall detection
-        ↓
-AI generation when required
-        ↓
+Coverage / mark shortfalldetection
+AI generation whenrequired
 Visual rendering
-        ↓
 Question / quiz review
-        ↓
-Final question paper + marking scheme PDF
-
+Final question paper +marking scheme PDF
 Architecture
-
-edtech_frontend/
-       │
-       │  Next.js / pnpm
-       ▼
-api/
-       │
-       │  FastAPI
-       ▼
-streamlit_integration/
-       │
-       │  Current runtime bridge
-       ▼
-langgraph_orchestration/
-       │
-       │  LangGraph workflow + PostgreSQL checkpoints
-       ▼
+edtech_frontend/ — Next.js/ pnpm
+api/ — FastAPI
+streamlit_integration/ —current runtime bridge
+langgraph_orchestration/ —LangGraph workflow +PostgreSQL checkpoints
 mcp_server/
-       │
-       ├──────────────► Agent_1/
-       │                 Transcript processing
-       │                 Topic extraction
-       │                 AQA syllabus mapping
-       │
-       └──────────────► Agent2/
-                         Question retrieval
-                         Quiz generation
-                         Visual rendering
-                         Final PDF generation
+Agent_1/ — transcriptprocessing, topic extraction,AQA syllabus mapping
+Agent2/ — questionretrieval, quiz generation,visual rendering, final PDF
 
 PostgreSQL
-    ├── workflow checkpoints
-    ├── technical-correction memory
-    ├── HITL decisions
-    └── syllabus metadata
+
+workflow checkpoints
+technical-correction memory
+HITL decisions
+syllabus metadata
 
 Qdrant
-    ├── syllabus semantic search
-    └── assessment-question retrieval
 
+syllabus semantic search
+assessment-question retrieval
 Repository Structure
-
+text
 EDTECH-AI/
 ├── Agent_1/                   # Transcript processing and syllabus mapping
 ├── Agent2/                    # Retrieval, quiz generation and visual tooling
@@ -95,144 +63,102 @@ EDTECH-AI/
 ├── requirements_langgraph.txt
 ├── requirements_mcp.txt
 └── README.md
-
 Agent 1 — Transcript to AQA Topics
 
 Agent 1 processes lesson transcripts and determines which AQA GCSE Computer Science concepts were genuinely taught.
 
-Agent 1 Pipeline
-
+Pipeline
 Transcript
-    ↓
 Preprocessing
-    ↓
 Technical normalisation
-    ↓
 Semantic chunking
-    ↓
 Topic candidate extraction
-    ↓
 Evidence-quality evaluation
-    ↓
 AQA syllabus mapping
-    ↓
 Human review
-    ↓
 Approved topics
-
 What Agent 1 Does
-
-extracts lesson transcript content
-
-removes timestamps, speaker labels, fillers and transcript noise
-
-normalises spoken technical/code terminology
-
-detects suspicious technical phrases
-
-uses PostgreSQL-backed correction memory
-
-calls an LLM only when uncertain technical correction requires additional reasoning
-
-creates semantic chunks with continuation metadata
-
-extracts Computer Science topic candidates
-
-evaluates whether the evidence is strong enough to represent a genuinely taught topic
-
-maps lesson topics to official AQA GCSE Computer Science concepts
-
-detects CS content that may not map directly to the stored syllabus
-
-supports human topic correction and editing
-
-stores reusable HITL decisions
-
-Agent 1 Runtime Code
+Extracts lesson transcript content
+Removes timestamps, speaker labels, fillers and transcript noise
+Normalises spoken technical / code terminology
+Detects suspicious technical phrases
+Uses PostgreSQL-backed correction memory
+Calls an LLM only when uncertain technical correction requires additional reasoning
+Creates semantic chunks with continuation metadata
+Extracts Computer Science topic candidates
+Evaluates whether the evidence is strong enough to represent a genuinely taught topic
+Maps lesson topics to official AQA GCSE Computer Science concepts
+Detects CS content that may not map directly to the stored syllabus
+Supports human topic correction and editing
+Stores reusable HITL decisions
+Runtime Code
 
 Core Python services live under:
 
+text
 Agent_1/app/
 
 The main Agent 1 notebooks currently live under:
 
+text
 Agent_1/Agent1_Streamlit_Frontend/Notebooks/
 
 Important notebooks include:
 
+text
 Module1 Preprocessing.ipynb
 Module2 Chunking.ipynb
 Module3 Topic Mapping.ipynb
-
 AQA Syllabus Storage
 
 The current syllabus runtime uses PostgreSQL + Qdrant rather than the earlier file-based catalogue approach.
 
 Structured syllabus metadata is managed through:
 
+text
 Agent_1/app/services/syllabus_store.py
 
 PostgreSQL stores structured concept metadata, while Qdrant provides semantic nearest-neighbour search over syllabus concepts.
 
 Human-in-the-Loop (HITL)
 
-Important decisions are surfaced to the user instead of being silently made by the agents.
+Important decisions are surfaced to the user instead of being silently made by the agents. Examples include:
 
-Examples include:
-
-approving or correcting topic mappings
-
-changing a detected topic role
-
-replacing a topic
-
-removing a topic
-
-adding a missing taught topic
-
-reviewing historical HITL decisions
-
-approving Agent 2 topics
-
-reviewing retrieval relevance
-
-approving, editing, regenerating or rejecting generated questions
-
-approving or rejecting the final generated quiz
+Approving or correcting topic mappings
+Changing a detected topic role
+Replacing a topic
+Removing a topic
+Adding a missing taught topic
+Reviewing historical HITL decisions
+Approving Agent 2 topics
+Reviewing retrieval relevance
+Approving, editing, regenerating or rejecting generated questions
+Approving or rejecting the final generated quiz
 
 Where applicable, previous human decisions can be stored in PostgreSQL and reused during later runs.
 
 Agent 2 — Assessment Retrieval and Generation
 
-Agent 2 uses the approved Agent 1 topics to build assessment material.
-
-The two main assessment paths are:
+Agent 2 uses the approved Agent 1 topics to build assessment material. The two main assessment paths are:
 
 Approved topics
-      │
-      ├──────────────► Official question retrieval
-      │
-      └──────────────► Complete AI quiz generation
-
+Official question retrieval
+Complete AI quizgeneration
 Official Question Retrieval
 
 Retrieval is handled by:
 
+text
 Agent2/Notebooks/05_agent1_topics_to_ranked_assessment_retrieval.ipynb
 
-The retrieval flow includes:
+The retrieval flow:
 
 Approved topics
-      ↓
 Qdrant question retrieval
-      ↓
 Topic / paper filtering
-      ↓
 Re-ranking
-      ↓
 Retrieval HITL feedback
-      ↓
-Approved retrieved questions
+Approved retrievedquestions
 
 The system preserves associated assessment metadata and marking guidance where available.
 
@@ -240,111 +166,84 @@ Retrieval Shortfall Handling
 
 Official retrieval may not always satisfy the required mark total or topic coverage.
 
-Example:
-
-Requested:
-5 questions
-20 marks
-
-Retrieved:
-5 questions
-15 marks
+text
+Requested:            Retrieved:
+5 questions           5 questions
+20 marks              15 marks   ← 5-mark shortfall
 
 The pipeline detects the missing coverage and can generate only the required shortfall:
 
 Official retrieved questions
-            +
-AI-generated missing coverage
-            ↓
 Final hybrid assessment
-
+AI-generated missingcoverage
 AI Quiz Generation
 
 Agent 2 supports complete quiz generation as well as generation for retrieval shortfalls.
 
-Important quiz notebooks are:
+Important quiz notebooks:
 
+text
 Agent2/Notebooks/06_quiz_generation.ipynb
 Agent2/Notebooks/06B_quiz_generation.ipynb
 Agent2/Notebooks/06C_quiz_generation.ipynb
-
 Quiz Generation Strategies
 
 Plan A — Per-Question Generation
 
 Questions are generated independently.
 
+text
 Question 1 → model call
 Question 2 → model call
 Question 3 → model call
 ...
 
-This makes individual question regeneration simple, but requires more API calls and repeated prompt tokens.
+Simple to regenerate individual questions, but requires more API calls and repeated prompt tokens.
 
 Plan B — Consolidated Generation
 
-Multiple questions are generated in a consolidated model request.
+Multiple questions are generated in a single consolidated model request.
 
 Quiz plan
-    ↓
-Single consolidated generation call
-    ↓
-Questions + marking guidance
+Single consolidatedgeneration call
+Questions + markingguidance
 
-This reduces repeated prompt overhead and API-call count.
+Reduces repeated prompt overhead and API-call count.
 
 Plan C — Hybrid Optimisation
 
-Plan C combines both approaches.
+Plan C combines both approaches — preserving token/API-call savings while retaining a fallback path when validation fails.
 
+Yes
+No
 Try consolidated generation
-            ↓
 Validate output
-            ↓
-        Valid?
-        /    \
-      Yes     No
-       ↓       ↓
-    Accept   Targeted fallback
-
-This is designed to preserve token/API-call savings while retaining a fallback path when validation fails.
-
+Valid?
+Accept
+Targeted fallback
 Supported Quiz Models
 
 Model configuration is stored in:
 
+text
 Agent2/Config/quiz_model_config.json
 
-The current configuration includes providers such as:
-
-Google Gemini
-
-Groq
-
-OpenAI
-
-Configured model options currently include Gemini, GPT-OSS via Groq, and OpenAI GPT models.
-
-Only the API key for the provider being used needs to be configured.
+Current providers include Google Gemini, Groq, and OpenAI — with options such as Gemini, GPT-OSS via Groq, and OpenAI GPT models. Only the API key for the provider being used needs to be configured.
 
 Visual Question Handling
 
 Agent 2 supports questions containing or requiring visual material such as:
 
-logic gate diagrams
+Logic gate diagrams
+Truth tables
+Code blocks
+Structured tables
+Retrieved examination figures
+Multi-page question material
 
-truth tables
+Important visual notebooks:
 
-code blocks
-
-structured tables
-
-retrieved examination figures
-
-multi-page question material
-
-Important visual notebooks include:
-
+text
 Agent2/Notebooks/07_question_visual_cropping_and_multipage_rendering.ipynb
 Agent2/Notebooks/08_visual_generation_tool_layer.ipynb
 
@@ -354,215 +253,130 @@ Final Assessment Output
 
 The final assessment can contain:
 
-official retrieved questions
-
+Official retrieved questions
 AI-generated AQA-aligned practice questions
-
-official marking guidance
-
+Official marking guidance
 AI-generated marking guidance
-
-diagrams and other visual assets
-
+Diagrams and other visual assets
 AQA syllabus references
-
 Paper 1 / Paper 2 metadata
+Primary / supporting topic roles
 
-primary / supporting topic roles
-
-The output is combined into a final question paper + marking scheme PDF after the required review state is satisfied.
+The output is combined into a final question paper + marking scheme PDF once the required review state is satisfied.
 
 MCP Layer
 
-The Model Context Protocol layer lives under:
-
-mcp_server/
-
-It exposes structured tools for:
+The Model Context Protocol layer lives under mcp_server/ and exposes structured tools for:
 
 Agent 1 execution
-
 Agent 1 HITL actions
-
 Agent 2 retrieval
+Quiz generation
+Visual generation
+Final PDF creation
 
-quiz generation
+Important directories:
 
-visual generation
-
-final PDF creation
-
-Important directories include:
-
+text
 mcp_server/adapters/
 mcp_server/schemas/
 mcp_server/tools/
-
 LangGraph Orchestration
 
-LangGraph coordinates the persisted workflow.
+LangGraph coordinates the persisted workflow (langgraph_orchestration/) and is responsible for:
 
-The implementation lives under:
-
-langgraph_orchestration/
-
-It is responsible for:
-
-workflow state
-
-routing
-
+Workflow state
+Routing
 MCP execution
-
-human interrupts
-
-workflow resume behaviour
-
+Human interrupts
+Workflow resume behaviour
 PostgreSQL checkpoints
 
 The graph is designed so that human-only decisions are not originated automatically by the agent.
 
 Controller Layer
 
-The orchestration controller lives under:
+The orchestration controller lives under orchestration/ and manages:
 
-orchestration/
-
-It manages:
-
-current workflow state
-
-assessment intent
-
-valid next actions
-
-controller planning
-
-state resolution
-
-workflow guardrails
-
+Current workflow state
+Assessment intent
+Valid next actions
+Controller planning
+State resolution
+Workflow guardrails
 Backend API
 
-The current backend entry point is:
+The current backend entry point is api/main.py. The FastAPI layer connects the Next.js frontend to the persisted LangGraph/MCP workflow, providing endpoints for:
 
-api/main.py
-
-The FastAPI layer connects the Next.js frontend to the persisted LangGraph/MCP workflow.
-
-It provides endpoints for operations including:
-
-transcript upload
-
-run creation and progress
-
-preprocessing output
-
-semantic chunking output
-
-topic mapping
-
+Transcript upload
+Run creation and progress
+Preprocessing output
+Semantic chunking output
+Topic mapping
 HITL review
-
-approved topics
-
-assessment configuration
-
-retrieval
-
-quiz generation
-
-question / quiz review
-
-generated assessment assets
-
-final PDF access
-
+Approved topics
+Assessment configuration
+Retrieval
+Quiz generation
+Question / quiz review
+Generated assessment assets
+Final PDF access
 Frontend
 
-The current user-facing frontend lives under:
+The user-facing frontend lives under edtech_frontend/ and uses Next.js, React, TypeScript, and pnpm.
 
-edtech_frontend/
+It defaults to http://localhost:8000, which can be overridden with:
 
-It uses:
-
-Next.js
-
-React
-
-TypeScript
-
-pnpm
-
-The frontend defaults to:
-
-http://localhost:8000
-
-This can be overridden using:
-
+bash
 NEXT_PUBLIC_API_URL=http://localhost:8000
-
+Getting Started
 Prerequisites
 
 Before running the full system, install and configure:
 
 Python 3.11+
-
 Node.js
-
 pnpm
-
 PostgreSQL
-
 Qdrant
 
 The project has primarily been developed and tested on Windows / PowerShell.
 
 Clone the Repository
-
+bash
 git clone https://github.com/ridafatimat/EDTECH-AI.git
 cd EDTECH-AI
-
 Python Environment Setup
 
 Create a virtual environment from the repository root:
 
+powershell
 python -m venv .venv
-
-Activate it:
-
 .\.venv\Scripts\Activate.ps1
-
 Install Python Dependencies
-
-Install Agent 1 runtime dependencies:
-
+powershell
+# Agent 1 runtime dependencies
 pip install -r "Agent_1\Agent1_Streamlit_Frontend\frontend\requirements.txt"
 
-Install Agent 2 dependencies:
-
+# Agent 2 dependencies
 pip install -r "Agent2\requirements_agent2.txt"
 
-Install MCP dependencies:
-
+# MCP dependencies
 pip install -r requirements_mcp.txt
 
-Install LangGraph dependencies:
-
+# LangGraph dependencies
 pip install -r requirements_langgraph.txt
 
-Install FastAPI server packages:
-
+# FastAPI server packages
 pip install fastapi uvicorn python-multipart
 
 Dependency note: Agent_1/requirements.txt has not yet been consolidated into the final runtime dependency file. Some Agent 1 dependencies are still stored in the earlier frontend-era requirements file shown above.
 
 Environment Variables
 
-Create a root .env file for local development.
+Create a root .env file for local development:
 
-Example:
-
+dotenv
 DATABASE_URL=postgresql+psycopg://postgres:YOUR_PASSWORD@localhost:5432/edtech
 
 QDRANT_URL=http://localhost:6333
@@ -572,12 +386,9 @@ GROQ_API_KEY=YOUR_GROQ_API_KEY
 OPENAI_API_KEY=YOUR_OPENAI_API_KEY
 GEMINI_API_KEY=YOUR_GEMINI_API_KEY
 
-Only configure provider keys you intend to use.
+Only configure provider keys you intend to use. Optional frontend override in edtech_frontend/.env.local:
 
-Optional frontend override:
-
-edtech_frontend/.env.local
-
+dotenv
 NEXT_PUBLIC_API_URL=http://localhost:8000
 
 Do not commit real API keys or passwords.
@@ -587,25 +398,22 @@ Start Required Services
 Before running the application, ensure that:
 
 PostgreSQL is running and the configured EDTech database is available
-
 Qdrant is running and accessible at the configured URL
-
-the required syllabus/question collections have been initialised for the environment being used
-
+The required syllabus / question collections have been initialised for the environment
 Start the FastAPI Backend
 
 From the repository root:
 
+bash
 python -m uvicorn api.main:app --reload --port 8000
 
-The backend will be available at:
-
-http://localhost:8000
+The backend will be available at http://localhost:8000.
 
 Start the pnpm Frontend
 
-Open a second terminal:
+In a second terminal:
 
+bash
 cd edtech_frontend
 pnpm install
 pnpm dev
@@ -616,107 +424,53 @@ Runtime Outputs and Diagnostics
 
 Current run artifacts are written under:
 
+text
 Agent_1/Agent1_Streamlit_Frontend/runs/
 
-Depending on the workflow stage, a run can contain:
-
-uploaded transcript data
-
-preprocessing output
-
-semantic chunking output
-
-topic-mapping output
-
-pipeline manifests
-
-HITL state
-
-assessment state
-
-retrieval / generation outputs
-
-diagnostic JSON / CSV information
-
-final assessment assets
+Depending on the workflow stage, a run can contain uploaded transcript data, preprocessing output, semantic chunking output, topic-mapping output, pipeline manifests, HITL state, assessment state, retrieval / generation outputs, diagnostic JSON / CSV information, and final assessment assets.
 
 Generated runtime artifacts should not be committed to source control.
 
-Current Streamlit Migration Status
+Streamlit Migration Status
 
-The Next.js / pnpm frontend has replaced Streamlit as the primary user-facing UI.
+The Next.js / pnpm frontend has replaced Streamlit as the primary user-facing UI. However, not every Streamlit-named directory can be deleted yet — the backend still references runtime paths and bridge code under:
 
-However, not every Streamlit-named directory can be deleted yet.
-
-The current backend still references runtime paths and bridge code under:
-
+text
 Agent_1/Agent1_Streamlit_Frontend/
 streamlit_integration/
 
-These directories currently contain a mixture of:
+These directories currently contain a mixture of legacy Streamlit UI code, runtime bridge logic, notebook locations, and run / diagnostic path compatibility.
 
-legacy Streamlit UI code
+Intended cleanup path:
 
-runtime bridge logic
+Separate runtime and diagnostic logic from UI-specific Streamlit code
+Move required runtime components into neutral backend / orchestration locations
+Update imports and paths
+Verify the project from a fresh clone
+Then remove the remaining obsolete Streamlit UI components
 
-notebook locations
-
-run / diagnostic path compatibility
-
-The intended cleanup path is:
-
-separate runtime and diagnostic logic from UI-specific Streamlit code,
-
-move required runtime components into neutral backend/orchestration locations,
-
-update imports and paths,
-
-verify the project from a fresh clone,
-
-then remove the remaining obsolete Streamlit UI components.
-
-The directories should therefore not be removed blindly while they remain part of the current execution path.
+These directories should not be removed blindly while they remain part of the current execution path.
 
 Tests
 
 Run the main test suite with:
 
+bash
 python -m pytest tests
 
-Additional Agent 1 diagnostic and migration utilities are available under:
-
-Agent_1/scripts/
+Additional Agent 1 diagnostic and migration utilities are available under Agent_1/scripts/.
 
 Git Branches
 
-main
+main — the cleaner, execution-focused version of the project, including Agent 1 execution logic, Agent 2 retrieval and generation, the FastAPI backend, the pnpm / Next.js frontend, the MCP server and adapters, LangGraph orchestration, and required runtime bridge components.
 
-The main branch contains the cleaner execution-focused version of the project, including:
-
-Agent 1 execution logic
-
-Agent 2 retrieval and generation
-
-FastAPI backend
-
-pnpm / Next.js frontend
-
-MCP server and adapters
-
-LangGraph orchestration
-
-required runtime bridge components
-
-backup/pre-cleanup-migration
-
-This branch preserves the pre-cleanup development state and historical implementation files.
-
-It is intended as a recovery/reference branch and should not be merged directly into main.
+backup/pre-cleanup-migration — preserves the pre-cleanup development state and historical implementation files. Intended as a recovery / reference branch; it should not be merged directly into main.
 
 Do Not Commit
 
-Do not commit local secrets, environments, caches or generated runtime outputs.
+Do not commit local secrets, environments, caches or generated runtime outputs:
 
+gitignore
 .env
 .env.*
 .venv/
@@ -728,23 +482,15 @@ __pycache__/
 runs/
 OUTPUT/
 test_outputs/
-
 Project Goal
 
 EDTech AI aims to provide a traceable lesson-to-assessment workflow for AQA GCSE Computer Science where:
 
-topics are grounded in what was actually taught,
-
-syllabus mappings can be reviewed and corrected,
-
-human decisions remain explicit at important gates,
-
-official assessment material is retrieved when suitable,
-
-AI generation fills genuine assessment gaps,
-
-token/API usage can be optimised without removing validation safeguards,
-
-visual questions and marking schemes remain aligned, and
-
-the final assessment remains auditable through persisted run outputs and diagnostics.
+Topics are grounded in what was actually taught
+Syllabus mappings can be reviewed and corrected
+Human decisions remain explicit at important gates
+Official assessment material is retrieved when suitable
+AI generation fills genuine assessment gaps
+Token / API usage can be optimised without removing validation safeguards
+Visual questions and marking schemes remain aligned
+The final assessment remains auditable through persisted run outputs and diagnostics
