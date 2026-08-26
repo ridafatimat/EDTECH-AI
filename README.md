@@ -120,33 +120,33 @@ Human review
     ↓
 Approved topics
 
-Agent 1 currently supports:
+What Agent 1 Does
 
-transcript text extraction
+extracts lesson transcript content
 
-removal of timestamps, speaker labels, fillers and transcript noise
+removes timestamps, speaker labels, fillers and transcript noise
 
-spoken technical/code normalisation
+normalises spoken technical/code terminology
 
-detection of suspicious technical phrases
+detects suspicious technical phrases
 
-PostgreSQL-backed correction memory
+uses PostgreSQL-backed correction memory
 
-LLM fallback for uncertain technical corrections
+calls an LLM only when uncertain technical correction requires additional reasoning
 
-semantic chunking with continuation metadata
+creates semantic chunks with continuation metadata
 
-topic candidate extraction
+extracts Computer Science topic candidates
 
-evidence-quality filtering
+evaluates whether the evidence is strong enough to represent a genuinely taught topic
 
-AQA syllabus mapping
+maps lesson topics to official AQA GCSE Computer Science concepts
 
-detection of relevant CS content that does not map cleanly
+detects CS content that may not map directly to the stored syllabus
 
-human topic correction and editing
+supports human topic correction and editing
 
-reusable HITL memory
+stores reusable HITL decisions
 
 Agent 1 Runtime Code
 
@@ -172,11 +172,11 @@ Structured syllabus metadata is managed through:
 
 Agent_1/app/services/syllabus_store.py
 
-PostgreSQL stores the concept metadata and Qdrant provides semantic nearest-neighbour search over syllabus concepts.
+PostgreSQL stores structured concept metadata, while Qdrant provides semantic nearest-neighbour search over syllabus concepts.
 
 Human-in-the-Loop (HITL)
 
-Important decisions are explicitly surfaced to the user instead of being silently made by the agents.
+Important decisions are surfaced to the user instead of being silently made by the agents.
 
 Examples include:
 
@@ -295,7 +295,7 @@ This reduces repeated prompt overhead and API-call count.
 
 Plan C — Hybrid Optimisation
 
-Plan C combines the two approaches.
+Plan C combines both approaches.
 
 Try consolidated generation
             ↓
@@ -307,7 +307,7 @@ Validate output
        ↓       ↓
     Accept   Targeted fallback
 
-This is designed to preserve the token/API-call savings of consolidated generation while retaining a fallback path when validation fails.
+This is designed to preserve token/API-call savings while retaining a fallback path when validation fails.
 
 Supported Quiz Models
 
@@ -494,7 +494,7 @@ TypeScript
 
 pnpm
 
-The frontend defaults to the backend URL:
+The frontend defaults to:
 
 http://localhost:8000
 
@@ -535,9 +535,7 @@ Activate it:
 
 Install Python Dependencies
 
-The current Python dependency files are separated by subsystem.
-
-Install the Agent 1 runtime dependencies:
+Install Agent 1 runtime dependencies:
 
 pip install -r "Agent_1\Agent1_Streamlit_Frontend\frontend\requirements.txt"
 
@@ -553,11 +551,11 @@ Install LangGraph dependencies:
 
 pip install -r requirements_langgraph.txt
 
-Install the FastAPI server packages:
+Install FastAPI server packages:
 
 pip install fastapi uvicorn python-multipart
 
-Dependency note: Agent_1/requirements.txt has not yet been consolidated into the final runtime dependency file. Some Agent 1 dependencies are still stored in the earlier frontend-era requirements file shown above. This should be consolidated during the later Streamlit/runtime cleanup.
+Dependency note: Agent_1/requirements.txt has not yet been consolidated into the final runtime dependency file. Some Agent 1 dependencies are still stored in the earlier frontend-era requirements file shown above.
 
 Environment Variables
 
