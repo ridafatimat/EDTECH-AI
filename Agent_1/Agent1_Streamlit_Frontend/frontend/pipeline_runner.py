@@ -17,8 +17,11 @@ from typing import Callable
 NOTEBOOKS = (
     ("Module 1 — Preprocessing", "Module1 Preprocessing.ipynb"),
     ("Module 2 — Semantic Chunking", "Module2 Chunking.ipynb"),
-    ("Module 3 — Topic Mapping", "Module3 Topic Mapping.ipynb"),
+    ("Module 3 — Topic Mapping", "Module3 Topic Mapping gpt.ipynb"),
 )
+
+MODULE3_NOTEBOOK = "Module3 Topic Mapping gpt.ipynb"
+JUPYTER_KERNEL = os.getenv("AGENT1_JUPYTER_KERNEL", "edtech-testing").strip()
 
 
 @dataclass(frozen=True)
@@ -93,6 +96,7 @@ def _run_notebook(
         executed_name,
         "--output-dir",
         str(run.executed_notebooks_dir),
+        f"--ExecutePreprocessor.kernel_name={JUPYTER_KERNEL}",
         "--ExecutePreprocessor.timeout=-1",
         "--ExecutePreprocessor.allow_errors=False",
     ]
@@ -306,7 +310,7 @@ def rerun_module3(
         )
 
     notebooks_dir = project_root / "Notebooks"
-    notebook_path = notebooks_dir / "Module3 Topic Mapping.ipynb"
+    notebook_path = notebooks_dir / MODULE3_NOTEBOOK
     if not notebook_path.is_file():
         raise FileNotFoundError(
             f"Module 3 notebook was not found: {notebook_path}"

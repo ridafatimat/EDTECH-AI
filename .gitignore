@@ -105,3 +105,34 @@ qdrant_storage/
 # Agent 2 ignored files
 Agent2/OUTPUT/
 Agent2/.env
+
+# =========================
+# Runtime / generated Agent 1 outputs
+# =========================
+Agent_1/Agent1_Streamlit_Frontend/runs/
+Agent_1/Agent1_Streamlit_Frontend/OUTPUT/
+Agent_1/Agent1_Streamlit_Frontend/Test Data/
+
+# =========================
+# Local backup copies
+# =========================
+Agent2/Notebooks/08_visual_generation_tool_layer old.ipynb
+Agent_1/Agent1_Streamlit_Frontend/frontend/agent2_runner old.py
+Agent_1/Agent1_Streamlit_Frontend/frontend/app beforee.py
+Agent_1/Agent1_Streamlit_Frontend/frontend/detected_topic_edit_capture before.py
+Agent_1/Agent1_Streamlit_Frontend/frontend/detected_topic_edit_runtime_BEFORE_STEP6_V3_20260809_013015.py
+Agent_1/Agent1_Streamlit_Frontend/frontend/pipeline_runner BEFORE TOPIC EDITOR.py
+Agent_1/app/services/detected_topic_edit_end_to_end old hitl.py
+Agent_1/app/services/module3_topic_overlay_adapter_BEFORE_STEP6_V2_20260809_010924.py
+Agent_1/app/services/technical_vocabulary oldd.py
+Agent_1/app/services/topic_candidate_extractor old.py
+mcp_server/adapters/agent1_hitl_adapter old.py
+
+# TypeScript build cache
+*.tsbuildinfo
+
+# Additional local backup files
+Agent_1/scripts/index_syllabus_qdrant old.py
+
+# Temporary notebook deliverable
+deliverables/06C_quiz_generation_FIXED_question_regeneration.ipynb

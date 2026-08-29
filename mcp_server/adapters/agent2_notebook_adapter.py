@@ -438,6 +438,7 @@ class Agent2NotebookAdapter:
         lesson_summary: str,
         notebook05_package_path: Path | None = None,
         notebook05_selected_csv_path: Path | None = None,
+        source_notebook: Path | None = None,
         run_generation: bool,
         review_decision: str = "pending",
         review_reason: str = "",
@@ -447,7 +448,16 @@ class Agent2NotebookAdapter:
         import time
 
         agent2_root = self._resolve_agent2_project_root()
-        source_notebook = self._resolve_quiz_notebook(agent2_root)
+
+        if source_notebook is None:
+            source_notebook = self._resolve_quiz_notebook(agent2_root)
+        else:
+            source_notebook = Path(source_notebook).expanduser().resolve()
+            if not source_notebook.is_file():
+                raise FileNotFoundError(
+                    f"Persisted Agent 2 quiz notebook was not found: {source_notebook}"
+                )
+
         run_dir = self._run_dir(run_id)
         output_dir = self._quiz_output_dir(run_id, quiz_mode)
         execution_dir = run_dir / "executed_notebooks" / "agent2_quiz" / quiz_mode
@@ -567,20 +577,33 @@ class Agent2NotebookAdapter:
     def execute_complete_quiz(self, request: GenerateAgent2CompleteQuizRequest) -> dict[str, Any]:
         _, _, topics = self._approved_topics(request.run_id)
         filters = self._quiz_filters_from_request(request, topics)
+
+        # Resolve the currently selected 06 / 06B / 06C once and persist the
+        # exact source path with this quiz request. This makes later HITL
+        # review/regeneration use the same generation plan even after the
+        # temporary Streamlit environment has been restored.
+        agent2_root = self._resolve_agent2_project_root()
+        selected_quiz_notebook = self._resolve_quiz_notebook(agent2_root)
+
         request_path = self._quiz_request_path(request.run_id, "complete_quiz")
         payload = {
             "schema_version": "agent2-complete-quiz-request-v1.0.0",
             "generated_at_utc": datetime.now(timezone.utc).isoformat(),
             "assessment_request": filters,
             "user_request": request.user_request,
+            "source_notebook": str(selected_quiz_notebook),
         }
-        request_path.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
+        request_path.write_text(
+            json.dumps(payload, indent=2, ensure_ascii=False),
+            encoding="utf-8",
+        )
         return self._run_quiz_notebook(
             run_id=request.run_id,
             quiz_mode="complete_quiz",
             assessment_request=filters,
             approved_topics=topics,
             lesson_summary=self._lesson_summary_from_topics(topics),
+            source_notebook=selected_quiz_notebook,
             run_generation=True,
         )
 
@@ -599,6 +622,9 @@ class Agent2NotebookAdapter:
         lesson_summary = str(package.get("lesson_summary") or "").strip()
         if not lesson_summary:
             lesson_summary = self._lesson_summary_from_topics(topics)
+        agent2_root = self._resolve_agent2_project_root()
+        selected_quiz_notebook = self._resolve_quiz_notebook(agent2_root)
+
         request_path = self._quiz_request_path(request.run_id, "fill_shortfall")
         payload = {
             "schema_version": "agent2-missing-quiz-request-v1.0.0",
@@ -607,6 +633,7 @@ class Agent2NotebookAdapter:
             "notebook05_selected_csv_path": str(selected_path),
             "assessment_request": filters,
             "user_request": request.user_request,
+            "source_notebook": str(selected_quiz_notebook),
         }
         request_path.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
         return self._run_quiz_notebook(
@@ -617,6 +644,7 @@ class Agent2NotebookAdapter:
             lesson_summary=lesson_summary,
             notebook05_package_path=package_path,
             notebook05_selected_csv_path=selected_path,
+            source_notebook=selected_quiz_notebook,
             run_generation=True,
         )
 
@@ -629,6 +657,16 @@ class Agent2NotebookAdapter:
             raise RuntimeError(
                 "No matching persisted quiz request exists for this human review."
             )
+
+        persisted_source_raw = str(
+            saved_request.get("source_notebook") or ""
+        ).strip()
+        persisted_source_notebook = (
+            Path(persisted_source_raw).expanduser().resolve()
+            if persisted_source_raw
+            else None
+        )
+
         package_path = None
         selected_path = None
         if quiz_mode == "fill_shortfall":
@@ -648,6 +686,7 @@ class Agent2NotebookAdapter:
             lesson_summary=self._lesson_summary_from_topics(topics),
             notebook05_package_path=package_path,
             notebook05_selected_csv_path=selected_path,
+            source_notebook=persisted_source_notebook,
             run_generation=False,
             review_decision=request.decision,
             review_reason=request.reason,

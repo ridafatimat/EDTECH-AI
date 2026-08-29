@@ -366,7 +366,7 @@ def _execution_environment(
 
 def _execution_helper_source() -> str:
     """Return the isolated notebook execution helper."""
-    return 'from __future__ import annotations\n\nimport sys\nimport traceback\nfrom pathlib import Path\n\nimport nbformat\nfrom jupyter_client.kernelspec import KernelSpecManager\nfrom nbconvert.preprocessors import ExecutePreprocessor\n\n\ndef resolve_kernel_name(notebook) -> str:\n    requested = str(\n        notebook.metadata.get("kernelspec", {}).get("name", "")\n    ).strip()\n\n    available = KernelSpecManager().find_kernel_specs()\n\n    if requested and requested in available:\n        return requested\n\n    if "python3" in available:\n        return "python3"\n\n    if available:\n        return sorted(available)[0]\n\n    raise RuntimeError(\n        "No Jupyter kernels are installed. Run: python -m ipykernel install --user --name python3"\n    )\n\n\ndef main() -> int:\n    if len(sys.argv) != 4:\n        raise RuntimeError(\n            "Expected: prepared_notebook executed_notebook project_root"\n        )\n\n    prepared_path = Path(sys.argv[1]).resolve()\n    executed_path = Path(sys.argv[2]).resolve()\n    project_root = Path(sys.argv[3]).resolve()\n\n    notebook = nbformat.read(prepared_path, as_version=4)\n    kernel_name = resolve_kernel_name(notebook)\n\n    executor = ExecutePreprocessor(\n        timeout=-1,\n        kernel_name=kernel_name,\n        allow_errors=False,\n    )\n\n    resources = {\n        "metadata": {\n            "path": str(project_root),\n        }\n    }\n\n    print(f"Using Jupyter kernel: {kernel_name}")\n    print(f"Available kernels: {sorted(KernelSpecManager().find_kernel_specs())}")\n\n    try:\n        executor.preprocess(\n            notebook,\n            resources=resources,\n        )\n    except Exception:\n        executed_path.parent.mkdir(parents=True, exist_ok=True)\n        nbformat.write(notebook, executed_path)\n        traceback.print_exc()\n        return 1\n\n    executed_path.parent.mkdir(parents=True, exist_ok=True)\n    nbformat.write(notebook, executed_path)\n\n    print(f"Notebook executed from project root: {project_root}")\n    print(f"Executed notebook saved to: {executed_path}")\n    return 0\n\n\nif __name__ == "__main__":\n    raise SystemExit(main())\n'
+    return 'from __future__ import annotations\n\nimport asyncio\nimport os\nimport sys\nimport traceback\nfrom pathlib import Path\n\nif sys.platform == "win32":\n    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())\n\nimport nbformat\nfrom jupyter_client.kernelspec import KernelSpecManager\nfrom nbconvert.preprocessors import ExecutePreprocessor\n\n\ndef resolve_kernel_name(notebook) -> str:\n    requested = str(\n        notebook.metadata.get("kernelspec", {}).get("name", "")\n    ).strip()\n\n    available = KernelSpecManager().find_kernel_specs()\n    preferred = str(os.environ.get("AGENT2_JUPYTER_KERNEL", "")).strip()\n\n    if preferred and preferred in available:\n        return preferred\n\n    if requested and requested != "python3" and requested in available:\n        return requested\n\n    if "edtech-testing" in available:\n        return "edtech-testing"\n\n    if requested and requested in available:\n        return requested\n\n    if "python3" in available:\n        return "python3"\n\n    if available:\n        return sorted(available)[0]\n\n    raise RuntimeError(\n        "No Jupyter kernels are installed. Run: python -m ipykernel install --user --name python3"\n    )\n\n\ndef main() -> int:\n    if len(sys.argv) != 4:\n        raise RuntimeError(\n            "Expected: prepared_notebook executed_notebook project_root"\n        )\n\n    prepared_path = Path(sys.argv[1]).resolve()\n    executed_path = Path(sys.argv[2]).resolve()\n    project_root = Path(sys.argv[3]).resolve()\n\n    notebook = nbformat.read(prepared_path, as_version=4)\n    kernel_name = resolve_kernel_name(notebook)\n\n    executor = ExecutePreprocessor(\n        timeout=-1,\n        kernel_name=kernel_name,\n        allow_errors=False,\n        shutdown_kernel="immediate",\n    )\n\n    resources = {\n        "metadata": {\n            "path": str(project_root),\n        }\n    }\n\n    print(f"Using Jupyter kernel: {kernel_name}")\n    print(f"Available kernels: {sorted(KernelSpecManager().find_kernel_specs())}")\n\n    try:\n        executor.preprocess(\n            notebook,\n            resources=resources,\n        )\n    except Exception:\n        executed_path.parent.mkdir(parents=True, exist_ok=True)\n        nbformat.write(notebook, executed_path)\n        traceback.print_exc()\n        return 1\n\n    executed_path.parent.mkdir(parents=True, exist_ok=True)\n    nbformat.write(notebook, executed_path)\n\n    print(f"Notebook executed from project root: {project_root}")\n    print(f"Executed notebook saved to: {executed_path}")\n    return 0\n\n\nif __name__ == "__main__":\n    raise SystemExit(main())\n'
 
 
 def run_agent2_notebook(
@@ -468,6 +468,11 @@ def run_agent2_notebook(
         )
 
     started = time.perf_counter()
+    creationflags = (
+        getattr(subprocess, "CREATE_NEW_PROCESS_GROUP", 0)
+        if os.name == "nt"
+        else 0
+    )
     completed = subprocess.run(
         command,
         cwd=agent2_project_root,
@@ -476,6 +481,7 @@ def run_agent2_notebook(
         text=True,
         encoding="utf-8",
         errors="replace",
+        creationflags=creationflags,
     )
     elapsed = time.perf_counter() - started
     log_path.write_text(
@@ -490,7 +496,7 @@ def run_agent2_notebook(
         + f"Kernel working directory: {agent2_project_root}\n"
         + f"Model cache directory: {model_cache_dir}\n"
         + f"Execution helper: {execution_helper}\n"
-        + "Kernel selection: notebook metadata -> python3 -> first installed kernel\n"
+        + "Kernel selection: AGENT2_JUPYTER_KERNEL -> specific notebook kernel -> edtech-testing -> python3 -> first installed kernel\n"
         + f"Output directory: {output_dir}\n"
         + f"Elapsed seconds: {elapsed:.3f}\n"
         + f"Return code: {completed.returncode}\n\n"

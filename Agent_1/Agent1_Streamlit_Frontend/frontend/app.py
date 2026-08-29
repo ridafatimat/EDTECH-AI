@@ -6075,6 +6075,124 @@ def render_agent2_assessment_results(*, run_dir: Path) -> None:
             download_file(path, f"Download {path.name}")
 
 
+
+QUIZ_GENERATION_NOTEBOOK_OPTIONS: dict[str, dict[str, Any]] = {
+    "plan_a": {
+        "label": "Plan A — Notebook 06 (baseline)",
+        "filenames": [
+            "06_quiz_generation.ipynb",
+        ],
+        "strategy": "current_notebook_06",
+    },
+    "plan_b": {
+        "label": "Plan B — Notebook 06B (aggressive single-batch)",
+        "filenames": [
+            "06B_quiz_generation.ipynb",
+        ],
+        "strategy": "plan_b_aggressive_single_batch",
+    },
+    "plan_c": {
+        "label": "Plan C — Notebook 06C (generic adaptive batching / cost-control V3)",
+        "filenames": [
+            "06C_quiz_generation_GENERIC_COST_CONTROL_V3.ipynb",
+            "06C_quiz_generation.ipynb",
+        ],
+        "strategy": "plan_c_hybrid_adaptive_batching_v1",
+    },
+}
+
+
+def _quiz_generation_notebook_label(option_key: str) -> str:
+    item = QUIZ_GENERATION_NOTEBOOK_OPTIONS.get(str(option_key), {})
+    return str(item.get("label") or option_key)
+
+
+def _resolve_quiz_generation_notebook(
+    *,
+    agent2_root_value: str | Path,
+    option_key: str,
+) -> Path | None:
+    """Resolve the selected Notebook 06 variant without changing runner logic."""
+    root = Path(agent2_root_value).expanduser().resolve()
+    option = QUIZ_GENERATION_NOTEBOOK_OPTIONS.get(str(option_key))
+    if not isinstance(option, dict):
+        return None
+
+    filenames = [
+        str(value).strip()
+        for value in (option.get("filenames") or [])
+        if str(value).strip()
+    ]
+    folders = [
+        root / "Notebooks",
+        root / "notebooks",
+        root,
+    ]
+
+    for folder in folders:
+        for filename in filenames:
+            candidate = folder / filename
+            if candidate.is_file():
+                return candidate.resolve()
+
+    return None
+
+
+def _quiz_notebook_selection_path(run_dir: Path) -> Path:
+    path = (
+        Path(run_dir)
+        / "output"
+        / "integration"
+        / "quiz_generation_notebook_selection.json"
+    )
+    path.parent.mkdir(parents=True, exist_ok=True)
+    return path
+
+
+def _save_quiz_notebook_selection(
+    *,
+    run_dir: Path,
+    option_key: str,
+    notebook_path: Path,
+) -> Path:
+    option = QUIZ_GENERATION_NOTEBOOK_OPTIONS.get(str(option_key), {})
+    output_path = _quiz_notebook_selection_path(run_dir)
+    payload = {
+        "schema_version": "agent2-quiz-notebook-selection-v1.0.0",
+        "updated_at_utc": datetime.now(timezone.utc).isoformat(),
+        "option_key": str(option_key),
+        "label": _quiz_generation_notebook_label(option_key),
+        "strategy": str(option.get("strategy") or ""),
+        "notebook_path": str(Path(notebook_path).resolve()),
+        "source": "streamlit_quiz_notebook_selector",
+    }
+    output_path.write_text(
+        json.dumps(payload, indent=2, ensure_ascii=False),
+        encoding="utf-8",
+    )
+    return output_path
+
+
+def _set_selected_quiz_notebook_environment(
+    *,
+    option_key: str,
+    notebook_path: Path,
+) -> None:
+    """
+    Keep the selected quiz notebook visible to the same-process controller.
+
+    The explicit path is still passed to run_langgraph_request. These
+    environment values are an additional audit/compatibility signal only.
+    """
+    option = QUIZ_GENERATION_NOTEBOOK_OPTIONS.get(str(option_key), {})
+    os.environ["AGENT2_QUIZ_NOTEBOOK_PATH"] = str(
+        Path(notebook_path).resolve()
+    )
+    os.environ["AGENT2_QUIZ_GENERATION_STRATEGY"] = str(
+        option.get("strategy") or option_key
+    )
+
+
 def _quiz_model_config_path(
     agent2_root_value: str | Path,
 ) -> Path:
@@ -6269,12 +6387,18 @@ def _agent2_quiz_output_dir(run_dir: Path, quiz_mode: str) -> Path:
 
 
 def _agent2_quiz_manifest(run_dir: Path, quiz_mode: str) -> dict[str, Any]:
-    """Use MCP/Notebook 08 final output once the post-MCP PDF is ready."""
+    """Return the freshest valid quiz manifest.
+
+    Notebook 08's MCP manifest is authoritative only until question-level HITL
+    edits or regeneration produce a newer base manifest.  Preferring an older
+    MCP artifact makes the UI reopen the pre-regeneration question/PDF.
+    """
     output_dir = _agent2_quiz_output_dir(
         run_dir,
         quiz_mode,
     )
 
+    base_manifest = output_dir / "final_quiz_manifest.json"
     mcp_manifest = (
         output_dir
         / "mcp_visuals"
@@ -6287,13 +6411,15 @@ def _agent2_quiz_manifest(run_dir: Path, quiz_mode: str) -> dict[str, Any]:
         if (
             isinstance(mcp_pdf, dict)
             and str(mcp_pdf.get("status") or "").strip().upper() == "SAVED"
+            and (
+                not base_manifest.is_file()
+                or mcp_manifest.stat().st_mtime_ns
+                >= base_manifest.stat().st_mtime_ns
+            )
         ):
             return payload
 
-    return load_json(
-        output_dir
-        / "final_quiz_manifest.json"
-    )
+    return load_json(base_manifest)
 
 
 AGENT2_ASSESSMENT_PATTERN_OPTIONS = [
@@ -8008,6 +8134,215 @@ def _fill_shortfall_manifest_is_current_and_consistent(
 
 
 
+
+def _agent2_hybrid_batching_diagnostics_path(
+    *,
+    manifest: dict[str, Any],
+    output_dir: Path,
+) -> Path | None:
+    """
+    Resolve Notebook 06C's adaptive-batching audit for the current quiz run.
+
+    Plan A / Plan B simply return None because they do not write this artifact.
+    """
+    source_artifacts = manifest.get("source_artifacts") or {}
+    if not isinstance(source_artifacts, dict):
+        source_artifacts = {}
+
+    raw_candidates = [
+        source_artifacts.get("hybrid_batching_diagnostics"),
+        manifest.get("hybrid_batching_diagnostics_path"),
+        output_dir / "hybrid_batching_diagnostics.json",
+    ]
+
+    for raw_path in raw_candidates:
+        path = _resolve_agent2_file(
+            raw_path,
+            output_dir=output_dir,
+        )
+        if path is not None:
+            return path
+
+    return None
+
+
+def _render_agent2_hybrid_batching_diagnostics(
+    *,
+    run_dir: Path,
+    manifest: dict[str, Any],
+    output_dir: Path,
+) -> None:
+    """
+    Show Plan C's actual generic split decision on screen.
+
+    This is deliberately an audit/view layer only. It does not change batching,
+    generation, validation, HITL, or release logic.
+    """
+    diagnostics_path = _agent2_hybrid_batching_diagnostics_path(
+        manifest=manifest,
+        output_dir=output_dir,
+    )
+
+    selection_payload = load_json(
+        _quiz_notebook_selection_path(run_dir)
+    )
+    selected_notebook = str(
+        selection_payload.get("notebook_path") or ""
+    ).strip()
+
+    generation_strategy = str(
+        manifest.get("generation_strategy")
+        or selection_payload.get("strategy")
+        or ""
+    ).strip().casefold()
+
+    is_plan_c = (
+        "plan_c" in generation_strategy
+        or "hybrid" in generation_strategy
+        or "06c" in selected_notebook.casefold()
+    )
+
+    if diagnostics_path is None:
+        if is_plan_c:
+            st.warning(
+                "Plan C batching diagnostics are missing for this run. "
+                "This usually means a legacy 06C notebook was executed, or "
+                "the run stopped before the adaptive-batching audit was written."
+            )
+            if selected_notebook:
+                st.caption(f"Notebook selected for this run: {selected_notebook}")
+            st.caption(
+                "Expected artifact: "
+                f"{output_dir / 'hybrid_batching_diagnostics.json'}"
+            )
+        return
+
+    diagnostics = load_json(diagnostics_path)
+    if not isinstance(diagnostics, dict) or not diagnostics:
+        return
+
+    batches = diagnostics.get("batches") or []
+    if not isinstance(batches, list):
+        batches = []
+
+    with st.expander(
+        "Plan C adaptive batching diagnostics",
+        expanded=True,
+    ):
+        st.caption(
+            "This shows why Notebook 06C split the deterministic blueprint "
+            "before generation. It is separate from the actual provider-call "
+            "audit below, which can also include a targeted repair or transport retry."
+        )
+        if selected_notebook:
+            st.caption(f"Notebook used: {selected_notebook}")
+        st.caption(f"Diagnostics artifact: {diagnostics_path}")
+
+        summary_cols = st.columns(5)
+        summary_cols[0].metric(
+            "Requested questions",
+            int(diagnostics.get("question_count") or 0),
+        )
+        summary_cols[1].metric(
+            "Planned batches",
+            int(diagnostics.get("batch_count") or len(batches)),
+        )
+        summary_cols[2].metric(
+            "Soft token ceiling",
+            int(diagnostics.get("soft_token_limit") or 0),
+        )
+        summary_cols[3].metric(
+            "Technical Q ceiling",
+            int(diagnostics.get("technical_max_batch_questions") or 0),
+        )
+        summary_cols[4].metric(
+            "Quiz-size mapping",
+            (
+                "Yes"
+                if bool(diagnostics.get("quiz_size_mapping_used"))
+                else "No"
+            ),
+        )
+
+        if diagnostics.get("quiz_size_mapping_used") is False:
+            st.success(
+                "Generic batching confirmed: no fixed 3+2 / 5+5 / "
+                "question-count split mapping was used."
+            )
+
+        strategy = str(diagnostics.get("strategy") or "").strip()
+        batching_version = str(
+            diagnostics.get("batching_version") or ""
+        ).strip()
+        if strategy or batching_version:
+            st.caption(
+                "Strategy: "
+                f"{strategy or 'N/A'}"
+                + (
+                    f" | batching version: {batching_version}"
+                    if batching_version
+                    else ""
+                )
+            )
+
+        batch_rows: list[dict[str, Any]] = []
+        for raw_batch in batches:
+            if not isinstance(raw_batch, dict):
+                continue
+
+            raw_indexes = raw_batch.get("plan_indexes") or []
+            if not isinstance(raw_indexes, list):
+                raw_indexes = [raw_indexes]
+
+            plan_indexes = ", ".join(
+                str(value)
+                for value in raw_indexes
+                if value is not None and str(value).strip()
+            )
+
+            batch_rows.append(
+                {
+                    "Batch": raw_batch.get("batch_number"),
+                    "Plan indexes": plan_indexes,
+                    "Questions": raw_batch.get("question_count"),
+                    "Marks": raw_batch.get("marks"),
+                    "Est. input": raw_batch.get("estimated_input_tokens"),
+                    "Reserved output": raw_batch.get("reserved_output_tokens"),
+                    "Est. total": raw_batch.get("estimated_total_tokens"),
+                    "Safe ceiling": raw_batch.get("safe_token_ceiling"),
+                    "Risk": raw_batch.get("risk_score"),
+                    "Safe util.": raw_batch.get("safe_utilization"),
+                    "Output pressure": raw_batch.get("output_pressure_ratio"),
+                    "Avg complexity": raw_batch.get("average_complexity"),
+                    "Visual fraction": raw_batch.get("visual_fraction"),
+                    "High-mark fraction": raw_batch.get("high_mark_fraction"),
+                    "Targeted repair": bool(
+                        raw_batch.get("targeted_repair")
+                    ),
+                }
+            )
+
+        summary_tab, raw_tab = st.tabs(
+            ["Batch decision", "Raw diagnostics JSON"]
+        )
+
+        with summary_tab:
+            if batch_rows:
+                st.dataframe(
+                    pd.DataFrame(batch_rows),
+                    use_container_width=True,
+                    hide_index=True,
+                )
+            else:
+                st.info(
+                    "The batching diagnostics file exists, but it contains "
+                    "no batch rows."
+                )
+
+        with raw_tab:
+            st.json(diagnostics)
+
+
 def _render_agent2_quiz_result(*, run_dir: Path, quiz_mode: str) -> None:
     """
     Render the current Notebook 06 quiz state.
@@ -8478,6 +8813,15 @@ def _render_agent2_quiz_result(*, run_dir: Path, quiz_mode: str) -> None:
                 "No provider API request was sent for this blocked call."
             )
 
+    _render_agent2_hybrid_batching_diagnostics(
+        run_dir=run_dir,
+        manifest=manifest,
+        output_dir=_agent2_quiz_output_dir(
+            run_dir,
+            quiz_mode,
+        ),
+    )
+
     model_call_usage = manifest.get(
         "model_call_usage"
     ) or []
@@ -8498,6 +8842,69 @@ def _render_agent2_quiz_result(*, run_dir: Path, quiz_mode: str) -> None:
                 )
             ]
             if usage_rows:
+                purpose_fields = {
+                    "call_stage",
+                    "trigger",
+                    "plan_indexes",
+                    "blueprint_plan_indexes",
+                    "prompt_profile",
+                }
+                if any(
+                    any(field in row for field in purpose_fields)
+                    for row in usage_rows
+                ):
+                    st.markdown("##### Why each API call happened")
+                    st.caption(
+                        "Initial generation, targeted repair, and transport "
+                        "recovery are shown separately when Notebook 06C "
+                        "provides the audit metadata."
+                    )
+
+                    call_rows = []
+                    for position, row in enumerate(
+                        usage_rows,
+                        start=1,
+                    ):
+                        raw_indexes = (
+                            row.get("plan_indexes")
+                            if row.get("plan_indexes") is not None
+                            else row.get("blueprint_plan_indexes")
+                        )
+                        if raw_indexes is None:
+                            raw_indexes = []
+                        if not isinstance(raw_indexes, list):
+                            raw_indexes = [raw_indexes]
+
+                        call_rows.append(
+                            {
+                                "Call": row.get("call_number") or position,
+                                "Stage": row.get("call_stage")
+                                or row.get("call_kind"),
+                                "Trigger": row.get("trigger"),
+                                "Plan indexes": ", ".join(
+                                    str(value)
+                                    for value in raw_indexes
+                                    if value is not None
+                                    and str(value).strip()
+                                ),
+                                "Prompt profile": row.get("prompt_profile"),
+                                "Status": row.get("status"),
+                                "Input": row.get("actual_input_tokens"),
+                                "Output": row.get("actual_output_tokens"),
+                                "Reasoning": row.get(
+                                    "actual_reasoning_tokens"
+                                ),
+                                "Total": row.get("actual_total_tokens"),
+                            }
+                        )
+
+                    st.dataframe(
+                        pd.DataFrame(call_rows),
+                        use_container_width=True,
+                        hide_index=True,
+                    )
+                    st.markdown("##### Full token audit")
+
                 st.dataframe(
                     pd.DataFrame(
                         usage_rows
@@ -8756,6 +9163,17 @@ def _render_agent2_quiz_result(*, run_dir: Path, quiz_mode: str) -> None:
         output_dir=output_dir,
     )
 
+    # Review-draft fallback: Notebook 06C always uses this canonical filename.
+    # This keeps the PDF visible even if manifest registration lags behind the
+    # HITL state transition by one Streamlit rerun.
+    if registered_pdf is None:
+        canonical_review_pdf = (
+            output_dir
+            / "Agent2_Quiz_Output_Questions_and_Marking_Schemes.pdf"
+        )
+        if canonical_review_pdf.is_file():
+            registered_pdf = canonical_review_pdf
+
     if quiz_mode == "fill_shortfall":
         st.markdown("#### Final Hybrid Quiz PDF")
         st.caption(
@@ -8774,12 +9192,54 @@ def _render_agent2_quiz_result(*, run_dir: Path, quiz_mode: str) -> None:
                 "(SchemDraw / Kroki / local structured renderer)."
             )
         if registered_pdf is not None:
+            official_pdf_rendering = (
+                manifest.get("official_pdf_rendering") or {}
+            )
+            if not isinstance(official_pdf_rendering, dict):
+                official_pdf_rendering = {}
+
+            rendering_mode = str(
+                official_pdf_rendering.get("mode") or ""
+            ).strip()
+
+            if rendering_mode == "ORIGINAL_NOTEBOOK05_PDF_PAGES":
+                st.success(
+                    "Official retrieval pages are preserved from Notebook 05, "
+                    "including diagrams, figures, tables and original page layout."
+                )
+            elif rendering_mode == "TEXT_RECONSTRUCTION_REVIEW_FALLBACK":
+                st.warning(
+                    "Review fallback: the original Notebook 05 student PDF was "
+                    "not resolved, so official retrieval diagrams may be missing. "
+                    "Rerun/fix the Notebook 05 handoff before release."
+                )
+
+            if bool(manifest.get("release_ready")):
+                download_label = (
+                    "Download Final Official + AI Hybrid Quiz PDF"
+                )
+                st.success(
+                    "Final hybrid PDF is release-ready."
+                )
+            else:
+                download_label = (
+                    "Download Review Draft Official + AI Hybrid Quiz PDF"
+                )
+                st.warning(
+                    "This PDF is available for review now. It is a HITL draft "
+                    "and is not release-ready until the required approvals are complete."
+                )
+
             download_file(
                 registered_pdf,
-                "Download Final Official + AI Hybrid Quiz PDF",
+                download_label,
             )
         else:
-            st.info("The final hybrid PDF is not available yet.")
+            st.info(
+                "The review PDF has not been written to disk yet. "
+                "It is no longer gated by approval; refresh once the current "
+                "Notebook 06C execution finishes."
+            )
 
     registered_usage = _resolve_agent2_file(
         (
@@ -8804,6 +9264,7 @@ def _render_agent2_quiz_result(*, run_dir: Path, quiz_mode: str) -> None:
         download_candidates = [
             registered_usage,
             output_dir / "model_call_usage.json",
+            output_dir / "hybrid_batching_diagnostics.json",
             output_dir / "final_quiz_manifest.json",
             output_dir / "quiz_generation_report.txt",
             output_dir / "generation_request.json",
@@ -8818,6 +9279,7 @@ def _render_agent2_quiz_result(*, run_dir: Path, quiz_mode: str) -> None:
             output_dir / "Agent2_Quiz_Output_Questions_and_Marking_Schemes.pdf",
             registered_usage,
             output_dir / "model_call_usage.json",
+            output_dir / "hybrid_batching_diagnostics.json",
             output_dir / "final_quiz_manifest.json",
             output_dir / "quiz_generation_report.txt",
             output_dir / "generation_request.json",
@@ -8877,6 +9339,8 @@ def _render_missing_quiz_cta(
     quiz_model_config: dict[str, Any],
     selected_model_key: str,
     model_selected: bool,
+    quiz_notebook_option_key: str,
+    quiz_notebook_path: Path | None,
 ) -> None:
     package_path, package = _agent2_current_package(run_dir)
     if package_path is None or not package:
@@ -8896,8 +9360,15 @@ def _render_missing_quiz_cta(
 
     if not model_selected:
         st.info(
-            "Select a Notebook 06 quiz generation model above before generating "
+            "Select a quiz generation model above before generating "
             "the missing coverage."
+        )
+        return
+
+    if quiz_notebook_path is None or not Path(quiz_notebook_path).is_file():
+        st.error(
+            "The selected quiz-generation notebook could not be resolved. "
+            "Check the Agent 2 project folder and Notebook 06 / 06B / 06C files."
         )
         return
 
@@ -8924,8 +9395,26 @@ def _render_missing_quiz_cta(
             )
             return
 
+        try:
+            _save_quiz_notebook_selection(
+                run_dir=run_dir,
+                option_key=quiz_notebook_option_key,
+                notebook_path=Path(quiz_notebook_path),
+            )
+            _set_selected_quiz_notebook_environment(
+                option_key=quiz_notebook_option_key,
+                notebook_path=Path(quiz_notebook_path),
+            )
+        except Exception as exc:
+            st.error(f"Could not save quiz notebook selection: {exc}")
+            return
+
         graph_request = build_missing_quiz_request_text()
-        status = st.status("LangGraph is generating only the missing quiz coverage", expanded=True)
+        status = st.status(
+            "LangGraph is generating only the missing quiz coverage "
+            f"with {_quiz_generation_notebook_label(quiz_notebook_option_key)}",
+            expanded=True,
+        )
         try:
             result = run_langgraph_request(
                 frontend_root=PROJECT_ROOT,
@@ -8937,6 +9426,7 @@ def _render_missing_quiz_cta(
                 mode="start",
                 on_update=_step4_on_graph_update,
                 agent2_project_root=agent2_root_value,
+                agent2_notebook_path=str(Path(quiz_notebook_path).resolve()),
             )
         except Exception as exc:
             status.update(label="Missing quiz generation failed", state="error", expanded=True)
@@ -8952,7 +9442,8 @@ def render_agent2_assessment_stage(*, run_dir: Path, transcript_name: str) -> No
     st.subheader("Agent 2 — Assessment / Quiz Filters")
     st.caption(
         "The same filters drive both actions. Retrieve Official Assessment uses Notebook 05. "
-        "Generate Complete Quiz skips Notebook 05 and runs the single config-driven Notebook 06 with the model selected below."
+        "Generate Complete Quiz skips Notebook 05 and runs the quiz-generation notebook "
+        "(Plan A / Plan B / Plan C) selected below with the chosen model."
     )
     if not approved_topics_path.is_file():
         st.info("Approve the Agent 1 topics in the Topic Approval tab first.")
@@ -8980,6 +9471,21 @@ def render_agent2_assessment_stage(*, run_dir: Path, transcript_name: str) -> No
     top_columns[2].metric("Supporting topics", supporting_topic_count)
     top_columns[3].metric("Actual chunk evidence", "Available" if evidence_ready else "Missing")
 
+    st.markdown("#### Choose quiz generation notebook")
+    quiz_notebook_option_key = st.selectbox(
+        "Quiz generation plan",
+        options=list(QUIZ_GENERATION_NOTEBOOK_OPTIONS),
+        index=0,
+        format_func=_quiz_generation_notebook_label,
+        help=(
+            "Plan A is the Notebook 06 baseline. Plan B tests aggressive single-batch "
+            "generation. Plan C keeps the same validators/HITL/release pipeline but "
+            "uses adaptive controlled batches with batch-specific lesson grounding."
+        ),
+        key=f"agent2_quiz_notebook_selector_{Path(run_dir).name}",
+    )
+    selected_quiz_notebook_path: Path | None = None
+
     with st.expander("Agent 2 connection", expanded=False):
         agent2_root_value = st.text_input(
             "Agent 2 project folder",
@@ -9000,17 +9506,43 @@ def render_agent2_assessment_stage(*, run_dir: Path, transcript_name: str) -> No
                 explicit_path=notebook_value or None,
             )
             st.success(f"Notebook 05 resolved: {resolved_notebook}")
-            quiz_candidates = [
-                resolved_root / "Notebooks" / "06_quiz_generation.ipynb",
-                resolved_root / "notebooks" / "06_quiz_generation.ipynb",
-            ]
-            quiz_notebook = next((path for path in quiz_candidates if path.is_file()), None)
-            if quiz_notebook:
-                st.success(f"Notebook 06 resolved: {quiz_notebook}")
+            selected_quiz_notebook_path = _resolve_quiz_generation_notebook(
+                agent2_root_value=resolved_root,
+                option_key=quiz_notebook_option_key,
+            )
+            if selected_quiz_notebook_path is not None:
+                st.success(
+                    "Quiz notebook resolved: "
+                    f"{selected_quiz_notebook_path}"
+                )
+                st.caption(
+                    "Selected strategy: "
+                    f"{_quiz_generation_notebook_label(quiz_notebook_option_key)}"
+                )
             else:
-                st.warning("06_quiz_generation.ipynb was not found under Agent2/Notebooks yet.")
+                expected_names = (
+                    QUIZ_GENERATION_NOTEBOOK_OPTIONS.get(
+                        quiz_notebook_option_key,
+                        {},
+                    ).get("filenames")
+                    or []
+                )
+                st.warning(
+                    "Selected quiz notebook was not found under Agent2/Notebooks. "
+                    "Expected one of: "
+                    + ", ".join(str(value) for value in expected_names)
+                )
         except Exception as exc:
             st.warning(str(exc))
+
+    if selected_quiz_notebook_path is None:
+        try:
+            selected_quiz_notebook_path = _resolve_quiz_generation_notebook(
+                agent2_root_value=agent2_root_value,
+                option_key=quiz_notebook_option_key,
+            )
+        except Exception:
+            selected_quiz_notebook_path = None
 
     try:
         quiz_model_config = _load_quiz_model_config_for_ui(
@@ -9038,7 +9570,7 @@ def render_agent2_assessment_stage(*, run_dir: Path, transcript_name: str) -> No
         *model_keys,
     ]
 
-    st.markdown("#### Choose the model for Notebook 06")
+    st.markdown("#### Choose the model for the selected quiz notebook")
     selected_model_key = st.selectbox(
         "Quiz generation model",
         options=model_select_options,
@@ -9052,9 +9584,8 @@ def render_agent2_assessment_stage(*, run_dir: Path, transcript_name: str) -> No
             )
         ),
         help=(
-            "Required for Notebook 06 quiz generation (complete quiz or missing coverage). "
-            "The selected model is saved for this run and the same Notebook 06 "
-            "routes to that provider."
+            "Required for quiz generation (complete quiz or missing coverage). "
+            "The selected model and selected Notebook 06/06B plan are saved for this run."
         ),
         key=f"agent2_quiz_model_selector_{Path(run_dir).name}",
     )
@@ -9074,7 +9605,7 @@ def render_agent2_assessment_stage(*, run_dir: Path, transcript_name: str) -> No
         )
 
         st.success(
-            f"Notebook 06 model selected: {selected_model_display}"
+            f"Quiz model selected: {selected_model_display}"
         )
         provider_tpm_limit = selected_model.get(
             "provider_tpm_limit_tokens"
@@ -9095,7 +9626,7 @@ def render_agent2_assessment_stage(*, run_dir: Path, transcript_name: str) -> No
         )
 
         st.info(
-            "Notebook 06 checks the selected model context window before every "
+            "The selected quiz notebook checks the selected model context window before every "
             "generation request. If the estimated request would exceed that "
             "context window, generation stops locally and no API hit is spent."
         )
@@ -9110,7 +9641,7 @@ def render_agent2_assessment_stage(*, run_dir: Path, transcript_name: str) -> No
         selected_model_display = ""
         st.info(
             "Select Gemini 3.5 Flash, GPT-OSS 120B / Groq, GPT-5 mini, or GPT-5.4 mini "
-            "before running Notebook 06 quiz generation."
+            "before running quiz generation."
         )
 
     default_question_count = max(5, len(approved_topics))
@@ -9146,7 +9677,7 @@ def render_agent2_assessment_stage(*, run_dir: Path, transcript_name: str) -> No
                 "or give extra emphasis to one of the approved topics."
             ),
             help=(
-                "Notebook 06 treats these as mandatory user requirements according to "
+                "The selected Notebook 06/06B treats these as mandatory user requirements according to "
                 "their natural-language meaning whenever they are feasible and remain inside "
                 "the approved AQA scope. The same generation call interprets and applies them; "
                 "Python still enforces objective constraints such as totals, paper routing, "
@@ -9161,7 +9692,7 @@ def render_agent2_assessment_stage(*, run_dir: Path, transcript_name: str) -> No
 
         st.caption(
             "Retrieve Official Assessment → Notebook 05.   |   "
-            "Generate Complete Quiz → config-selected model through Notebook 06 directly "
+            "Generate Complete Quiz → selected Notebook 06/06B + selected model directly "
             "(no Notebook 05)."
         )
         b1, b2 = st.columns(2)
@@ -9219,7 +9750,14 @@ def render_agent2_assessment_stage(*, run_dir: Path, transcript_name: str) -> No
         if generate_complete_clicked:
             if not model_selected:
                 errors.append(
-                    "Choose a quiz generation model before running Notebook 06."
+                    "Choose a quiz generation model before running the selected quiz notebook."
+                )
+            if (
+                selected_quiz_notebook_path is None
+                or not Path(selected_quiz_notebook_path).is_file()
+            ):
+                errors.append(
+                    "The selected quiz-generation notebook could not be resolved."
                 )
             if number_of_questions * minimum_marks > target_total_marks:
                 errors.append("Complete quiz cannot meet the target marks: minimum marks × questions exceeds target total marks.")
@@ -9248,6 +9786,22 @@ def render_agent2_assessment_stage(*, run_dir: Path, transcript_name: str) -> No
                 st.session_state[
                     f"agent2_quiz_model_key_{Path(run_dir).name}"
                 ] = selected_model_key
+
+                try:
+                    _save_quiz_notebook_selection(
+                        run_dir=run_dir,
+                        option_key=quiz_notebook_option_key,
+                        notebook_path=Path(selected_quiz_notebook_path),
+                    )
+                    _set_selected_quiz_notebook_environment(
+                        option_key=quiz_notebook_option_key,
+                        notebook_path=Path(selected_quiz_notebook_path),
+                    )
+                except Exception as exc:
+                    st.error(
+                        f"Could not save quiz notebook selection: {exc}"
+                    )
+                    return
 
             paper = {"Both papers": "Any", "Paper 1": "Paper 1", "Paper 2": "Paper 2"}[paper_label]
             common = dict(
@@ -9281,8 +9835,10 @@ def render_agent2_assessment_stage(*, run_dir: Path, transcript_name: str) -> No
 
                 agent2_action = "complete_quiz"
                 status_label = (
-                    "LangGraph is generating the complete quiz "
-                    f"with {selected_model_display} through MCP"
+                    "LangGraph is generating the complete quiz with "
+                    f"{selected_model_display} using "
+                    f"{_quiz_generation_notebook_label(quiz_notebook_option_key)} "
+                    "through MCP"
                 )
 
             status = st.status(status_label, expanded=True)
@@ -9299,7 +9855,11 @@ def render_agent2_assessment_stage(*, run_dir: Path, transcript_name: str) -> No
                     mode="start",
                     on_update=_step4_on_graph_update,
                     agent2_project_root=agent2_root_value,
-                    agent2_notebook_path=notebook_value or None,
+                    agent2_notebook_path=(
+                        str(Path(selected_quiz_notebook_path).resolve())
+                        if agent2_action == "complete_quiz"
+                        else notebook_value or None
+                    ),
                 )
             except Exception as exc:
                 status.update(label="Agent 2 action failed", state="error", expanded=True)
@@ -9329,6 +9889,8 @@ def render_agent2_assessment_stage(*, run_dir: Path, transcript_name: str) -> No
         quiz_model_config=quiz_model_config,
         selected_model_key=selected_model_key,
         model_selected=model_selected,
+        quiz_notebook_option_key=quiz_notebook_option_key,
+        quiz_notebook_path=selected_quiz_notebook_path,
     )
 
     # Both quiz modes have independent artifacts and can be inspected safely.

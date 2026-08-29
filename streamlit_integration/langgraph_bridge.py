@@ -115,9 +115,43 @@ def _temporary_agent2_environment(
     agent2_notebook_path: str | None = None,
     agent2_notebook08_path: str | None = None,
 ):
+    """
+    Temporarily expose the user-selected Agent 2 notebook to downstream MCP.
+
+    The Streamlit layer intentionally reuses ``agent2_notebook_path`` for:
+      - Notebook 05 retrieval, and
+      - Notebook 06 / 06B / 06C quiz generation.
+
+    Downstream code does NOT reuse one environment key:
+      - retrieval reads EDTECH_AGENT2_NOTEBOOK05
+      - quiz generation reads EDTECH_AGENT2_NOTEBOOK06
+
+    Route by notebook filename so selecting 06B/06C cannot silently fall back
+    to baseline Notebook 06.
+    """
+    selected_notebook = str(agent2_notebook_path or "").strip()
+    selected_name = (
+        Path(selected_notebook).name.casefold()
+        if selected_notebook
+        else ""
+    )
+
+    notebook05_path = ""
+    notebook06_path = ""
+
+    if selected_notebook:
+        if selected_name.startswith("06"):
+            # Covers 06_quiz_generation, 06B_..., 06C_..., and compatible
+            # future quiz variants that preserve the Notebook 06 prefix.
+            notebook06_path = selected_notebook
+        else:
+            # Backward-compatible default for the existing retrieval path.
+            notebook05_path = selected_notebook
+
     updates = {
         "EDTECH_AGENT2_PROJECT_ROOT": str(agent2_project_root or "").strip(),
-        "EDTECH_AGENT2_NOTEBOOK05": str(agent2_notebook_path or "").strip(),
+        "EDTECH_AGENT2_NOTEBOOK05": notebook05_path,
+        "EDTECH_AGENT2_NOTEBOOK06": notebook06_path,
         "EDTECH_AGENT2_NOTEBOOK08": str(agent2_notebook08_path or "").strip(),
     }
     previous = {key: os.environ.get(key) for key in updates}
