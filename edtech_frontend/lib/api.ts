@@ -521,6 +521,12 @@ export type AssessmentStartInput = {
   special_instructions: string
 }
 
+export type UserRegenerationAttemptInfo = {
+  user_regeneration_attempts_used: number
+  user_regeneration_attempts_remaining: number
+  max_user_regeneration_attempts: number
+}
+
 export type AssessmentQuestion = {
   question_id: string
   generated_question_id?: string
@@ -539,6 +545,9 @@ export type AssessmentQuestion = {
   visual_type: string
   visual_spec: Record<string, unknown>
   semantic_score?: number | null
+  user_regeneration_attempts_used?: number
+  user_regeneration_attempts_remaining?: number
+  max_user_regeneration_attempts?: number
   retrieval_feedback?: {
     decision: 'relevant' | 'not_relevant' | string
     reason?: string
@@ -569,8 +578,20 @@ export type GeneratedAssessmentResult = {
   candidate_marks: number
   accepted_count: number
   accepted_marks: number
+  // Existing Notebook 06 / internal retry counters (kept for compatibility).
   regeneration_attempts_used: number
   max_regeneration_attempts: number
+  internal_regeneration_attempts_used?: number
+  internal_max_regeneration_attempts?: number
+
+  // New USER-triggered regeneration budget: max 2 per generated question.
+  max_user_regeneration_attempts_per_question: number
+  user_regeneration_attempts_by_plan_index: Record<string, UserRegenerationAttemptInfo>
+  whole_quiz_user_regeneration_available: boolean
+  whole_quiz_user_regeneration_attempts_remaining: number
+  whole_quiz_user_regeneration_blocked_plan_indexes: number[]
+  user_regeneration_disclaimer: string
+
   pdf_paths: string[]
   validation: Record<string, unknown>
 }
@@ -591,6 +612,8 @@ export type AssessmentStatusResponse = {
   status: 'idle' | 'queued' | 'running' | 'complete' | 'failed' | string
   stage: string
   progress: number
+  progress_source?: string | null
+  progress_detail?: string | null
   message: string
   mode?: AssessmentMode | null
   request?: Partial<AssessmentStartInput> | null
@@ -614,6 +637,24 @@ export type AssessmentStatusResponse = {
   official?: OfficialAssessmentResult | null
   generated?: GeneratedAssessmentResult | null
   human_write_result?: unknown
+  question_review_result?: {
+    question_id: string
+    plan_index: number
+    action: string
+    quiz_mode: string
+    question_changed?: boolean | null
+    user_regeneration_attempt_before?: UserRegenerationAttemptInfo | null
+    user_regeneration_attempt_after?: UserRegenerationAttemptInfo | null
+    regeneration_commit_gate?: unknown
+  }
+  quiz_review_result?: {
+    quiz_mode: string
+    decision: string
+    affected_plan_indexes: number[]
+    changed_plan_indexes: number[]
+    user_regeneration_attempts_before: Record<string, UserRegenerationAttemptInfo> | Record<number, UserRegenerationAttemptInfo>
+    user_regeneration_attempts_after: Record<string, UserRegenerationAttemptInfo> | Record<number, UserRegenerationAttemptInfo>
+  }
 }
 
 export type Agent2EtaProcess =

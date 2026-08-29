@@ -256,117 +256,148 @@ function Dashboard({
 }
 
 
+function TranscriptPreviewCard({
+  file,
+  previewText,
+  previewUrl,
+  previewLoading,
+  previewError,
+  onClose,
+}: {
+  file: File
+  previewText: string
+  previewUrl: string | null
+  previewLoading: boolean
+  previewError: string | null
+  onClose: () => void
+}) {
+  const extension =
+    file.name.split('.').pop()?.toUpperCase() || ''
+
+  const previewLimit = 12000
+  const displayedPreview =
+    previewText.length > previewLimit
+      ? `${previewText.slice(0, previewLimit)}\n\n… Preview shortened for display.`
+      : previewText
+
+  return (
+    <Card className="persistent-transcript-preview">
+      <div className="card-heading transcript-preview-heading">
+        <div>
+          <p className="eyebrow">TRANSCRIPT PREVIEW</p>
+
+          <h2 className="transcript-preview-title">
+            {file.name}
+          </h2>
+
+          <span className="muted">
+            Original upload preview
+          </span>
+        </div>
+
+        <div className="transcript-preview-actions">
+          <Badge tone="info">{extension}</Badge>
+
+          <button
+            type="button"
+            className="transcript-preview-close"
+            onClick={onClose}
+            aria-label="Close transcript preview"
+            title="Close transcript preview"
+          >
+            <X size={18} />
+          </button>
+        </div>
+      </div>
+
+      <div className="transcript-preview-frame">
+        {previewLoading ? (
+          <div className="transcript-preview-state">
+            <div>
+              <div className="spinner transcript-preview-spinner" />
+              <strong>Preparing preview...</strong>
+            </div>
+          </div>
+        ) : previewError ? (
+          <div className="transcript-preview-state">
+            <div>
+              <FileText
+                size={34}
+                className="transcript-preview-state-icon"
+              />
+
+              <strong className="transcript-preview-state-title">
+                Preview unavailable
+              </strong>
+
+              <span className="muted">
+                {previewError}
+              </span>
+            </div>
+          </div>
+        ) : previewUrl ? (
+          <iframe
+            src={previewUrl}
+            title={`${file.name} preview`}
+            className="transcript-preview-iframe"
+          />
+        ) : (
+          <div className="transcript-preview-text-wrap">
+            <pre className="transcript-preview-text">
+              {displayedPreview
+                || 'No readable transcript text was found in this file.'}
+            </pre>
+          </div>
+        )}
+      </div>
+
+      <div className="transcript-preview-meta">
+        <span className="muted">
+          {extension} · {(file.size / 1024).toFixed(1)} KB
+        </span>
+
+        <span className="muted">
+          Stays open until you close it
+        </span>
+      </div>
+    </Card>
+  )
+}
+
 function Transcript({
   go,
+  file,
+  onFileSelected,
+  onClearFile,
   onRunCreated,
   onProcessingStarted,
 }: {
   go: (p: string) => void
+  file: File | null
+  onFileSelected: (file: File) => void
+  onClearFile: () => void
   onRunCreated: (run: CreateRunResponse) => void
   onProcessingStarted: () => void
 }) {
-  const [file, setFile] = useState<File | null>(null)
   const [isProcessing, setIsProcessing] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const [previewText, setPreviewText] = useState('')
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
-  const [previewLoading, setPreviewLoading] = useState(false)
-  const [previewError, setPreviewError] = useState<string | null>(null)
-
   const chooseFile = () => {
-    document.getElementById('transcript-file-input')?.click()
+    const input = document.getElementById(
+      'transcript-file-input'
+    ) as HTMLInputElement | null
+
+    if (!input) return
+
+    // Clearing the value first also lets the user deliberately
+    // choose the same file again as a new upload.
+    input.value = ''
+    input.click()
   }
 
-  useEffect(() => {
-    let cancelled = false
-    let objectUrl: string | null = null
-
-    const buildPreview = async () => {
-      setPreviewText('')
-      setPreviewError(null)
-      setPreviewUrl(null)
-
-      if (!file) return
-
-      setPreviewLoading(true)
-
-      const extension =
-        file.name.split('.').pop()?.toLowerCase() || ''
-
-      try {
-        if (extension === 'pdf') {
-          objectUrl = URL.createObjectURL(file)
-
-          if (!cancelled) {
-            setPreviewUrl(objectUrl)
-          }
-
-          return
-        }
-
-        if (extension === 'txt') {
-          const rawText = await file.text()
-
-          if (!cancelled) {
-            setPreviewText(rawText)
-          }
-
-          return
-        }
-
-        if (extension === 'docx') {
-          const mammoth = await import('mammoth')
-          const arrayBuffer = await file.arrayBuffer()
-
-          const result = await mammoth.extractRawText({
-            arrayBuffer,
-          })
-
-          if (!cancelled) {
-            setPreviewText(result.value || '')
-          }
-
-          return
-        }
-
-        if (!cancelled) {
-          setPreviewError(
-            'Preview is not available for this file type.'
-          )
-        }
-      } catch (err) {
-        if (!cancelled) {
-          console.error('Transcript preview failed:', err)
-
-          setPreviewError(
-            'The transcript was selected successfully, but its preview could not be generated.'
-          )
-        }
-      } finally {
-        if (!cancelled) {
-          setPreviewLoading(false)
-        }
-      }
-    }
-
-    buildPreview()
-
-    return () => {
-      cancelled = true
-
-      if (objectUrl) {
-        URL.revokeObjectURL(objectUrl)
-      }
-    }
-  }, [file])
-
   const clearFile = () => {
-    setFile(null)
+    onClearFile()
     setError(null)
-    setPreviewText('')
-    setPreviewUrl(null)
-    setPreviewError(null)
 
     const input = document.getElementById(
       'transcript-file-input'
@@ -404,12 +435,6 @@ function Transcript({
   const extension =
     file?.name.split('.').pop()?.toUpperCase() || ''
 
-  const previewLimit = 12000
-  const displayedPreview =
-    previewText.length > previewLimit
-      ? `${previewText.slice(0, previewLimit)}\n\n… Preview shortened for display.`
-      : previewText
-
   return (
     <>
       <Header
@@ -420,290 +445,127 @@ function Transcript({
 
       <Stepper current={0} />
 
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: file
-            ? 'minmax(0, 0.9fr) minmax(0, 1.1fr)'
-            : 'minmax(0, 1fr)',
-          gap: '1.15rem',
-          alignItems: 'stretch',
-        }}
-      >
-        <Card className="upload-card">
-          <input
-            id="transcript-file-input"
-            type="file"
-            accept=".pdf,.docx,.txt"
-            hidden
-            onChange={(event) => {
-              const selected =
-                event.target.files?.[0] ?? null
+      <Card className="upload-card">
+        <input
+          id="transcript-file-input"
+          type="file"
+          accept=".pdf,.docx,.txt"
+          hidden
+          onChange={(event) => {
+            const selected =
+              event.target.files?.[0] ?? null
 
-              setFile(selected)
-              setError(null)
-            }}
-          />
+            if (selected) {
+              onFileSelected(selected)
+            }
 
-          <div
-            className="dropzone"
-            onClick={chooseFile}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(event) => {
-              if (
-                event.key === 'Enter'
-                || event.key === ' '
-              ) {
-                event.preventDefault()
-                chooseFile()
-              }
-            }}
-            style={{
-              minHeight: file ? '280px' : undefined,
-            }}
-          >
-            <div className="upload-icon">
-              <Upload />
-            </div>
+            setError(null)
+          }}
+        />
 
-            <h2>
-              {file
-                ? file.name
-                : 'Drop your transcript here'}
-            </h2>
-
-            <p>
-              {file
-                ? `${extension} · ${(
-                    file.size / 1024
-                  ).toFixed(1)} KB · Ready to process`
-                : 'or click to browse from your device'}
-            </p>
-
-            {file && (
-              <Badge tone="teal">
-                File selected
-              </Badge>
-            )}
+        <div
+          className="dropzone"
+          onClick={chooseFile}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(event) => {
+            if (
+              event.key === 'Enter'
+              || event.key === ' '
+            ) {
+              event.preventDefault()
+              chooseFile()
+            }
+          }}
+          style={{
+            minHeight: file ? '280px' : undefined,
+          }}
+        >
+          <div className="upload-icon">
+            <Upload />
           </div>
+
+          <h2>
+            {file
+              ? file.name
+              : 'Drop your transcript here'}
+          </h2>
+
+          <p>
+            {file
+              ? `${extension} · ${(
+                  file.size / 1024
+                ).toFixed(1)} KB · Ready to process`
+              : 'or click to browse from your device'}
+          </p>
 
           {file && (
-            <div className="file-row">
-              <FileAudio size={19} />
-
-              <div>
-                <strong>{file.name}</strong>
-                <small>
-                  {extension} ·{' '}
-                  {(file.size / 1024).toFixed(1)} KB
-                </small>
-              </div>
-
-              <button
-                type="button"
-                onClick={(event) => {
-                  event.stopPropagation()
-                  clearFile()
-                }}
-                aria-label="Remove file"
-              >
-                <X size={18} />
-              </button>
-            </div>
+            <Badge tone="teal">
+              File selected
+            </Badge>
           )}
-
-          {error && (
-            <div className="guidance">
-              <XCircle size={19} />
-              <div>
-                <strong>
-                  Transcript processing failed
-                </strong>
-                <p>{error}</p>
-              </div>
-            </div>
-          )}
-
-          <div className="upload-footer">
-            <div>
-              <strong>Supported formats</strong>
-              <span>
-                PDF, DOCX and TXT transcript files
-              </span>
-            </div>
-
-            <Button
-              onClick={processTranscript}
-              disabled={!file || isProcessing}
-            >
-              {isProcessing
-                ? 'Starting Agent 1...'
-                : 'Process Transcript'}
-
-              {!isProcessing && (
-                <ArrowRight size={17} />
-              )}
-            </Button>
-          </div>
-        </Card>
+        </div>
 
         {file && (
-          <Card>
-            <div
-              className="card-heading"
-              style={{
-                marginBottom: '0.85rem',
-              }}
-            >
-              <div>
-                <p className="eyebrow">
-                  TRANSCRIPT PREVIEW
-                </p>
+          <div className="file-row">
+            <FileAudio size={19} />
 
-                <h2
-                  style={{
-                    marginBottom: '0.2rem',
-                  }}
-                >
-                  {file.name}
-                </h2>
-
-                <span className="muted">
-                  Preview before processing
-                </span>
-              </div>
-
-              <Badge tone="info">
-                {extension}
-              </Badge>
-            </div>
-
-            <div
-              style={{
-                minHeight: '470px',
-                height: '470px',
-                borderRadius: '16px',
-                overflow: 'hidden',
-                background: 'rgba(43, 35, 59, 0.42)',
-                border:
-                  '1px solid rgba(255,255,255,0.15)',
-                boxShadow:
-                  'inset 0 1px 0 rgba(255,255,255,0.04)',
-              }}
-            >
-              {previewLoading ? (
-                <div
-                  style={{
-                    height: '100%',
-                    display: 'grid',
-                    placeItems: 'center',
-                    textAlign: 'center',
-                    padding: '2rem',
-                  }}
-                >
-                  <div>
-                    <div
-                      className="spinner"
-                      style={{
-                        margin: '0 auto 1rem',
-                      }}
-                    />
-                    <strong>
-                      Preparing preview...
-                    </strong>
-                  </div>
-                </div>
-              ) : previewError ? (
-                <div
-                  style={{
-                    height: '100%',
-                    display: 'grid',
-                    placeItems: 'center',
-                    padding: '2rem',
-                    textAlign: 'center',
-                  }}
-                >
-                  <div>
-                    <FileText
-                      size={34}
-                      style={{
-                        marginBottom: '0.8rem',
-                        opacity: 0.75,
-                      }}
-                    />
-                    <strong
-                      style={{
-                        display: 'block',
-                        marginBottom: '0.4rem',
-                      }}
-                    >
-                      Preview unavailable
-                    </strong>
-                    <span className="muted">
-                      {previewError}
-                    </span>
-                  </div>
-                </div>
-              ) : previewUrl ? (
-                <iframe
-                  src={previewUrl}
-                  title={`${file.name} preview`}
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    border: 0,
-                    background: '#ffffff',
-                  }}
-                />
-              ) : (
-                <div
-                  style={{
-                    height: '100%',
-                    overflowY: 'auto',
-                    padding: '1.15rem 1.25rem',
-                  }}
-                >
-                  <pre
-                    style={{
-                      margin: 0,
-                      whiteSpace: 'pre-wrap',
-                      wordBreak: 'break-word',
-                      fontFamily: 'inherit',
-                      fontSize: '0.9rem',
-                      lineHeight: 1.7,
-                      color:
-                        'rgba(255,255,255,0.92)',
-                    }}
-                  >
-                    {displayedPreview
-                      || 'No readable transcript text was found in this file.'}
-                  </pre>
-                </div>
-              )}
-            </div>
-
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                gap: '1rem',
-                marginTop: '0.8rem',
-                fontSize: '0.78rem',
-              }}
-            >
-              <span className="muted">
+            <div>
+              <strong>{file.name}</strong>
+              <small>
                 {extension} ·{' '}
                 {(file.size / 1024).toFixed(1)} KB
-              </span>
-
-              <span className="muted">
-                Original upload preview
-              </span>
+              </small>
             </div>
-          </Card>
+
+            <button
+              type="button"
+              onClick={(event) => {
+                event.stopPropagation()
+                clearFile()
+              }}
+              aria-label="Remove file"
+              title="Remove file"
+            >
+              <X size={18} />
+            </button>
+          </div>
         )}
-      </div>
+
+        {error && (
+          <div className="guidance">
+            <XCircle size={19} />
+            <div>
+              <strong>
+                Transcript processing failed
+              </strong>
+              <p>{error}</p>
+            </div>
+          </div>
+        )}
+
+        <div className="upload-footer">
+          <div>
+            <strong>Supported formats</strong>
+            <span>
+              PDF, DOCX and TXT transcript files
+            </span>
+          </div>
+
+          <Button
+            onClick={processTranscript}
+            disabled={!file || isProcessing}
+          >
+            {isProcessing
+              ? 'Starting Agent 1...'
+              : 'Process Transcript'}
+
+            {!isProcessing && (
+              <ArrowRight size={17} />
+            )}
+          </Button>
+        </div>
+      </Card>
     </>
   )
 }
@@ -3574,6 +3436,12 @@ function assessmentStageLabel(status: AssessmentStatusResponse) {
   if (/generating_shortfall|missing coverage|shortfall/.test(raw)) {
     return 'Generating missing questions'
   }
+  if (/preparing_review|human-review queue|candidate questions/.test(raw)) {
+    return 'Preparing review'
+  }
+  if (/planning|routing|blueprint|preflight/.test(raw)) {
+    return 'Planning quiz'
+  }
   if (/final|package|pdf/.test(raw)) return 'Finalising assessment'
   if (/quality|semantic|qa|review gate/.test(raw)) return 'Quality checks'
   if (/marking|mark scheme/.test(raw)) return 'Generating marking schemes'
@@ -3807,6 +3675,28 @@ function GeneratedQuestionHITL({
   ).trim()
   const storageKey = `edtech-question-review:${runId}:${quizMode}:${questionId || planIndex}`
 
+  // USER-triggered regeneration budget. This is intentionally different from
+  // Notebook 06's internal validation / model retry counters.
+  const maxUserRegenerationAttempts = Math.max(
+    1,
+    Number(question.max_user_regeneration_attempts ?? 2)
+  )
+  const userRegenerationAttemptsUsed = Math.max(
+    0,
+    Math.min(
+      maxUserRegenerationAttempts,
+      Number(question.user_regeneration_attempts_used ?? 0)
+    )
+  )
+  const userRegenerationAttemptsRemaining = Math.max(
+    0,
+    Number(
+      question.user_regeneration_attempts_remaining
+      ?? (maxUserRegenerationAttempts - userRegenerationAttemptsUsed)
+    )
+  )
+  const regenerationLimitReached = userRegenerationAttemptsRemaining <= 0
+
   const [modal, setModal] = useState<ModalKind>(null)
   const [busyAction, setBusyAction] = useState<string | null>(null)
   const [reviewState, setReviewState] = useState<ReviewState>('review')
@@ -3843,7 +3733,7 @@ function GeneratedQuestionHITL({
   }, [busyAction, actionStartedAt])
 
   useEffect(() => {
-    if (modal !== 'regenerate') return
+    if (modal !== 'regenerate' || regenerationLimitReached) return
 
     let cancelled = false
     setRegenerationEtaLoading(true)
@@ -3862,7 +3752,7 @@ function GeneratedQuestionHITL({
     return () => {
       cancelled = true
     }
-  }, [modal, runId])
+  }, [modal, runId, regenerationLimitReached])
 
   const persistReviewState = (value: ReviewState) => {
     setReviewState(value)
@@ -3888,6 +3778,13 @@ function GeneratedQuestionHITL({
 
     if (!questionId) {
       setError('This generated question has no question ID, so the review cannot be saved safely.')
+      return
+    }
+
+    if (action === 'regenerate' && regenerationLimitReached) {
+      setError(
+        `Regeneration limit reached. This question has already used ${maxUserRegenerationAttempts}/${maxUserRegenerationAttempts} user regeneration attempts.`
+      )
       return
     }
 
@@ -3942,7 +3839,14 @@ function GeneratedQuestionHITL({
         setSuccess('Marking scheme updated successfully.')
       } else {
         persistReviewState('review')
-        setSuccess('Question regenerated and revalidated successfully.')
+        const remaining = updated.question_review_result
+          ?.user_regeneration_attempt_after
+          ?.user_regeneration_attempts_remaining
+        setSuccess(
+          typeof remaining === 'number'
+            ? `Question regenerated and revalidated successfully. ${remaining} of ${maxUserRegenerationAttempts} user regeneration attempts remaining.`
+            : 'Question regenerated and revalidated successfully.'
+        )
       }
 
       setModal(null)
@@ -3979,12 +3883,13 @@ function GeneratedQuestionHITL({
     label: string,
     action: string,
     onClick: () => void,
-    variant: string = 'secondary'
+    variant: string = 'secondary',
+    forceDisabled = false
   ) => (
     <Button
       key={action}
       variant={variant}
-      disabled={Boolean(busyAction)}
+      disabled={Boolean(busyAction) || forceDisabled}
       onClick={onClick}
     >
       {busyAction === action && (
@@ -4064,6 +3969,35 @@ function GeneratedQuestionHITL({
             Review this question independently before final quiz approval.
             Notebook 06 supports question-level corrections without regenerating the complete quiz.
           </p>
+
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'flex-start',
+              gap: '0.65rem',
+              marginBottom: '0.8rem',
+              padding: '0.72rem 0.8rem',
+              borderRadius: '12px',
+              background: regenerationLimitReached
+                ? 'rgba(239,68,68,0.12)'
+                : 'rgba(255,255,255,0.07)',
+              border: regenerationLimitReached
+                ? '1px solid rgba(254,202,202,0.22)'
+                : '1px solid rgba(255,255,255,0.12)',
+            }}
+          >
+            <Info size={16} style={{ marginTop: '0.08rem', flex: '0 0 auto' }} />
+            <div style={{ display: 'grid', gap: '0.18rem' }}>
+              <strong>
+                User regeneration attempts: {userRegenerationAttemptsRemaining} of {maxUserRegenerationAttempts} remaining
+              </strong>
+              <span className="muted" style={{ fontSize: '0.8rem', lineHeight: 1.45 }}>
+                Each question can be regenerated by the user up to {maxUserRegenerationAttempts} times.
+                Automatic validation, quality-control, and model retry attempts are separate and do not count toward this limit.
+                A user attempt is used only after a valid regenerated question is successfully committed.
+              </span>
+            </div>
+          </div>
 
           {busyAction === 'regenerate' && (
             <div
@@ -4152,12 +4086,18 @@ function GeneratedQuestionHITL({
               setReason('')
               setModal('marking')
             })}
-            {actionButton('Regenerate', 'regenerate', () => {
-              setError(null)
-              setSuccess(null)
-              setReason('')
-              setModal('regenerate')
-            })}
+            {actionButton(
+              regenerationLimitReached ? 'Regeneration Limit Reached' : 'Regenerate',
+              'regenerate',
+              () => {
+                setError(null)
+                setSuccess(null)
+                setReason('')
+                setModal('regenerate')
+              },
+              'secondary',
+              regenerationLimitReached
+            )}
             {actionButton('Reject', 'reject', () => {
               setError(null)
               setSuccess(null)
@@ -4242,32 +4182,53 @@ function GeneratedQuestionHITL({
         </HitlModal>
       )}
 
-      {modal === 'regenerate' && (
+      {modal === 'regenerate' && !regenerationLimitReached && (
         <HitlModal
           title="Regenerate this question?"
           description={
             regenerationEtaLoading
-              ? 'Only this question will be regenerated. Calculating ETA from recent Agent 2 runs…'
+              ? `Only this question will be regenerated. ${userRegenerationAttemptsRemaining} of ${maxUserRegenerationAttempts} user attempts remain. Calculating ETA…`
               : regenerationEta?.eta_total_label
-                ? `Only this question will be regenerated. Historical ETA: ${regenerationEta.eta_total_label}.`
-                : 'Only this question will be regenerated. ETA will improve as Agent 2 timing history builds.'
+                ? `Only this question will be regenerated. ${userRegenerationAttemptsRemaining} of ${maxUserRegenerationAttempts} user attempts remain. Historical ETA: ${regenerationEta.eta_total_label}.`
+                : `Only this question will be regenerated. ${userRegenerationAttemptsRemaining} of ${maxUserRegenerationAttempts} user attempts remain.`
           }
           onClose={closeModal}
           footer={
             <>
               <Button variant="secondary" disabled={Boolean(busyAction)} onClick={closeModal}>Cancel</Button>
-              <Button disabled={Boolean(busyAction)} onClick={() => performAction('regenerate')}>
+              <Button
+                disabled={Boolean(busyAction) || regenerationLimitReached}
+                onClick={() => performAction('regenerate')}
+              >
                 {busyAction === 'regenerate' ? 'Regenerating...' : 'Regenerate Question'}
               </Button>
             </>
           }
         >
+          <div
+            style={{
+              marginBottom: '0.75rem',
+              padding: '0.68rem 0.75rem',
+              borderRadius: '10px',
+              background: 'rgba(255,255,255,0.07)',
+              border: '1px solid rgba(255,255,255,0.12)',
+              lineHeight: 1.5,
+            }}
+          >
+            <strong>Regeneration disclaimer</strong>
+            <p className="muted" style={{ margin: '0.25rem 0 0', fontSize: '0.8rem' }}>
+              A successful regeneration uses 1 of this question&apos;s {maxUserRegenerationAttempts} user attempts.
+              Internal automatic retries used for validation or correction do not count.
+              If regeneration fails or no valid changed question is committed, the user attempt is not consumed.
+            </p>
+          </div>
+
           <label style={{ display: 'grid', gap: '0.42rem' }}>
-            <strong>Why should this question be regenerated?</strong>
+            <strong>Tell EDTech how you want this question regenerated</strong>
             <textarea
               value={reason}
               onChange={(event) => setReason(event.target.value)}
-              placeholder="Example: the question is ambiguous or the marking scheme does not match."
+              placeholder="Example: make it more application-based, keep the same topic and marks, and avoid a code question."
               style={textareaStyle}
             />
           </label>
@@ -4606,6 +4567,7 @@ function GeneratedQuizHITL({
   const [reason, setReason] = useState('')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState<string | null>(null)
 
   if (!generated) return null
 
@@ -4616,7 +4578,190 @@ function GeneratedQuizHITL({
     && !generated.generated_quality_accepted
     && !reviewState.includes('QUESTION_LEVEL')
 
-  if (!needsWholeQuizReview && !reviewState.includes('QUESTION_LEVEL')) {
+  const maxPerQuestion = Math.max(
+    1,
+    Number(generated.max_user_regeneration_attempts_per_question || 2)
+  )
+  const wholeQuizAttemptsRemaining = Math.max(
+    0,
+    Number(generated.whole_quiz_user_regeneration_attempts_remaining || 0)
+  )
+  const wholeQuizRegenerationAvailable = Boolean(
+    generated.whole_quiz_user_regeneration_available
+  )
+  const blockedPlanIndexes = Array.isArray(
+    generated.whole_quiz_user_regeneration_blocked_plan_indexes
+  )
+    ? generated.whole_quiz_user_regeneration_blocked_plan_indexes
+    : []
+
+  const submit = async (decision: 'approve' | 'regenerate' | 'reject') => {
+    if (!reason.trim()) {
+      setError('Add a written review reason before submitting the HITL decision.')
+      return
+    }
+
+    if (decision === 'regenerate' && !wholeQuizRegenerationAvailable) {
+      setError(
+        blockedPlanIndexes.length > 0
+          ? `Whole-quiz regeneration is unavailable because question slot${blockedPlanIndexes.length === 1 ? '' : 's'} ${blockedPlanIndexes.join(', ')} already reached the ${maxPerQuestion}/${maxPerQuestion} user regeneration limit.`
+          : 'Whole-quiz regeneration is unavailable because at least one question has no user regeneration attempts remaining.'
+      )
+      return
+    }
+
+    setSaving(true)
+    setError(null)
+    setSuccess(null)
+
+    try {
+      const updated = await submitQuizReview(runId, {
+        quiz_mode: generated.quiz_mode === 'fill_shortfall'
+          ? 'fill_shortfall'
+          : 'complete_quiz',
+        decision,
+        reason: reason.trim(),
+      })
+
+      onUpdated(updated)
+
+      if (decision === 'regenerate') {
+        const remaining = updated.generated
+          ?.whole_quiz_user_regeneration_attempts_remaining
+        setSuccess(
+          typeof remaining === 'number'
+            ? `Whole quiz regenerated successfully. ${remaining} whole-quiz regeneration opportunity${remaining === 1 ? '' : 'ies'} remain before any question exhausts its user limit.`
+            : 'Whole quiz regenerated successfully.'
+        )
+      }
+
+      setReason('')
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'Could not save generated-quiz HITL decision.'
+      )
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const regenerationDisclaimer = (
+    <div
+      style={{
+        marginTop: '0.8rem',
+        padding: '0.78rem 0.85rem',
+        borderRadius: '12px',
+        background: wholeQuizRegenerationAvailable
+          ? 'rgba(255,255,255,0.07)'
+          : 'rgba(239,68,68,0.11)',
+        border: wholeQuizRegenerationAvailable
+          ? '1px solid rgba(255,255,255,0.12)'
+          : '1px solid rgba(254,202,202,0.22)',
+        display: 'flex',
+        gap: '0.65rem',
+        alignItems: 'flex-start',
+      }}
+    >
+      <Info size={17} style={{ marginTop: '0.08rem', flex: '0 0 auto' }} />
+      <div style={{ display: 'grid', gap: '0.2rem' }}>
+        <strong>
+          User regeneration limit: {maxPerQuestion} attempts per question
+        </strong>
+        <span className="muted" style={{ fontSize: '0.82rem', lineHeight: 1.5 }}>
+          Regenerating the whole quiz uses 1 user regeneration attempt for every generated question.
+          Automatic Notebook 06 validation, quality-control, and model retry attempts are completely separate and do not count.
+          A user attempt is recorded only after a fresh valid regenerated quiz is successfully committed.
+        </span>
+        {wholeQuizRegenerationAvailable ? (
+          <span style={{ fontSize: '0.82rem', fontWeight: 750 }}>
+            Whole-quiz regenerations currently available: {wholeQuizAttemptsRemaining}
+          </span>
+        ) : (
+          <span style={{ fontSize: '0.82rem', fontWeight: 750 }}>
+            Whole-quiz regeneration locked
+            {blockedPlanIndexes.length > 0
+              ? ` · question slot${blockedPlanIndexes.length === 1 ? '' : 's'} ${blockedPlanIndexes.join(', ')} reached the limit`
+              : ''}
+          </span>
+        )}
+      </div>
+    </div>
+  )
+
+  // Question-level HITL stays active, but the user is now also allowed to
+  // explicitly regenerate the WHOLE quiz. Approve/reject remains question-level.
+  if (reviewState.includes('QUESTION_LEVEL')) {
+    return (
+      <Card>
+        <div className="card-heading">
+          <div>
+            <p className="eyebrow">WHOLE QUIZ REGENERATION</p>
+            <h2>Regenerate the complete generated quiz</h2>
+          </div>
+          <Badge tone={wholeQuizRegenerationAvailable ? 'info' : 'warning'}>
+            {wholeQuizRegenerationAvailable
+              ? `${wholeQuizAttemptsRemaining} available`
+              : 'Limit reached'}
+          </Badge>
+        </div>
+
+        <p className="muted">
+          Question-level review remains available above. Use this only if you want EDTech to regenerate the entire generated quiz using one instruction.
+        </p>
+
+        {regenerationDisclaimer}
+
+        <textarea
+          aria-label="Whole quiz regeneration instruction"
+          value={reason}
+          onChange={(event) => setReason(event.target.value)}
+          placeholder="Tell EDTech how you want the whole quiz regenerated. Example: keep the same topics and total marks, but make the questions more application-based and avoid repeated formats."
+          disabled={saving || !wholeQuizRegenerationAvailable}
+          style={{
+            width: '100%',
+            minHeight: '100px',
+            marginTop: '0.9rem',
+            resize: 'vertical',
+            borderRadius: '10px',
+            border: '1px solid rgba(255,255,255,0.24)',
+            background: 'rgba(255,255,255,0.12)',
+            color: 'inherit',
+            padding: '0.75rem',
+            font: 'inherit',
+            opacity: wholeQuizRegenerationAvailable ? 1 : 0.6,
+          }}
+        />
+
+        {success && (
+          <div className="success-banner" style={{ marginTop: '0.8rem' }}>
+            <CheckCircle2 size={17} />
+            <div><strong>Regeneration completed</strong><span>{success}</span></div>
+          </div>
+        )}
+
+        {error && (
+          <div className="guidance" style={{ marginTop: '0.8rem' }}>
+            <XCircle size={17} />
+            <div><strong>Whole-quiz regeneration could not be completed</strong><p>{error}</p></div>
+          </div>
+        )}
+
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '0.9rem' }}>
+          <Button
+            disabled={saving || !wholeQuizRegenerationAvailable || !reason.trim()}
+            variant="secondary"
+            onClick={() => submit('regenerate')}
+          >
+            {saving ? 'Regenerating Whole Quiz...' : 'Regenerate Whole Quiz'}
+          </Button>
+        </div>
+      </Card>
+    )
+  }
+
+  if (!needsWholeQuizReview) {
     if (generated.generated_quality_accepted || generated.release_ready) {
       return (
         <div className="success-banner">
@@ -4631,48 +4776,6 @@ function GeneratedQuizHITL({
     return null
   }
 
-  if (reviewState.includes('QUESTION_LEVEL')) {
-    return (
-      <div className="guidance">
-        <Info size={18} />
-        <div>
-          <strong>Question-level HITL is active in Notebook 06</strong>
-          <p>
-            The notebook is waiting for per-question actions. The whole-quiz Approve / Regenerate / Reject gate below is intentionally not used for this state.
-          </p>
-        </div>
-      </div>
-    )
-  }
-
-  const submit = async (decision: 'approve' | 'regenerate' | 'reject') => {
-    if (!reason.trim()) {
-      setError('Add a written review reason before submitting the HITL decision.')
-      return
-    }
-    setSaving(true)
-    setError(null)
-    try {
-      const updated = await submitQuizReview(runId, {
-        quiz_mode: generated.quiz_mode === 'fill_shortfall'
-          ? 'fill_shortfall'
-          : 'complete_quiz',
-        decision,
-        reason: reason.trim(),
-      })
-      onUpdated(updated)
-      setReason('')
-    } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : 'Could not save generated-quiz HITL decision.'
-      )
-    } finally {
-      setSaving(false)
-    }
-  }
-
   return (
     <Card>
       <div className="card-heading">
@@ -4682,9 +4785,13 @@ function GeneratedQuizHITL({
         </div>
         <Badge tone="warning">Human review required</Badge>
       </div>
+
       <p className="muted">
-        Approve the candidate set, regenerate it with your reason, or reject it. The decision is persisted through the existing Agent 2 HITL workflow.
+        Approve the candidate set, regenerate it with your instruction, or reject it. The decision is persisted through the existing Agent 2 HITL workflow.
       </p>
+
+      {regenerationDisclaimer}
+
       <textarea
         aria-label="Quiz review reason"
         value={reason}
@@ -4703,12 +4810,21 @@ function GeneratedQuizHITL({
           font: 'inherit',
         }}
       />
+
+      {success && (
+        <div className="success-banner" style={{ marginTop: '0.8rem' }}>
+          <CheckCircle2 size={17} />
+          <div><strong>Regeneration completed</strong><span>{success}</span></div>
+        </div>
+      )}
+
       {error && (
         <div className="guidance" style={{ marginTop: '0.8rem' }}>
           <XCircle size={17} />
           <div><strong>Review could not be saved</strong><p>{error}</p></div>
         </div>
       )}
+
       <div
         style={{
           display: 'flex',
@@ -4717,19 +4833,24 @@ function GeneratedQuizHITL({
           marginTop: '0.9rem',
         }}
       >
-        <Button disabled={saving} onClick={() => submit('approve')}>
+        <Button disabled={saving || !reason.trim()} onClick={() => submit('approve')}>
           Approve Quiz <Check size={16} />
         </Button>
-        <Button disabled={saving} variant="secondary" onClick={() => submit('regenerate')}>
-          Regenerate
+        <Button
+          disabled={saving || !reason.trim() || !wholeQuizRegenerationAvailable}
+          variant="secondary"
+          onClick={() => submit('regenerate')}
+        >
+          {saving ? 'Saving...' : 'Regenerate Whole Quiz'}
         </Button>
-        <Button disabled={saving} variant="danger" onClick={() => submit('reject')}>
+        <Button disabled={saving || !reason.trim()} variant="danger" onClick={() => submit('reject')}>
           Reject
         </Button>
       </div>
     </Card>
   )
 }
+
 
 function Assessment({ runId }: { runId: string }) {
   const [config, setConfig] = useState<AssessmentConfigResponse | null>(null)
@@ -5260,14 +5381,36 @@ function Assessment({ runId }: { runId: string }) {
               </div>
               <div style={{ marginTop: '0.9rem' }}>
                 <div style={{ height: '9px', borderRadius: '99px', overflow: 'hidden', background: 'rgba(255,255,255,0.16)' }}>
-                  <div style={{ width: `${Math.max(0, Math.min(100, Number(status.progress || 0)))}%`, height: '100%', background: 'currentColor', opacity: 0.85 }} />
+                  <div
+                    style={{
+                      width: `${Math.max(0, Math.min(100, Number(status.progress || 0)))}%`,
+                      height: '100%',
+                      background: 'currentColor',
+                      opacity: 0.85,
+                      transition: 'width 450ms ease',
+                    }}
+                  />
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.45rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.45rem', gap: '1rem' }}>
                   <span className="muted">
                     {workflowDisplayStage}
                   </span>
-                  <strong>{status.progress || 0}%</strong>
+                  <strong>
+                    {Math.round(Math.max(0, Math.min(100, Number(status.progress || 0))))}%
+                  </strong>
                 </div>
+                {isBusy && status.progress_detail && (
+                  <div
+                    className="muted"
+                    style={{
+                      marginTop: '0.35rem',
+                      fontSize: '0.82rem',
+                      lineHeight: 1.4,
+                    }}
+                  >
+                    {status.progress_detail}
+                  </div>
+                )}
               </div>
 
               {isBusy && (
@@ -5458,7 +5601,131 @@ export default function Page() {
   const [topicsData, setTopicsData] =
     useState<TopicsResponse | null>(null)
 
+  // The selected upload and its preview live at Page level rather
+  // than inside <Transcript />. This is what keeps the preview alive
+  // when Transcript unmounts and the workflow moves to preprocessing,
+  // semantic analysis, topic mapping and assessment.
+  const [transcriptFile, setTranscriptFile] =
+    useState<File | null>(null)
+
+  const [previewText, setPreviewText] = useState('')
+  const [previewUrl, setPreviewUrl] =
+    useState<string | null>(null)
+  const [previewLoading, setPreviewLoading] =
+    useState(false)
+  const [previewError, setPreviewError] =
+    useState<string | null>(null)
+  const [previewVisible, setPreviewVisible] =
+    useState(false)
+
   const go = (p: string) => setPage(p)
+
+  useEffect(() => {
+    let cancelled = false
+    let objectUrl: string | null = null
+
+    const buildPreview = async () => {
+      setPreviewText('')
+      setPreviewError(null)
+      setPreviewUrl(null)
+
+      if (!transcriptFile) {
+        setPreviewLoading(false)
+        return
+      }
+
+      setPreviewLoading(true)
+
+      const extension =
+        transcriptFile.name
+          .split('.')
+          .pop()
+          ?.toLowerCase() || ''
+
+      try {
+        if (extension === 'pdf') {
+          objectUrl = URL.createObjectURL(transcriptFile)
+
+          if (!cancelled) {
+            setPreviewUrl(objectUrl)
+          }
+
+          return
+        }
+
+        if (extension === 'txt') {
+          const rawText = await transcriptFile.text()
+
+          if (!cancelled) {
+            setPreviewText(rawText)
+          }
+
+          return
+        }
+
+        if (extension === 'docx') {
+          const mammoth = await import('mammoth')
+          const arrayBuffer =
+            await transcriptFile.arrayBuffer()
+
+          const result = await mammoth.extractRawText({
+            arrayBuffer,
+          })
+
+          if (!cancelled) {
+            setPreviewText(result.value || '')
+          }
+
+          return
+        }
+
+        if (!cancelled) {
+          setPreviewError(
+            'Preview is not available for this file type.'
+          )
+        }
+      } catch (err) {
+        if (!cancelled) {
+          console.error(
+            'Transcript preview failed:',
+            err
+          )
+
+          setPreviewError(
+            'The transcript was selected successfully, but its preview could not be generated.'
+          )
+        }
+      } finally {
+        if (!cancelled) {
+          setPreviewLoading(false)
+        }
+      }
+    }
+
+    buildPreview()
+
+    return () => {
+      cancelled = true
+
+      if (objectUrl) {
+        URL.revokeObjectURL(objectUrl)
+      }
+    }
+  }, [transcriptFile])
+
+  const handleTranscriptSelected = (file: File) => {
+    setTranscriptFile(file)
+    setPreviewVisible(true)
+  }
+
+  const handleClearTranscriptFile = () => {
+    setTranscriptFile(null)
+    setPreviewVisible(false)
+    setPreviewText('')
+    setPreviewUrl(null)
+    setPreviewError(null)
+    setPreviewLoading(false)
+  }
 
   // ----------------------------------------------------------
   // REAL Agent 1 progress polling.
@@ -5581,6 +5848,9 @@ export default function Page() {
         return (
           <Transcript
             go={go}
+            file={transcriptFile}
+            onFileSelected={handleTranscriptSelected}
+            onClearFile={handleClearTranscriptFile}
             onRunCreated={setActiveRun}
             onProcessingStarted={resetRun}
           />
@@ -5650,7 +5920,14 @@ export default function Page() {
     preprocessingData,
     semanticData,
     topicsData,
+    transcriptFile,
   ])
+
+  const showTranscriptPreview = Boolean(
+    transcriptFile
+    && previewVisible
+    && page === 'transcript'
+  )
 
   return (
     <div
@@ -5802,8 +6079,29 @@ export default function Page() {
         }
       `}</style>
 
-      <main className="main-content">
+      <main
+        className={`main-content ${
+          showTranscriptPreview
+            ? 'preview-active'
+            : ''
+        } ${
+          showTranscriptPreview && page === 'transcript'
+            ? 'transcript-preview-layout'
+            : ''
+        }`}
+      >
         {content}
+
+        {showTranscriptPreview && transcriptFile && (
+          <TranscriptPreviewCard
+            file={transcriptFile}
+            previewText={previewText}
+            previewUrl={previewUrl}
+            previewLoading={previewLoading}
+            previewError={previewError}
+            onClose={() => setPreviewVisible(false)}
+          />
+        )}
       </main>
     </div>
   )
